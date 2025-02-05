@@ -43,17 +43,11 @@ class LoginView(TokenObtainPairView):
             return Response({'error': 'Invalid credentials or user is not active'}, status=status.HTTP_400_BAD_REQUEST)
 
         account_type_redirect_map = {
-            'admin': '/admin',
-            'evaluator': '/evaluator',
             'manager': '/manager',
-            'candidate': '/student/step1'
+            'employee': '/employee',
+            'customer': '/customer',
         }
         redirect_url = account_type_redirect_map.get(user.account_type)
-
-        if user.account_type == 'candidate':
-            candidate = Candidates.objects.filter(Account=user).first()
-            if candidate and candidate.is_finished:
-                redirect_url = '/student'
 
         if redirect_url:
             login(request, user)
@@ -63,8 +57,8 @@ class LoginView(TokenObtainPairView):
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'email': user.email,
-                'username': user.username,
-                'role': user.account_type,
+                # 'username': user.username,
+                # 'role': user.account_type,
                 'redirect_url': redirect_url
             }
             return Response(tokens)

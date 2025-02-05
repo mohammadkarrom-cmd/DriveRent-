@@ -68,6 +68,7 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)  
         return super().update(instance, validated_data)
 ###############
+
 class CustomerCreateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=150)
     password = serializers.CharField(write_only=True)
@@ -82,16 +83,22 @@ class CustomerCreateSerializer(serializers.ModelSerializer):
             "username", "password", "first_name", "last_name", "email", "phone",
             "id_number", "id_front_image", "id_back_image", "driving_license_image"
         ]
-        
-    def validate_username(self, value):
-            if models.User.objects.filter(username=value).exists():
-                raise ValidationError({"message": "حصل خطأ ما"})
-            return value
-    
+
+    def validate(self, data):
+        """
+        التحقق من وجود اسم المستخدم مسبقًا قبل إنشاء المستخدم
+        """
+        if models.User.objects.filter(username=data.get("username")).exists():
+            raise ValidationError({"message": "حصل خطأ ما"})  # ✅ خطأ 400 برسالة عامة
+
+        return data
+
     def create(self, validated_data):
-        username = validated_data.get("username")
+        """
+        إنشاء مستخدم وزبون مع التحقق المسبق من صحة البيانات
+        """
         user_data = {
-            "username": username,
+            "username": validated_data.pop("username"),
             "first_name": validated_data.pop("first_name"),
             "last_name": validated_data.pop("last_name"),
             "email": validated_data.pop("email"),
@@ -106,4 +113,3 @@ class CustomerCreateSerializer(serializers.ModelSerializer):
 
         customer = models.Customer.objects.create(user=user, **validated_data)
         return customer
-
