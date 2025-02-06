@@ -85,18 +85,12 @@ class CustomerCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        """
-        التحقق من وجود اسم المستخدم مسبقًا قبل إنشاء المستخدم
-        """
         if models.User.objects.filter(username=data.get("username")).exists():
-            raise ValidationError({"message": "حصل خطأ ما"})  # ✅ خطأ 400 برسالة عامة
+            raise ValidationError({"message": "حصل خطأ ما"})  
 
         return data
 
     def create(self, validated_data):
-        """
-        إنشاء مستخدم وزبون مع التحقق المسبق من صحة البيانات
-        """
         user_data = {
             "username": validated_data.pop("username"),
             "first_name": validated_data.pop("first_name"),

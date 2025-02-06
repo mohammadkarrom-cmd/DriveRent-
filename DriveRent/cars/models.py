@@ -28,6 +28,7 @@ class PathAndRename:
         return os.path.join(self.sub_path, filename)
     
 class Car(models.Model):
+    id_car=models.AutoField(primary_key=True)
     brand = models.CharField(max_length=255)
     model = models.CharField(max_length=255)
     description = models.TextField()
@@ -42,13 +43,12 @@ class Car(models.Model):
     image2 = models.ImageField(upload_to=PathAndRename('cars'), blank=True, null=True)
     image3 = models.ImageField(upload_to=PathAndRename('cars'), blank=True, null=True)
     status = models.IntegerField(choices=status_list)
-
+    created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return f"{self.brand} {self.model}"
 
-
-
 class Reservation(models.Model):
+    id_reservation =models.AutoField(primary_key=True)
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     start_date = models.DateTimeField()

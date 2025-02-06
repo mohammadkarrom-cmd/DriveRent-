@@ -53,7 +53,7 @@ class CarListCreateView(generics.ListCreateAPIView):
 
         serializer.save(**images)
         
-        
+#####################
 class CarUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Car.objects.all()
     serializer_class = serializers.CarSerializer
@@ -72,7 +72,7 @@ class CarUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
         serializer.save(**images)
         
-        
+#####################
 class CarSearchView(generics.GenericAPIView):
     serializer_class = serializers.CarSerializer
     permission_classes = [AllowAny]
@@ -99,7 +99,6 @@ class CarSearchView(generics.GenericAPIView):
 
         cars = self.get_cars(brand=brand, model=model)
 
-        # هنا يجب تمرير many=True لأن cars عبارة عن QuerySet
         cars_serializer = self.serializer_class(cars, many=True, context={'request': request})
 
         data = {
@@ -107,3 +106,88 @@ class CarSearchView(generics.GenericAPIView):
         }
 
         return Response(data, status=status.HTTP_200_OK)
+    
+#####################
+class HomeCustomerView(generics.GenericAPIView):
+    serializer_class = serializers.CarSerializer
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        cars_new = models.Car.objects.order_by('-created_at')[:10]
+        cars_random = models.Car.objects.order_by('?')[:10]
+        cars_new_serialized = self.get_serializer(cars_new, many=True).data
+        cars_random_serialized = self.get_serializer(cars_random, many=True).data
+
+        return Response(
+            {
+                "cars_new": cars_new_serialized,
+                "cars_random": cars_random_serialized
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+#####################
+class CarlistViewView(generics.GenericAPIView):
+    serializer_class = serializers.CarSerializer
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        cars = models.Car.objects.all()
+        cars = self.get_serializer(cars, many=True).data
+
+        return Response(cars,status=status.HTTP_200_OK)
+
+#####################
+class CarSearchCustomerView(generics.GenericAPIView):
+    serializer_class = serializers.CarSerializer
+    permission_classes = [AllowAny]
+
+    def get_cars(self, category=None, type_rent=None):
+        cars = models.Car.objects.all()
+
+        if category:
+            cars = cars.filter(category=category)
+
+        if type_rent == "1":
+            cars = cars.filter(is_available_daily=True)
+        elif type_rent == "2":
+            cars = cars.filter(is_available_monthly=True)
+        elif type_rent == "3":
+            cars = cars.filter(is_available_yearly=True)
+
+        if not cars.exists():
+            raise Http404("لا توجد استمارات متطابقة مع البحث")
+
+        return cars
+
+    def get(self, request, *args, **kwargs):
+        category = request.query_params.get('category')
+        type_rent = request.query_params.get('type_rent')
+
+        if not category and not type_rent:
+            return Response({'message': 'ادخل قيم في خيارات البحث'}, status=status.HTTP_400_BAD_REQUEST)
+
+        cars = self.get_cars(category=category, type_rent=type_rent)
+
+        cars_serializer = self.serializer_class(cars, many=True, context={'request': request})
+
+        return Response(cars_serializer.data, status=status.HTTP_200_OK)
+    
+class CarDetailView(generics.GenericAPIView):
+    serializer_class = serializers.CarSerializer
+    permission_classes = [AllowAny]
+    def get(self, request, id_car, *args, **kwargs):
+        car = get_object_or_404(models.Car, id_car=id_car)
+        reservations = models.Reservation.objects.filter(car=car)
+        car_serialized = self.get_serializer(car).data
+        reservations_serialized = serializers.ReservationViewCustomerSerializer(reservations, many=True).data
+
+        return Response(
+            {
+                "car": car_serialized,
+                "reservations": reservations_serialized
+            },
+            status=status.HTTP_200_OK
+        )
+

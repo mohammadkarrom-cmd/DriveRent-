@@ -1,31 +1,18 @@
-from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.response import Response
-from .permissions import IsRole
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.shortcuts import redirect
 from django.contrib.auth import login
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework import status
-from django.db.models import F, Q, Count
-from django.utils import timezone
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
-from django.shortcuts import get_object_or_404
-from datetime import date
 from rest_framework_simplejwt.views import TokenRefreshView
-from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework import status
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from django.core.cache import cache
 from users import serializers
 from users import models
-from rembg import remove
-from PIL import Image
-from io import BytesIO
-from django.core.files.base import ContentFile
 #######################################
 class LoginView(TokenObtainPairView):
     serializer_class = serializers.LoginSerializer
@@ -45,10 +32,27 @@ class LoginView(TokenObtainPairView):
         account_type_redirect_map = {
             'manager': '/manager',
             'employee': '/employee',
-            'customer': '/customer',
+            # 'customer': '/customer',
         }
+        if user.account_type == 'customer':
+            customer = getattr(user, 'customer', None) 
+            login(request, user)
+            tokens = {  
+                'refresh': serializer.validated_data['refresh'],
+                'access': serializer.validated_data['access'],
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'phone': user.phone,
+                'id_number': customer.id_number if customer else None,
+                'id_front_image': customer.id_front_image.url if customer and customer.id_front_image else None,
+                'id_back_image': customer.id_back_image.url if customer and customer.id_back_image else None,
+                'driving_license_image': customer.driving_license_image.url if customer and customer.driving_license_image else None,
+            }
+            return Response(tokens)
+        
         redirect_url = account_type_redirect_map.get(user.account_type)
-
+        
         if redirect_url:
             login(request, user)
             tokens = {
@@ -139,7 +143,6 @@ class BulkUserActionAPIView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        # دعم تمرير الـ id عبر `POST` أو `GET`
         user_ids = request.data.get("id") or request.query_params.get("id")
 
         if not user_ids:
@@ -180,9 +183,22 @@ class CustomerCreateView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         customer = serializer.save()
         
+        user = customer.user
+        refresh = RefreshToken.for_user(user)
+        
         return Response(
             {
                 "message": "تم إنشاء الحساب بنجاح",
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'phone': user.phone,
+                'id_number': customer.id_number if customer else None,
+                'id_front_image': customer.id_front_image.url if customer and customer.id_front_image else None,
+                'id_back_image': customer.id_back_image.url if customer and customer.id_back_image else None,
+                'driving_license_image': customer.driving_license_image.url if customer and customer.driving_license_image else None,                
             },
             status=status.HTTP_201_CREATED
         )

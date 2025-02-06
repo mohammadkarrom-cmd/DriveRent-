@@ -29,6 +29,7 @@ class User(AbstractUser):
 
 
 class Customer(models.Model):
+    id_customer=models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     id_number = models.TextField(unique=True)
     id_front_image =models.ImageField(upload_to=PathAndRename('media/id_front_image'), blank=True, null=True)
