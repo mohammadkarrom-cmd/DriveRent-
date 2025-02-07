@@ -2,15 +2,11 @@ from rest_framework import generics
 from rest_framework.response import Response
 from users.permissions import IsRole
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.shortcuts import redirect
-from django.contrib.auth import login
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from django.db.models import Q
+from django.core.mail import send_mail
 from rest_framework import status
 from django.http import Http404
-from django.utils import timezone
 from django.shortcuts import get_object_or_404
-from datetime import date
 from rest_framework import status
 from cars import serializers
 from cars import models
@@ -191,3 +187,204 @@ class CarDetailView(generics.GenericAPIView):
             status=status.HTTP_200_OK
         )
 
+    
+from django_q.tasks import schedule
+from datetime import timedelta
+from django.utils.timezone import now
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from cars.tasks import expire_reservation
+from cars import models, serializers
+type_reservation_list = {
+    1: timedelta(days=1),  
+    2: timedelta(days=30),  
+    3: timedelta(days=365)  
+}
+
+class CreateReservationView(generics.CreateAPIView):
+    queryset = models.Reservation.objects.all()
+    serializer_class = serializers.ReservationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def calculate_end_date(self, start_date, type_reservation):
+        """حساب تاريخ انتهاء الحجز تلقائيًا"""
+        duration = type_reservation_list.get(type_reservation)
+        if duration:
+            return start_date + duration
+        return start_date  # في حال كان الإدخال غير صحيح، يبقى كما هو
+
+    def perform_create(self, serializer):
+        customer = self.request.user.customer 
+        start_date = serializer.validated_data['start_date']
+        type_reservation = serializer.validated_data['type_reservation']
+        
+        end_date = self.calculate_end_date(start_date, type_reservation)
+        car = serializer.validated_data['car']
+
+        reservation = serializer.save(
+            customer=customer,
+            status_reservation=2,
+            start_date=start_date,
+            end_date=end_date,  # تحديد تاريخ الانتهاء المحسوب تلقائيًا
+            time_reservation=now()  # وقت تسجيل الحجز
+        )
+
+        # جدولة وظيفة لإلغاء الحجز بعد ساعتين بالضبط
+        schedule(
+            'cars.tasks.expire_reservation',
+            reservation.id_reservation,
+            schedule_type='O',  # تشغيل المهمة مرة واحدة فقط
+            next_run=now() + timedelta(seconds=50)
+        )
+
+    def create(self, request, *args, **kwargs):
+        """إرجاع رسالة تأكيد عند إنشاء الحجز"""
+        response = super().create(request, *args, **kwargs)
+        return Response({"message": "تم إنشاء الحجز المؤقت بنجاح، بانتظار التأكيد."}, status=status.HTTP_201_CREATED)
+    
+
+
+class CancelReservationView(generics.UpdateAPIView):
+    queryset = models.Reservation.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        """إلغاء الحجز المؤقت قبل انتهاء المهلة الزمنية (ساعتين)"""
+        reservation_id = kwargs.get("pk")
+        reservation = self.get_object()
+
+        if reservation.customer != request.user.customer:
+            return Response({"error": "⚠️ غير مصرح لك بإلغاء هذا الحجز."}, status=status.HTTP_403_FORBIDDEN)
+
+        # التحقق من أن الحجز لا يزال مؤقتًا
+        if reservation.status_reservation != 2:
+            return Response({"error": "⚠️ لا يمكنك إلغاء هذا الحجز، لأنه غير مؤقت."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # تحديث حالة الحجز إلى "منتهي الصلاحية"
+        reservation.status_reservation = 4  # تم إلغاؤه يدويًا
+        reservation.save()
+
+        return Response({"message": "✅ تم إلغاء الحجز بنجاح."}, status=status.HTTP_200_OK)
+
+
+
+
+class CustomerTemporaryReservationsView(generics.ListAPIView):
+    serializer_class = serializers.ReservationDetialSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """إرجاع قائمة بالحجوزات المؤقتة (`status_reservation=2`) الخاصة بالزبون"""
+        return models.Reservation.objects.filter(customer=self.request.user.customer, status_reservation=2)
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if not queryset.exists():
+            return Response({"message": "لا توجد حجوزات مؤقتة."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
+class OfficeEmployeeTemporaryReservationsView(generics.ListAPIView):
+    """
+    عرض قائمة الحجوزات المؤقتة (`status_reservation=2`) مع إمكانية البحث باستخدام:
+    - الرقم الوطني
+    - الاسم الأول
+    - الاسم الثاني
+    - رقم الهاتف
+    """
+    serializer_class = serializers.ReservationSrecheSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = models.Reservation.objects.filter(status_reservation=2)
+        search_query = Q()
+
+        # الحصول على قيم البحث من `query_params`
+        first_name = self.request.query_params.get("first_name", None)
+        last_name = self.request.query_params.get("last_name", None)
+        phone = self.request.query_params.get("phone", None)
+        id_number = self.request.query_params.get("id_number", None)
+
+        # إضافة كل حقل إلى `Q` إذا تم إدخاله
+        if first_name:
+            search_query &= Q(customer__user__first_name__icontains=first_name)
+        if last_name:
+            search_query &= Q(customer__user__last_name__icontains=last_name)
+        if phone:
+            search_query &= Q(customer__user__phone__icontains=phone)
+        if id_number:
+            search_query &= Q(customer__id_number__icontains=id_number)
+
+        if search_query:
+            queryset = queryset.filter(search_query)
+
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if not queryset.exists():
+            return Response({"message": " لا توجد حجوزات مؤقتة مطابقة للبحث."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
+class ConfirmReservationView(generics.UpdateAPIView):
+    """
+    تأكيد الحجز بعد التحقق من المعلومات، وطباعة البريد الإلكتروني في `Terminal`
+    """
+    queryset = models.Reservation.objects.all()
+    permission_classes = [AllowAny]
+
+    def update(self, request, *args, **kwargs):
+        reservation = self.get_object()
+
+        # التحقق من أن الحجز مؤقت
+        if reservation.status_reservation != 2:
+            return Response({"error": "⚠️ لا يمكن تأكيد هذا الحجز."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # تحديث الحجز إلى مؤكد (`status_reservation=3`)
+        reservation.status_reservation = 3
+        reservation.save()
+
+        # الحصول على البريد الإلكتروني للعميل
+        customer_email = reservation.customer.user.email
+        ## TODO mk
+        # طباعة البريد الإلكتروني في `Terminal` بدلاً من إرساله
+        print("=" * 50)
+        print("📩 محاكاة إرسال البريد الإلكتروني")
+        print(f"📤 إلى: {customer_email}")
+        print(f"📨 الموضوع: ✅ تأكيد حجز السيارة")
+        print(f"📝 الرسالة: تم تأكيد حجزك للسيارة {reservation.car.brand} {reservation.car.model}. شكرًا لاختيارك خدمتنا!")
+        print("=" * 50)
+
+        return Response({"message": "✅ تم تأكيد الحجز. (تم طباعة البريد في `Terminal`) "}, status=status.HTTP_200_OK)
+    
+
+    
+    
+class CancelReservationView(generics.UpdateAPIView):
+    queryset = models.Reservation.objects.all()
+    serializer_class = serializers.ReservationSerializer
+    permission_classes = [AllowAny]
+
+    def update(self, request, *args, **kwargs):
+        reservation = self.get_object()
+
+        # التحقق من أن حالة الحجز مؤقتة
+        if reservation.status_reservation != 2:  # 2 تمثل الحالة "مؤقتة"
+            return Response(
+                {"error": "لا يمكن إلغاء الحجز لأن حالته ليست مؤقتة."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # تحديث حالة الحجز إلى "منتهي الصلاحية"
+        reservation.status_reservation = 4  # 4 تمثل الحالة "منتهي الصلاحية"
+        reservation.save()
+
+        return Response(
+            {"message": "تم تحويل الحجز إلى حالة منتهي الصلاحية."},
+            status=status.HTTP_200_OK
+        )

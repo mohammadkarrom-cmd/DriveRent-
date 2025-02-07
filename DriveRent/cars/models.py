@@ -15,6 +15,13 @@ status_list=(
         (1, 'متاحة'),
         (2, 'حجز مؤقت'),
         (3, 'محجوزة'),
+        (4, 'منتهية الصلاحية'),  
+
+    )
+type_reservation_list=(
+        (1, 'يومي'),
+        (2, 'شهري'),
+        (3, 'سنوي'),
     )
 
 @deconstructible
@@ -45,7 +52,7 @@ class Car(models.Model):
     status = models.IntegerField(choices=status_list)
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return f"{self.brand} {self.model}"
+        return f"{self.id_car}- {self.brand} {self.model}"
 
 class Reservation(models.Model):
     id_reservation =models.AutoField(primary_key=True)
@@ -53,9 +60,9 @@ class Reservation(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    type_reservation = models.IntegerField(choices=status_list)
-    status_reservation = models.IntegerField()
+    type_reservation = models.IntegerField(choices=type_reservation_list)
+    status_reservation = models.IntegerField(choices=status_list)
     time_reservation = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Reservation {self.id} - {self.car} by {self.customer}"
+        return f"Reservation {self.id_reservation} - {self.car} by {self.customer}"
