@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from django.core.cache import cache
 from users import serializers
 from users import models
+from .permissions import IsRole
 #######################################
 class LoginView(TokenObtainPairView):
     serializer_class = serializers.LoginSerializer
@@ -124,24 +125,23 @@ class CustomTokenRefreshView(TokenRefreshView):
     
 #####################
 class UserListCreateView(generics.ListCreateAPIView):
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['admin'])]
-    queryset = models.User.objects.exclude(account_type='customer')
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager'])]
+    queryset = models.User.objects.filter(account_type__in=['manager', 'employee'])
     serializer_class = serializers.UserSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 ########
 class UserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['admin'])]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager'])]
     queryset = models.User.objects.all()
     serializer_class = serializers.UserSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     
-    from rest_framework.views import APIView
 
 class BulkUserActionAPIView(APIView):
-    permission_classes = [AllowAny]
-
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager'])]
     def post(self, request, *args, **kwargs):
         user_ids = request.data.get("id") or request.query_params.get("id")
 

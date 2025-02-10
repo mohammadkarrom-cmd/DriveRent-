@@ -32,9 +32,11 @@ def remove_background(image_field):
 
 #####################
 class CarListCreateView(generics.ListCreateAPIView):
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager','employee'])]
     queryset = models.Car.objects.all()
     serializer_class = serializers.CarSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
         images = {
@@ -51,9 +53,11 @@ class CarListCreateView(generics.ListCreateAPIView):
         
 #####################
 class CarUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager','employee'])]
     queryset = models.Car.objects.all()
     serializer_class = serializers.CarSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def perform_update(self, serializer):
         images = {
@@ -70,8 +74,10 @@ class CarUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         
 #####################
 class CarSearchView(generics.GenericAPIView):
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager','employee'])]
     serializer_class = serializers.CarSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def get_cars(self, brand=None, model=None):
         cars = models.Car.objects.all()
@@ -105,8 +111,10 @@ class CarSearchView(generics.GenericAPIView):
     
 #####################
 class HomeCustomerView(generics.GenericAPIView):
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['customer'])]
     serializer_class = serializers.CarSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
         cars_new = models.Car.objects.order_by('-created_at')[:10]
@@ -125,8 +133,10 @@ class HomeCustomerView(generics.GenericAPIView):
 
 #####################
 class CarlistViewView(generics.GenericAPIView):
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['customer'])]
     serializer_class = serializers.CarSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
         cars = models.Car.objects.all()
@@ -136,8 +146,10 @@ class CarlistViewView(generics.GenericAPIView):
 
 #####################
 class CarSearchCustomerView(generics.GenericAPIView):
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['customer'])]
     serializer_class = serializers.CarSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def get_cars(self, category=None, type_rent=None):
         cars = models.Car.objects.all()
@@ -171,8 +183,10 @@ class CarSearchCustomerView(generics.GenericAPIView):
         return Response(cars_serializer.data, status=status.HTTP_200_OK)
     
 class CarDetailView(generics.GenericAPIView):
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['customer'])]
     serializer_class = serializers.CarSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     def get(self, request, id_car, *args, **kwargs):
         car = get_object_or_404(models.Car, id_car=id_car)
         reservations = models.Reservation.objects.filter(car=car)
@@ -202,9 +216,11 @@ type_reservation_list = {
 }
 
 class CreateReservationView(generics.CreateAPIView):
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['customer'])]
     queryset = models.Reservation.objects.all()
     serializer_class = serializers.ReservationSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def calculate_end_date(self, start_date, type_reservation):
         """حساب تاريخ انتهاء الحجز تلقائيًا"""
@@ -234,7 +250,7 @@ class CreateReservationView(generics.CreateAPIView):
             'cars.tasks.expire_reservation',
             reservation.id_reservation,
             schedule_type='O',  # تشغيل المهمة مرة واحدة فقط
-            next_run=now() + timedelta(seconds=50)
+            next_run=now() + timedelta(hours=2)
         )
 
     def create(self, request, *args, **kwargs):
@@ -245,8 +261,10 @@ class CreateReservationView(generics.CreateAPIView):
 
 
 class CancelReservationView(generics.UpdateAPIView):
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['customer'])]
     queryset = models.Reservation.objects.all()
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
         """إلغاء الحجز المؤقت قبل انتهاء المهلة الزمنية (ساعتين)"""
@@ -270,8 +288,10 @@ class CancelReservationView(generics.UpdateAPIView):
 
 
 class CustomerTemporaryReservationsView(generics.ListAPIView):
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['customer'])]
     serializer_class = serializers.ReservationDetialSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """إرجاع قائمة بالحجوزات المؤقتة (`status_reservation=2`) الخاصة بالزبون"""
@@ -294,8 +314,10 @@ class OfficeEmployeeTemporaryReservationsView(generics.ListAPIView):
     - الاسم الثاني
     - رقم الهاتف
     """
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['employee'])]
     serializer_class = serializers.ReservationSrecheSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = models.Reservation.objects.filter(status_reservation=2)
@@ -335,8 +357,10 @@ class ConfirmReservationView(generics.UpdateAPIView):
     """
     تأكيد الحجز بعد التحقق من المعلومات، وطباعة البريد الإلكتروني في `Terminal`
     """
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['employee'])]
     queryset = models.Reservation.objects.all()
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def update(self, request, *args, **kwargs):
         reservation = self.get_object()
@@ -365,26 +389,27 @@ class ConfirmReservationView(generics.UpdateAPIView):
 
     
     
-class CancelReservationView(generics.UpdateAPIView):
-    queryset = models.Reservation.objects.all()
-    serializer_class = serializers.ReservationSerializer
-    permission_classes = [AllowAny]
+# class CancelReservationView(generics.UpdateAPIView):
+    
+#     queryset = models.Reservation.objects.all()
+#     serializer_class = serializers.ReservationSerializer
+#     # permission_classes = [AllowAny]
 
-    def update(self, request, *args, **kwargs):
-        reservation = self.get_object()
+#     def update(self, request, *args, **kwargs):
+#         reservation = self.get_object()
 
-        # التحقق من أن حالة الحجز مؤقتة
-        if reservation.status_reservation != 2:  # 2 تمثل الحالة "مؤقتة"
-            return Response(
-                {"error": "لا يمكن إلغاء الحجز لأن حالته ليست مؤقتة."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+#         # التحقق من أن حالة الحجز مؤقتة
+#         if reservation.status_reservation != 2:  # 2 تمثل الحالة "مؤقتة"
+#             return Response(
+#                 {"error": "لا يمكن إلغاء الحجز لأن حالته ليست مؤقتة."},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
 
-        # تحديث حالة الحجز إلى "منتهي الصلاحية"
-        reservation.status_reservation = 4  # 4 تمثل الحالة "منتهي الصلاحية"
-        reservation.save()
+#         # تحديث حالة الحجز إلى "منتهي الصلاحية"
+#         reservation.status_reservation = 4  # 4 تمثل الحالة "منتهي الصلاحية"
+#         reservation.save()
 
-        return Response(
-            {"message": "تم تحويل الحجز إلى حالة منتهي الصلاحية."},
-            status=status.HTTP_200_OK
-        )
+#         return Response(
+#             {"message": "تم تحويل الحجز إلى حالة منتهي الصلاحية."},
+#             status=status.HTTP_200_OK
+#         )

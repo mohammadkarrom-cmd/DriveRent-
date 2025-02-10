@@ -47,26 +47,46 @@ class ReservationSerializer(serializers.ModelSerializer):
     
     
 class ReservationDetialSerializer(serializers.ModelSerializer):
-    remaining_time = serializers.SerializerMethodField()  # ⬅️ حقل جديد لحساب الوقت المتبقي
+    remaining_time = serializers.SerializerMethodField() 
+    car = CarSerializer()  
+    type_reservation = serializers.SerializerMethodField() 
+    status_reservation = serializers.SerializerMethodField() 
 
     class Meta:
         model = models.Reservation
-        fields = ['id_reservation', 'car', 'start_date', 'end_date', 'type_reservation', 'status_reservation', 'time_reservation', 'remaining_time']
+        fields = [
+            'id_reservation',
+            'car',
+            'start_date',
+            'end_date',
+            'type_reservation',
+            'status_reservation',
+            # 'time_reservation',
+            'remaining_time'
+        ]
 
     def get_remaining_time(self, obj):
         """
-        حساب الوقت المتبقي قبل الإلغاء التلقائي للحجز المؤقت
+        حساب الوقت المتبقي قبل الإلغاء التلقائي للحجز المؤقت وإرجاعه كـ `timedelta`
         """
-        if obj.status_reservation == 2:  # فقط للحجوزات المؤقتة
+        if obj.status_reservation == 2:  
             elapsed_time = (now() - obj.time_reservation).total_seconds()
-            remaining_seconds = max(0, 2 * 60 * 60 - elapsed_time)  # ساعتين (بالثواني)
+            remaining_seconds = max(0, 2 * 60 * 60 - elapsed_time) 
 
-            minutes = int(remaining_seconds // 60)
-            seconds = int(remaining_seconds % 60)
+            return timedelta(seconds=int(remaining_seconds))  
 
-            return f"{minutes}m-{seconds}s"
+        return None  
+    def get_type_reservation(self, obj):
+        """
+        إرجاع النصوص بدلاً من معرف `type_reservation`
+        """
+        return dict(models.type_reservation_list).get(obj.type_reservation, "غير معروف")
 
-        return "تم إلغاء الحجز أو تأكيده"
+    def get_status_reservation(self, obj):
+        """
+        إرجاع النصوص بدلاً من معرف `status_reservation`
+        """
+        return dict(models.status_list).get(obj.status_reservation, "غير معروف")
     
     
 class CustomerSerializer(serializers.ModelSerializer):
