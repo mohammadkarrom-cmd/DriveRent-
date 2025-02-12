@@ -9,5 +9,4 @@ pycache/
 *.pyc
 *.pyo
 *.pyd
-DriveRent/media/
 myenv
