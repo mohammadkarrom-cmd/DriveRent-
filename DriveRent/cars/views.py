@@ -111,10 +111,10 @@ class CarSearchView(generics.GenericAPIView):
     
 #####################
 class HomeCustomerView(generics.GenericAPIView):
-    def get_permissions(self):
-        return [IsRole(allowed_roles=['customer'])]
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['customer'])]
     serializer_class = serializers.CarSerializer
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
         cars_new = models.Car.objects.order_by('-created_at')[:10]
@@ -133,10 +133,10 @@ class HomeCustomerView(generics.GenericAPIView):
 
 #####################
 class CarlistViewView(generics.GenericAPIView):
-    def get_permissions(self):
-        return [IsRole(allowed_roles=['customer'])]
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['customer'])]
     serializer_class = serializers.CarSerializer
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
         cars = models.Car.objects.all()
@@ -146,10 +146,10 @@ class CarlistViewView(generics.GenericAPIView):
 
 #####################
 class CarSearchCustomerView(generics.GenericAPIView):
-    def get_permissions(self):
-        return [IsRole(allowed_roles=['customer'])]
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['customer'])]
     serializer_class = serializers.CarSerializer
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
     def get_cars(self, category=None, type_rent=None):
         cars = models.Car.objects.all()
@@ -234,8 +234,16 @@ class CreateReservationView(generics.CreateAPIView):
         start_date = serializer.validated_data['start_date']
         type_reservation = serializer.validated_data['type_reservation']
         
-        end_date = self.calculate_end_date(start_date, type_reservation)
         car = serializer.validated_data['car']
+
+        if car.status in [2, 3]: 
+            raise serializers.ValidationError("🚫 هذه السيارة غير متاحة للحجز حاليًا.")
+
+        end_date = self.calculate_end_date(start_date, type_reservation)
+
+        car.status = 2  
+        car.save()
+
 
         reservation = serializer.save(
             customer=customer,
@@ -261,16 +269,18 @@ class CreateReservationView(generics.CreateAPIView):
 
 
 class CancelReservationView(generics.UpdateAPIView):
+    """
+    إلغاء الحجز المؤقت قبل انتهاء المهلة الزمنية (ساعتين)، مع إعادة السيارة إلى حالة متاحة.
+    """
+    queryset = models.Reservation.objects.all()
+
     def get_permissions(self):
         return [IsRole(allowed_roles=['customer'])]
-    queryset = models.Reservation.objects.all()
-    # permission_classes = [IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
-        """إلغاء الحجز المؤقت قبل انتهاء المهلة الزمنية (ساعتين)"""
-        reservation_id = kwargs.get("pk")
         reservation = self.get_object()
 
+        # التحقق من أن المستخدم الحالي هو مالك الحجز
         if reservation.customer != request.user.customer:
             return Response({"error": "⚠️ غير مصرح لك بإلغاء هذا الحجز."}, status=status.HTTP_403_FORBIDDEN)
 
@@ -278,13 +288,17 @@ class CancelReservationView(generics.UpdateAPIView):
         if reservation.status_reservation != 2:
             return Response({"error": "⚠️ لا يمكنك إلغاء هذا الحجز، لأنه غير مؤقت."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # تحديث حالة الحجز إلى "منتهي الصلاحية"
-        reservation.status_reservation = 4  # تم إلغاؤه يدويًا
-        reservation.save()
+        with transaction.atomic():  # ضمان تنفيذ جميع العمليات أو التراجع عند حدوث خطأ
+            # تحديث حالة الحجز إلى "ملغى"
+            reservation.status_reservation = 4  # 4 = ملغى يدويًا
+            reservation.save()
 
-        return Response({"message": "✅ تم إلغاء الحجز بنجاح."}, status=status.HTTP_200_OK)
+            # إعادة حالة السيارة إلى "متاحة"
+            car = reservation.car
+            car.status = 1  # 1 = متاحة
+            car.save()
 
-
+        return Response({"message": "✅ تم إلغاء الحجز بنجاح، وأصبحت السيارة متاحة للحجز."}, status=status.HTTP_200_OK)
 
 
 class CustomerTemporaryReservationsView(generics.ListAPIView):
@@ -295,7 +309,7 @@ class CustomerTemporaryReservationsView(generics.ListAPIView):
 
     def get_queryset(self):
         """إرجاع قائمة بالحجوزات المؤقتة (`status_reservation=2`) الخاصة بالزبون"""
-        return models.Reservation.objects.filter(customer=self.request.user.customer, status_reservation=2)
+        return models.Reservation.objects.filter(customer=self.request.user.customer,status_reservation__in=[ 2, 3])
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -320,16 +334,19 @@ class OfficeEmployeeTemporaryReservationsView(generics.ListAPIView):
     # permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = models.Reservation.objects.filter(status_reservation=2)
+        queryset = models.Reservation.objects.all()
         search_query = Q()
 
         # الحصول على قيم البحث من `query_params`
+        status_reservation = self.request.query_params.get("status_reservation", None)
         first_name = self.request.query_params.get("first_name", None)
         last_name = self.request.query_params.get("last_name", None)
         phone = self.request.query_params.get("phone", None)
         id_number = self.request.query_params.get("id_number", None)
 
         # إضافة كل حقل إلى `Q` إذا تم إدخاله
+        if first_name:
+            search_query &= Q(status_reservation=status_reservation)
         if first_name:
             search_query &= Q(customer__user__first_name__icontains=first_name)
         if last_name:
@@ -372,7 +389,12 @@ class ConfirmReservationView(generics.UpdateAPIView):
         # تحديث الحجز إلى مؤكد (`status_reservation=3`)
         reservation.status_reservation = 3
         reservation.save()
-
+        
+        # تحديث حالة السيارة إلى (3: محجوزة)
+        car = reservation.car
+        car.status = 3  # 3 تعني "محجوزة"
+        car.save()
+        
         # الحصول على البريد الإلكتروني للعميل
         customer_email = reservation.customer.user.email
         ## TODO mk

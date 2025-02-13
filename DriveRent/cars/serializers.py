@@ -71,9 +71,13 @@ class ReservationDetialSerializer(serializers.ModelSerializer):
         """
         if obj.status_reservation == 2:  
             elapsed_time = (now() - obj.time_reservation).total_seconds()
-            remaining_seconds = max(0, 2 * 60 * 60 - elapsed_time) 
+            remaining_seconds = max(0, 2 * 60 * 60 - elapsed_time)  # حساب الثواني المتبقية
 
-            return timedelta(seconds=int(remaining_seconds))  
+            # استخراج الدقائق والثواني من الوقت المتبقي
+            minutes = int(remaining_seconds // 60)  # تحويل الثواني إلى دقائق
+            seconds = int(remaining_seconds % 60)   # استخراج الثواني المتبقية
+
+            return {"mint": minutes, "second": seconds}  # إرجاع القيم كمصفوفة JSON
 
         return None  
     def get_type_reservation(self, obj):
