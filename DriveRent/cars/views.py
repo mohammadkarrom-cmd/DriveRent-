@@ -183,10 +183,10 @@ class CarSearchCustomerView(generics.GenericAPIView):
         return Response(cars_serializer.data, status=status.HTTP_200_OK)
     
 class CarDetailView(generics.GenericAPIView):
-    def get_permissions(self):
-        return [IsRole(allowed_roles=['customer'])]
+    # def get_permissions(self):
+        # return [IsRole(allowed_roles=['customer'])]
     serializer_class = serializers.CarSerializer
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
     def get(self, request, id_car, *args, **kwargs):
         car = get_object_or_404(models.Car, id_car=id_car)
         reservations = models.Reservation.objects.filter(car=car)
@@ -288,15 +288,15 @@ class CancelReservationView(generics.UpdateAPIView):
         if reservation.status_reservation != 2:
             return Response({"error": "⚠️ لا يمكنك إلغاء هذا الحجز، لأنه غير مؤقت."}, status=status.HTTP_400_BAD_REQUEST)
 
-        with transaction.atomic():  # ضمان تنفيذ جميع العمليات أو التراجع عند حدوث خطأ
+        # with transaction.atomic():  # ضمان تنفيذ جميع العمليات أو التراجع عند حدوث خطأ
             # تحديث حالة الحجز إلى "ملغى"
-            reservation.status_reservation = 4  # 4 = ملغى يدويًا
-            reservation.save()
+        reservation.status_reservation = 4  # 4 = ملغى يدويًا
+        reservation.save()
 
             # إعادة حالة السيارة إلى "متاحة"
-            car = reservation.car
-            car.status = 1  # 1 = متاحة
-            car.save()
+        car = reservation.car
+        car.status = 1  # 1 = متاحة
+        car.save()
 
         return Response({"message": "✅ تم إلغاء الحجز بنجاح، وأصبحت السيارة متاحة للحجز."}, status=status.HTTP_200_OK)
 
@@ -329,7 +329,7 @@ class OfficeEmployeeTemporaryReservationsView(generics.ListAPIView):
     - رقم الهاتف
     """
     def get_permissions(self):
-        return [IsRole(allowed_roles=['employee'])]
+        return [IsRole(allowed_roles=['employee','manager'])]
     serializer_class = serializers.ReservationSrecheSerializer
     # permission_classes = [AllowAny]
 
@@ -343,9 +343,8 @@ class OfficeEmployeeTemporaryReservationsView(generics.ListAPIView):
         last_name = self.request.query_params.get("last_name", None)
         phone = self.request.query_params.get("phone", None)
         id_number = self.request.query_params.get("id_number", None)
-
         # إضافة كل حقل إلى `Q` إذا تم إدخاله
-        if first_name:
+        if status_reservation:
             search_query &= Q(status_reservation=status_reservation)
         if first_name:
             search_query &= Q(customer__user__first_name__icontains=first_name)
@@ -411,27 +410,32 @@ class ConfirmReservationView(generics.UpdateAPIView):
 
     
     
-# class CancelReservationView(generics.UpdateAPIView):
-    
-#     queryset = models.Reservation.objects.all()
-#     serializer_class = serializers.ReservationSerializer
-#     # permission_classes = [AllowAny]
+class CancelEmployeeReservationView(generics.UpdateAPIView):
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['employee'])]
+    queryset = models.Reservation.objects.all()
+    serializer_class = serializers.ReservationSerializer
+    # permission_classes = [AllowAny]
 
-#     def update(self, request, *args, **kwargs):
-#         reservation = self.get_object()
+    def update(self, request, *args, **kwargs):
+        reservation = self.get_object()
 
-#         # التحقق من أن حالة الحجز مؤقتة
-#         if reservation.status_reservation != 2:  # 2 تمثل الحالة "مؤقتة"
-#             return Response(
-#                 {"error": "لا يمكن إلغاء الحجز لأن حالته ليست مؤقتة."},
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
+        # التحقق من أن حالة الحجز مؤقتة
+        if reservation.status_reservation != 2:  # 2 تمثل الحالة "مؤقتة"
+            return Response(
+                {"error": "لا يمكن إلغاء الحجز لأن حالته ليست مؤقتة."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-#         # تحديث حالة الحجز إلى "منتهي الصلاحية"
-#         reservation.status_reservation = 4  # 4 تمثل الحالة "منتهي الصلاحية"
-#         reservation.save()
+        # تحديث حالة الحجز إلى "منتهي الصلاحية"
+        reservation.status_reservation = 4  # 4 تمثل الحالة "منتهي الصلاحية"
+        reservation.save()
 
-#         return Response(
-#             {"message": "تم تحويل الحجز إلى حالة منتهي الصلاحية."},
-#             status=status.HTTP_200_OK
-#         )
+        # تحديث حالة السيارة إلى (1: متاحة)
+        car = reservation.car
+        car.status = 1  # 1 تعني "متاحة"
+        car.save()
+        return Response(
+            {"message": "تم تحويل الحجز إلى حالة منتهي الصلاحية."},
+            status=status.HTTP_200_OK
+        )
