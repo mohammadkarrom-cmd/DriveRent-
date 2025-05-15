@@ -29,7 +29,7 @@ class LoginView(TokenObtainPairView):
         account_type_redirect_map = {
             'manager': '/manager',
             'employee': '/employee',
-            # 'customer': '/customer',
+            'admin': '/admin',
         }
         if user.account_type == 'customer':
             customer = getattr(user, 'customer', None) 
@@ -58,8 +58,8 @@ class LoginView(TokenObtainPairView):
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'email': user.email,
-                # 'username': user.username,
-                # 'role': user.account_type,
+                'username': user.username,
+                'role': user.account_type,
                 'redirect_url': redirect_url
             }
             return Response(tokens)
