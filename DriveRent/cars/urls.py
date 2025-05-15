@@ -31,6 +31,6 @@ urlpatterns = [
     path('office/temporary-reservations/', views.OfficeEmployeeTemporaryReservationsView.as_view(), name='office-temporary-reservations'),
     path('office/confirm-reservation/<int:pk>/', views.ConfirmReservationView.as_view(), name='confirm-reservation'),
 
-    path('reservations/cancel/<int:pk>/', views.CancelReservationView.as_view(), name='cancel-reservation'),
+    path('reservations/cancel/<int:pk>/', views.CancelEmployeeReservationView.as_view(), name='cancel-reservation'),
 
 ]

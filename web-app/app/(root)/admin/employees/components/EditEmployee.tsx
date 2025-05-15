@@ -1,0 +1,257 @@
+"use client"
+
+import MyFormProvider from '@/app/components/form/MyFormProvider'
+import RHFInput from '@/app/components/form/RHFInput'
+import { useSettingsContext } from '@/lib/context/settings/setting-context'
+import useBoolean from '@/lib/hooks/use-boolean'
+import { Backgrounds, CardBackgrounds, CardBackgroundsReverse, TextPrimary, TextPrimaryReverse } from '@/lib/ui/class/classNames'
+import { Button, Dialog, DialogBody, DialogFooter, DialogHeader, IconButton, Option, Tooltip, Typography } from '@/lib/ui/MTFix'
+import { zodResolver } from '@hookform/resolvers/zod'
+import clsx from 'clsx'
+import { useForm } from 'react-hook-form'
+import { IoIosMail } from 'react-icons/io'
+import { updateEmployeeSchema, UpdateEmployeeSchemaType } from '@/lib/api/data/zod/schemas'
+import { MdOutlineShortText } from 'react-icons/md'
+import { RiShieldUserFill } from 'react-icons/ri'
+import { FaPhoneFlip } from 'react-icons/fa6'
+import RHFSelect from '@/app/components/form/RHFSelect'
+import { IoEye } from 'react-icons/io5'
+import { PiEyeClosedDuotone } from 'react-icons/pi'
+import dataMutate from '@/lib/api/data/dataMutate'
+import { endpoints } from '@/app/api/common'
+import { METHODS } from '@/lib/api/setup/api'
+import { KeyedMutator } from 'swr'
+import { AxiosError, AxiosResponse } from 'axios'
+import { toast } from 'react-toastify'
+import { FaUserEdit } from 'react-icons/fa'
+import { unset } from 'lodash'
+
+type Props = {
+    mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
+    employee: EmployeeType
+
+}
+const EditEmployee = ({ mutate, employee }: Props) => {
+    const { theme } = useSettingsContext();
+    const open = useBoolean({ initialState: false });
+    const showPassword = useBoolean({ initialState: false });
+    const showConfirmPassword = useBoolean({ initialState: false });
+
+
+    const defaultValues: UpdateEmployeeSchemaType = {
+        account_type: employee.account_type,
+        email: employee.email,
+        first_name: employee.first_name,
+        last_name: employee.last_name,
+        phone: employee.phone,
+        username: employee.username,
+        is_active: employee.is_active,
+        password: "",
+        confirm_password: "",
+
+    };
+
+    const methods = useForm<UpdateEmployeeSchemaType>({
+        resolver: zodResolver(updateEmployeeSchema),
+        defaultValues: defaultValues
+    });
+
+    const onSubmit = async (data: UpdateEmployeeSchemaType) => {
+        const formData = data;
+        unset(formData, "confirm_password")
+        const promise = dataMutate(endpoints.employee.update(employee.id), METHODS.PUT, formData)
+
+        await promise.then(() => {
+            mutate();
+            toast.success("تم تعديل الحساب بنجاح ")
+            methods.reset(defaultValues)
+            open.onFalse();
+        }).catch(error => {
+            if (error instanceof AxiosError && error.status === 400) {
+                toast.error("اسم المستخدم موجود بالفعل")
+            } else {
+                console.log(error);
+            }
+        })
+    };
+
+    return (
+        <>
+            <Tooltip
+                content="تعديل بيانات الموظف"
+                className={clsx(CardBackgroundsReverse, TextPrimaryReverse)}
+            >
+                <IconButton
+                    variant='filled'
+                    color="green"
+                    className='p-0 shadow-none rounded-full'
+                    size='sm'
+                    onClick={open.onTrue}
+                >
+                    <FaUserEdit
+                        size={15}
+                    />
+                </IconButton>
+            </Tooltip>
+            <Dialog
+                open={open.value}
+                handler={open.onToggle}
+                className={clsx(CardBackgrounds)}
+                size='xl'
+            >
+                <DialogHeader
+                    className='flex-col justify-start items-start'
+                >
+                    <Typography
+                        variant='h3'
+                        color='green'
+                    >
+                        <FaUserEdit className='inline-block me-1' />تعديل بيانات الموظف {employee.username}
+                    </Typography>
+                    <Typography
+                        variant='paragraph'
+                        className={clsx(TextPrimary)}
+                    >
+                        اسم الموظف الثنائي {employee.first_name} {employee.last_name}
+                    </Typography>
+                </DialogHeader>
+                <MyFormProvider
+                    methods={methods}
+                    onSubmit={onSubmit}
+                >
+                    <DialogBody
+                        className='grid grid-cols-1 gap-5 md:grid-cols-2'
+                    >
+                        <RHFInput
+                            label='الاسم الأول'
+                            type='text'
+                            color={theme === "dark" ? 'white' : "black"}
+                            icon={<MdOutlineShortText size={25} />}
+                            name='first_name'
+                            helperText=''
+                        />
+                        <RHFInput
+                            label='الاسم الأخير'
+                            type='text'
+                            color={theme === "dark" ? 'white' : "black"}
+                            icon={<MdOutlineShortText size={25} />}
+                            name='last_name'
+                            helperText=''
+                        />
+                        <RHFInput
+                            label='البريد الإلكتروني'
+                            type='email'
+                            color={theme === "dark" ? 'white' : "black"}
+                            icon={<IoIosMail size={25} />}
+                            name='email'
+                            helperText=''
+                        />
+                        <RHFInput
+                            label='اسم المستخدم'
+                            type='text'
+                            color={theme === "dark" ? 'white' : "black"}
+                            icon={<RiShieldUserFill size={25} />}
+                            name='username'
+                            helperText=''
+                        />
+                        <RHFInput
+                            label='رقم الهاتف'
+                            type='text'
+                            color={theme === "dark" ? 'white' : "black"}
+                            icon={<FaPhoneFlip size={25} />}
+                            name='phone'
+                            helperText=''
+                        />
+                        <RHFSelect
+                            label='نوع الحساب'
+                            color='green'
+                            name='account_type'
+                        >
+                            <Option
+                                value='employee'
+                                className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
+                            >
+                                موظف
+                            </Option>
+                            <Option
+                                value='manager'
+                                className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
+                            >
+                                مدير
+                            </Option>
+                            <Option
+                                value='customer'
+                                className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
+                            >
+                                زبون
+                            </Option>
+                        </RHFSelect>
+                        <RHFInput
+                            label='كلمة المرور'
+                            color={theme === "dark" ? 'white' : "black"}
+                            name='password'
+                            helperText=''
+                            type={showPassword.value ? "text" : "password"}
+                            icon={
+                                showPassword.value
+                                    ? <IoEye
+                                        size={25}
+                                        onClick={showPassword.onToggle}
+                                        className='cursor-pointer hover:scale-105 mb-1'
+                                    />
+                                    : <PiEyeClosedDuotone
+                                        size={25}
+                                        onClick={showPassword.onToggle}
+                                        className='cursor-pointer hover:scale-105'
+                                    />
+                            }
+                        />
+                        <RHFInput
+                            label='كلمة المرور المؤكدة'
+                            color={theme === "dark" ? 'white' : "black"}
+                            name='confirm_password'
+                            helperText=''
+                            type={showConfirmPassword.value ? "text" : "password"}
+                            icon={
+                                showConfirmPassword.value
+                                    ? <IoEye
+                                        size={25}
+                                        onClick={showConfirmPassword.onToggle}
+                                        className='cursor-pointer hover:scale-105 mb-1'
+                                    />
+                                    : <PiEyeClosedDuotone
+                                        size={25}
+                                        onClick={showConfirmPassword.onToggle}
+                                        className='cursor-pointer hover:scale-105'
+                                    />
+                            }
+                        />
+
+                    </DialogBody>
+                    <DialogFooter className='gap-5'>
+                        <Button
+                            variant="text"
+                            color="red"
+                            onClick={() => {
+                                open.onFalse();
+                                methods.reset(defaultValues);
+                            }}
+                            className="mr-1"
+                        >
+                            إلغاء
+                        </Button>
+                        <Button
+                            variant="gradient"
+                            color="green"
+                            type='submit'
+                        >
+                            تأكيد
+                        </Button>
+                    </DialogFooter>
+                </MyFormProvider>
+            </Dialog >
+        </>
+    )
+}
+
+export default EditEmployee
