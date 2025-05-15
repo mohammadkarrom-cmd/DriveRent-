@@ -2,6 +2,17 @@ from django.urls import path
 from cars import views
 
 urlpatterns = [
+    ##### admin
+    path('office/list-create/', views.OfficeListCreateView.as_view(), name='office-list-create'),
+    path('office/<int:id_office>/', views.OfficeRetrieveUpdateView.as_view(), name='office-detail'),
+
+    path('office/<int:office_id>/accounts/', views.OfficeAccountListCreateView.as_view(), name='officeaccount-list-create'),
+    path('office/accounts/<int:id_office_account>/', views.OfficeAccountRetrieveUpdateDestroyView.as_view(), name='officeaccount-detail'),
+    
+    path('send-test-email/', views.SendEmail.as_view()),
+
+    
+    
     ##### cars
     path('list-create/', views.CarListCreateView.as_view(), name='car-list-create'),
     path('updata-delete/<int:pk>/', views.CarUpdateDestroyView.as_view(), name='car-detail'),
@@ -12,7 +23,7 @@ urlpatterns = [
     path('serche-customer/', views.CarSearchCustomerView.as_view(), name='car-serche-customer'),
     path('detail/<int:id_car>/', views.CarDetailView.as_view(), name='car-detail'),
     path('reserve/', views.CreateReservationView.as_view(), name='reserve-car'),
-    path('reserve/cancel/<int:pk>/',  views.CancelReservationView.as_view(), name='cancel-reservation'),  # ⬅️ مسار إلغاء الحجز
+    path('reserve/cancel/<int:pk>/',  views.CancelReservationView.as_view(), name='cancel-reservation'),  
     path('my-temporary-reservations/', views.CustomerTemporaryReservationsView.as_view(), name='customer-temporary-reservations'),
 
 

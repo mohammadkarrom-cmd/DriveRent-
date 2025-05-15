@@ -20,16 +20,12 @@ class LoginView(TokenObtainPairView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        try:
-            serializer.is_valid(raise_exception=True)
-        except:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         user = serializer.validated_data['user']
-
-        if not user or not user.is_active:
-            return Response({'error': 'Invalid credentials or user is not active'}, status=status.HTTP_400_BAD_REQUEST)
-
+            
+            
         account_type_redirect_map = {
             'manager': '/manager',
             'employee': '/employee',
@@ -140,8 +136,10 @@ class UserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     
 
 class BulkUserActionAPIView(APIView):
-    def get_permissions(self):
-        return [IsRole(allowed_roles=['manager'])]
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['manager'])]
+    permission_classes=[AllowAny]
+    
     def post(self, request, *args, **kwargs):
         user_ids = request.data.get("id") or request.query_params.get("id")
 
@@ -202,3 +200,21 @@ class CustomerCreateView(generics.CreateAPIView):
             },
             status=status.HTTP_201_CREATED
         )
+
+
+###############
+class CustomerUserListView(generics.ListAPIView):
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['admin'])]
+    queryset = models.Customer.objects.all()
+    serializer_class = serializers.CustomerViewListSerializer
+    permission_classes = [AllowAny]
+    
+class CustomerUserView(generics.RetrieveAPIView):
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['admin'])]
+    queryset = models.Customer.objects.all()
+    serializer_class = serializers.CustomerViewSerializer
+    permission_classes = [AllowAny]
+    
+    

@@ -5,33 +5,48 @@ from django.contrib.auth import  authenticate
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from users import models
+from django.contrib.auth import get_user_model
+
 # from .models import (
 #     User,
 #     Customer,
 # )
+User = get_user_model()
+
 class LoginSerializer(TokenObtainPairSerializer):
     username_field = 'username'
-    
+
     def validate(self, attrs):
         username = attrs.get('username')
         password = attrs.get('password')
 
-        if username and password:
-            user = authenticate(username=username, password=password)
+        if not username or not password:
+            raise serializers.ValidationError(
+                {"message": "يجب إدخال اسم المستخدم وكلمة المرور"}
+            )
 
-            if not user:
-                raise serializers.ValidationError('Invalid credentials')
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(
+                {"message": "بيانات الدخول غير صحيحة"}
+            )
 
-            if not user.is_active:
-                raise serializers.ValidationError('User account is disabled.')
+        if not user.check_password(password):
+            raise serializers.ValidationError(
+                {"message": "بيانات الدخول غير صحيحة"}
+            )
 
-            return {
-                'user': user,
-                'refresh': str(self.get_token(user)),
-                'access': str(self.get_token(user).access_token),
-            }
-        else:
-            raise serializers.ValidationError('Must include "username" and "password".')
+        if not user.is_active:
+            raise serializers.ValidationError(
+                {"message": "حسابك معطّل، يرجى الانتظار حتى يتم تفعيله من قبل الأدمن"}
+            )
+
+        return {
+            'user': user,
+            'refresh': str(self.get_token(user)),
+            'access': str(self.get_token(user).access_token),
+        }
 
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField(required=True)
@@ -98,6 +113,7 @@ class CustomerCreateSerializer(serializers.ModelSerializer):
             "email": validated_data.pop("email"),
             "phone": validated_data.pop("phone", None),
             "account_type": "customer",  
+            "is_active":False
         }
         password = validated_data.pop("password")
 
@@ -107,3 +123,33 @@ class CustomerCreateSerializer(serializers.ModelSerializer):
 
         customer = models.Customer.objects.create(user=user, **validated_data)
         return customer
+    
+    
+
+class CustomerViewListSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source="user.username", read_only=True)
+    first_name = serializers.CharField(source="user.first_name", read_only=True)
+    last_name = serializers.CharField(source="user.last_name", read_only=True)
+    email = serializers.EmailField(source="user.email", read_only=True)
+    phone = serializers.CharField(source="user.phone", read_only=True)
+
+    class Meta:
+        model = models.Customer
+        fields = [
+            "id_customer","first_name", "last_name", "email", "phone","username",
+        ]
+
+class CustomerViewSerializer(serializers.ModelSerializer):
+    id_user= serializers.IntegerField(source="user.id", read_only=True)
+    username = serializers.CharField(source="user.username", read_only=True)
+    first_name = serializers.CharField(source="user.first_name", read_only=True)
+    last_name = serializers.CharField(source="user.last_name", read_only=True)
+    email = serializers.EmailField(source="user.email", read_only=True)
+    phone = serializers.CharField(source="user.phone", read_only=True)
+    is_active= serializers.CharField(source="user.is_active", read_only=True)
+    class Meta:
+        model = models.Customer
+        fields = [
+           "id_customer", "id_user","username", "first_name", "last_name", "email", "phone",'is_active',
+            "id_number", "id_front_image", "id_back_image", "driving_license_image"
+        ]

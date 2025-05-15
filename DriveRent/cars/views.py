@@ -435,3 +435,69 @@ class ConfirmReservationView(generics.UpdateAPIView):
 #             {"message": "تم تحويل الحجز إلى حالة منتهي الصلاحية."},
 #             status=status.HTTP_200_OK
 #         )
+
+
+class OfficeListCreateView(generics.ListCreateAPIView):
+    queryset = models.Office.objects.all()
+    serializer_class = serializers.OfficeSerializer
+    permission_classes = [AllowAny]
+
+class OfficeRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = models.Office.objects.all()
+    serializer_class = serializers.OfficeSerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'id_office'
+    
+    
+class OfficeAccountListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.OfficeAccountSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        office_id = self.kwargs.get('office_id')
+        return models.OfficeAccount.objects.filter(office__id_office=office_id)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        office_id = self.kwargs.get('office_id')
+        office = get_object_or_404(models.Office, id_office=office_id)
+        context['office'] = office
+        return context
+
+
+class OfficeAccountRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.OfficeAccount.objects.all()
+    serializer_class = serializers.OfficeAccountSerializer
+    lookup_field = 'id_office_account'
+    permission_classes = [AllowAny]
+    
+from django.core.mail import send_mail
+from django.conf import settings
+class SendEmail(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+    
+    def send_emails_to_users(self, users):
+        subject = 'Email sent successfully:'
+        message = 'هذا هو محتوى البريد الإلكتروني.'
+        
+        for user in users:
+            self.send_custom_email(user, subject, message)
+    
+    def send_custom_email(self, recipient_email, subject, message):
+        try:
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL, 
+                [recipient_email],  
+                fail_silently=False,
+            )
+        except Exception as e:
+            print(f"Error occurred: {e}") 
+            return Response({'error': str(e)}, status=500)
+
+    def post(self, request, *args, **kwargs):
+        user_email = 'abdohouir@gmail.com' 
+        self.send_emails_to_users([user_email])
+        return Response({'message': 'Email sent successfully!'}, status=status.HTTP_200_OK)
+    
