@@ -32,11 +32,11 @@ def remove_background(image_field):
 
 #####################
 class CarListCreateView(generics.ListCreateAPIView):
-    def get_permissions(self):
-        return [IsRole(allowed_roles=['manager','employee'])]
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['manager','employee'])]
     queryset = models.Car.objects.all()
     serializer_class = serializers.CarSerializer
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
         images = {
@@ -53,11 +53,11 @@ class CarListCreateView(generics.ListCreateAPIView):
         
 #####################
 class CarUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    def get_permissions(self):
-        return [IsRole(allowed_roles=['manager','employee'])]
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['manager','employee'])]
     queryset = models.Car.objects.all()
     serializer_class = serializers.CarSerializer
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
     def perform_update(self, serializer):
         images = {

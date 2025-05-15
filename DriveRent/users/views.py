@@ -121,11 +121,11 @@ class CustomTokenRefreshView(TokenRefreshView):
     
 #####################
 class UserListCreateView(generics.ListCreateAPIView):
-    def get_permissions(self):
-        return [IsRole(allowed_roles=['manager'])]
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['manager'])]
     queryset = models.User.objects.filter(account_type__in=['manager', 'employee'])
     serializer_class = serializers.UserSerializer
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 ########
 class UserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     def get_permissions(self):

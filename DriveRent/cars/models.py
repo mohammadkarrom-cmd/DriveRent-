@@ -84,7 +84,7 @@ class Car(models.Model):
     is_for_sale = models.BooleanField(default=False, verbose_name="هل متاحة للبيع") 
     sale_price = models.FloatField(null=True, blank=True, verbose_name="سعر البيع") 
     
-    owner_office = models.ForeignKey(Office,on_delete=models.SET_NULL,null=True,blank=True,limit_choices_to={'account_type': 'manager'},related_name="cars_owned_by_office",verbose_name="صاحب السيارة (مكتب)")
+    owner_office = models.ForeignKey(Office,on_delete=models.SET_NULL,null=True,blank=True,related_name="cars_owned_by_office",verbose_name="صاحب السيارة (مكتب)")
     owner_customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,blank=True,related_name="cars_owned_by_customer",verbose_name="صاحب السيارة (زبون)")
     
     image1 = models.ImageField(upload_to=PathAndRename('cars'), blank=True, null=True)
