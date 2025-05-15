@@ -14,5 +14,9 @@ urlpatterns = [
     path('bulk-action/', views.BulkUserActionAPIView.as_view(), name='users-bulk-action'),
 
 
+    path('customer/user-list/', views.CustomerUserListView.as_view(), name='customer-user-list'),
+    path('customer/user/<int:pk>/', views.CustomerUserView.as_view(), name='customer-user-view'),
+
+
 
 ]

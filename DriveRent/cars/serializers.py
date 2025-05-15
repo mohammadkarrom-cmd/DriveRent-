@@ -2,8 +2,9 @@ from rest_framework import serializers
 from cars import models
 from datetime import timedelta
 from django.utils.timezone import now
-from users.models import Customer
-
+from users import models as models_user
+from rest_framework.exceptions import ValidationError
+from django.db import IntegrityError
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Car
@@ -100,15 +101,121 @@ class CustomerSerializer(serializers.ModelSerializer):
     phone = serializers.CharField(source='user.phone')
 
     class Meta:
-        model = Customer
+        model = models.Customer
         fields = ['first_name', 'last_name', 'phone', 'id_number']    
     
     
 class ReservationSrecheSerializer(serializers.ModelSerializer):
     """سيريلز الحجز مع تفاصيل العميل والسيارة"""
-    customer = CustomerSerializer()  # تضمين تفاصيل المستخدم بدل ID
-    car = CarSerializer()  # تضمين تفاصيل السيارة بدل ID
+    customer = CustomerSerializer()  
+    car = CarSerializer()  
 
     class Meta:
         model = models.Reservation
         fields = ['id_reservation', 'start_date', 'end_date', 'type_reservation', 'status_reservation', 'time_reservation', 'car', 'customer']
+        
+        
+        
+
+class OfficeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Office
+        fields = '__all__'
+        
+        
+class OfficeAccountSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(write_only=True)
+    last_name = serializers.CharField(write_only=True)
+    email = serializers.EmailField(write_only=True)
+    username = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
+    phone = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    account_type = serializers.ChoiceField(write_only=True, choices=[('manager', 'مدير'), ('employee', 'موظف')])
+    is_active = serializers.BooleanField(write_only=True, default=True)
+
+    class Meta:
+        model = models.OfficeAccount
+        fields = [
+            'id_office_account', 'first_name', 'last_name', 'email', 'username', 'password',
+            'phone', 'account_type', 'is_active', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id_office_account', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        username = validated_data.get("username")
+
+        if models_user.User.objects.filter(username=username).exists():
+            raise ValidationError({"username": "اسم المستخدم مستخدم مسبقًا، الرجاء اختيار اسم آخر."})
+
+        email = validated_data.get("email") 
+        if models_user.User.objects.filter(email=email).exists():
+            raise ValidationError({"email": "البريد الإلكتروني مستخدم مسبقًا."})
+
+        try:
+            user = models_user.User(
+                first_name=validated_data.pop("first_name"),
+                last_name=validated_data.pop("last_name"),
+                email=validated_data.pop("email"),
+                username=username,
+                account_type=validated_data.pop("account_type"),
+                is_active=validated_data.pop("is_active", True),
+                phone=validated_data.pop("phone", ""),
+            )
+            user.set_password(validated_data.pop("password"))
+            user.save()
+        except IntegrityError as e:
+            raise ValidationError({"detail": "حدث خطأ أثناء إنشاء المستخدم. تأكد من عدم تكرار البيانات."})
+
+        office = self.context['office']
+        return models.OfficeAccount.objects.create(user=user, office=office, **validated_data)
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        user = instance.user
+        rep['user'] = {
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'username': user.username,
+            'phone': user.phone,
+            'account_type': user.account_type,
+            'is_active': user.is_active,
+        }
+        return rep
+    
+    def update(self, instance, validated_data):
+        user_data = {
+            "first_name": validated_data.pop("first_name", None),
+            "last_name": validated_data.pop("last_name", None),
+            "email": validated_data.pop("email", None),
+            "username": validated_data.pop("username", None),
+            "password": validated_data.pop("password", None),
+            "phone": validated_data.pop("phone", None),
+            "account_type": validated_data.pop("account_type", None),
+            "is_active": validated_data.pop("is_active", None),
+        }
+
+        user = instance.user
+
+        if user_data["username"] and user.username != user_data["username"]:
+            if models_user.User.objects.filter(username=user_data["username"]).exclude(id=user.id).exists():
+                raise ValidationError({"username": "اسم المستخدم مستخدم مسبقًا."})
+            user.username = user_data["username"]
+
+        if user_data["email"] and user.email != user_data["email"]:
+            if models_user.User.objects.filter(email=user_data["email"]).exclude(id=user.id).exists():
+                raise ValidationError({"email": "البريد الإلكتروني مستخدم مسبقًا."})
+            user.email = user_data["email"]
+
+        for field in ['first_name', 'last_name', 'phone', 'account_type', 'is_active']:
+            value = user_data.get(field)
+            if value is not None:
+                setattr(user, field, value)
+
+        if user_data["password"]:
+            user.set_password(user_data["password"])
+
+        user.save()
+
+        return super().update(instance, validated_data)
