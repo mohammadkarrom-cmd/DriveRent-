@@ -535,3 +535,18 @@ class SendEmail(generics.GenericAPIView):
         user_email = 'abdohouir@gmail.com' 
         self.send_emails_to_users([user_email])
         return Response({'message': 'Email sent successfully!'}, status=status.HTTP_200_OK)
+    
+   
+class OfficeRatingAminListCreateView(generics.ListAPIView):
+    serializer_class = serializers.OfficeRatingAdminSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        office_id = self.kwargs.get('office_id')
+        get_object_or_404(models.Office,id_office=office_id)
+        return models.OfficeRating.objects.filter(office_id=office_id)
+
+    def list(self, request, *args, **kwargs):
+        ratings=self.get_queryset()
+        ratings=self.get_serializer(ratings,many=True)
+        return Response(ratings.data,status=status.HTTP_200_OK)

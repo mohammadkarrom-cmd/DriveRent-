@@ -219,3 +219,14 @@ class OfficeAccountSerializer(serializers.ModelSerializer):
         user.save()
 
         return super().update(instance, validated_data)
+    
+    
+class OfficeRatingAdminSerializer(serializers.ModelSerializer):
+    customer = serializers.SerializerMethodField()
+    office=serializers.CharField(source='office.name')
+    class Meta:
+        model = models.OfficeRating
+        fields = '__all__'
+        
+    def get_customer(self, obj):
+        return f"{obj.customer.user.first_name}-{obj.customer.user.last_name}"

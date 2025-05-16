@@ -8,6 +8,10 @@ urlpatterns = [
 
     path('office/<int:office_id>/accounts/', views.OfficeAccountListCreateView.as_view(), name='officeaccount-list-create'),
     path('office/accounts/<int:id_office_account>/', views.OfficeAccountRetrieveUpdateDestroyView.as_view(), name='officeaccount-detail'),
+    
+    
+    path('office/<int:office_id>/ratings/', views.OfficeRatingAminListCreateView.as_view(), name='list'),
+
     ##### manager
     ##################cars
     path('list-create/', views.CarListCreateView.as_view(), name='car-list-create'),
@@ -26,7 +30,6 @@ urlpatterns = [
     ##### Office Employee
     path('office/temporary-reservations/', views.OfficeEmployeeTemporaryReservationsView.as_view(), name='office-temporary-reservations'),
     path('office/confirm-reservation/<int:pk>/', views.ConfirmReservationView.as_view(), name='confirm-reservation'),
-
     path('reservations/cancel/<int:pk>/', views.CancelEmployeeReservationView.as_view(), name='cancel-reservation'),
 
 ]
