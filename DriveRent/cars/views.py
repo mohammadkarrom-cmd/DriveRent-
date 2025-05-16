@@ -143,12 +143,20 @@ class CarSearchView(generics.GenericAPIView):
 class HomeCustomerView(generics.GenericAPIView):
     # def get_permissions(self):
     #     return [IsRole(allowed_roles=['customer'])]
-    serializer_class = serializers.CarSerializer
+    serializer_class = serializers.CarCustomerListSerializer
     permission_classes = [AllowAny]
+    def get_queryset(self):
+        cars = models.Car.objects.filter(
+            Q(status=1) &
+            Q(owner_office=None) & Q(owner_customer__user__is_active=True) |
+            Q(owner_customer=None) & Q(owner_office__status_office=True) 
+            )
+        return cars
 
     def get(self, request, *args, **kwargs):
-        cars_new = models.Car.objects.order_by('-created_at')[:10]
-        cars_random = models.Car.objects.order_by('?')[:10]
+        queryset = self.get_queryset()
+        cars_new = queryset.order_by('-created_at')[:10]
+        cars_random = queryset.order_by('?')[:10]
         cars_new_serialized = self.get_serializer(cars_new, many=True).data
         cars_random_serialized = self.get_serializer(cars_random, many=True).data
 
@@ -165,11 +173,17 @@ class HomeCustomerView(generics.GenericAPIView):
 class CarlistViewView(generics.GenericAPIView):
     # def get_permissions(self):
     #     return [IsRole(allowed_roles=['customer'])]
-    serializer_class = serializers.CarSerializer
+    serializer_class = serializers.CarCustomerListSerializer
     permission_classes = [AllowAny]
-
+    def get_queryset(self):
+        cars = models.Car.objects.filter(
+            # Q(status=1) &
+            Q(owner_office=None) & Q(owner_customer__user__is_active=True) |
+            Q(owner_customer=None) & Q(owner_office__status_office=True) 
+            )
+        return cars
     def get(self, request, *args, **kwargs):
-        cars = models.Car.objects.all()
+        cars = self.get_queryset()
         cars = self.get_serializer(cars, many=True).data
 
         return Response(cars,status=status.HTTP_200_OK)
@@ -215,7 +229,7 @@ class CarSearchCustomerView(generics.GenericAPIView):
 class CarDetailView(generics.GenericAPIView):
     # def get_permissions(self):
         # return [IsRole(allowed_roles=['customer'])]
-    serializer_class = serializers.CarSerializer
+    serializer_class = serializers.CarCustomerSerializer
     permission_classes = [AllowAny]
     def get(self, request, id_car, *args, **kwargs):
         car = get_object_or_404(models.Car, id_car=id_car)
@@ -224,10 +238,9 @@ class CarDetailView(generics.GenericAPIView):
         reservations_serialized = serializers.ReservationViewCustomerSerializer(reservations, many=True).data
 
         return Response(
-            {
-                "car": car_serialized,
-                "reservations": reservations_serialized
-            },
+                # "car": car_serialized,
+                # "reservations": reservations_serialized
+                car_serialized,
             status=status.HTTP_200_OK
         )
 
@@ -550,3 +563,15 @@ class OfficeRatingAminListCreateView(generics.ListAPIView):
         ratings=self.get_queryset()
         ratings=self.get_serializer(ratings,many=True)
         return Response(ratings.data,status=status.HTTP_200_OK)
+
+
+class CarCategoryListCreateView(generics.ListCreateAPIView):
+    queryset = models.CarCategory.objects.all()
+    serializer_class = serializers.CarCategorySerializer
+    permission_classes = [AllowAny]
+
+class CarCategoryRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = models.CarCategory.objects.all()
+    serializer_class = serializers.CarCategorySerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'id_car_type'

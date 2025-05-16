@@ -5,6 +5,8 @@ from django.utils.timezone import now
 from users import models as models_user
 from rest_framework.exceptions import ValidationError
 from django.db import IntegrityError
+from users import serializers as users_serializers
+
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Car
@@ -230,3 +232,63 @@ class OfficeRatingAdminSerializer(serializers.ModelSerializer):
         
     def get_customer(self, obj):
         return f"{obj.customer.user.first_name}-{obj.customer.user.last_name}"
+    
+    
+class CarCustomerListSerializer(serializers.ModelSerializer):
+    owner_office = serializers.SerializerMethodField()
+    owner_customer = serializers.SerializerMethodField()
+    status=serializers.SerializerMethodField()
+    class Meta:
+        model = models.Car
+        fields = '__all__'
+        
+    def get_owner_office(self, obj):
+        return (
+            f"{obj.owner_office.name}"
+            if obj.owner_office else None
+        )
+        
+    def get_owner_customer(self, obj):
+        return (
+            f"{obj.owner_customer.user.first_name}-{obj.owner_customer.user.last_name}"
+            if obj.owner_customer and obj.owner_customer.user else None
+        )
+        
+    def get_status(self,obj):
+        return dict(models.status_list).get(obj.status, "غير معروف")
+
+
+
+class CarCustomerSerializer(serializers.ModelSerializer):
+    owner_office = serializers.SerializerMethodField()
+    owner_customer = serializers.SerializerMethodField()
+    status=serializers.SerializerMethodField()
+    class Meta:
+        model = models.Car
+        fields = '__all__'
+
+    def get_owner_office(self, obj):
+        if obj.owner_office:
+            return OfficeSerializer(obj.owner_office, context=self.context).data
+        return None
+
+    def get_owner_customer(self, obj):
+        if obj.owner_customer and obj.owner_customer.user:
+            return users_serializers.UserCustomerSerializer(obj.owner_customer.user).data
+        return None
+    
+    
+    def get_status(self,obj):
+        return dict(models.status_list).get(obj.status, "غير معروف")
+
+
+
+
+class CarCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CarCategory
+        fields = '__all__'
+
+
+
+

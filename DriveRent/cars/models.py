@@ -20,7 +20,7 @@ status_list=(
         (2, 'حجز مؤقت'),
         (3, 'محجوزة'),
         (4, 'منتهية الصلاحية'),  
-
+        (5, 'مباعة'),  
     )
 type_reservation_list=(
         (1, 'يومي'),
@@ -87,12 +87,20 @@ class OfficeRating(models.Model):
         return f"{self.customer} rated {self.office} ({self.rating})"
     
     
+class CarCategory(models.Model):
+    id_car_type = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, unique=True, verbose_name="نوع السيارة")
+
+    def __str__(self):
+        return self.name
+    
+    
 class Car(models.Model):
     id_car=models.AutoField(primary_key=True)
     brand = models.CharField(max_length=255)
     model = models.CharField(max_length=255)
     description = models.TextField()
-    category = models.IntegerField(choices=category_list)
+    category = models.ForeignKey(CarCategory, on_delete=models.SET_NULL, null=True, blank=True)
     is_available_daily = models.BooleanField(default=True)
     is_available_monthly = models.BooleanField(default=False)
     is_available_yearly = models.BooleanField(default=False)

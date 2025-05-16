@@ -133,11 +133,12 @@ class CustomerViewListSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
     phone = serializers.CharField(source="user.phone", read_only=True)
+    is_active = serializers.BooleanField(source="user.is_active", read_only=True)
 
     class Meta:
         model = models.Customer
         fields = [
-            "id_customer","first_name", "last_name", "email", "phone","username",
+            "id_customer","first_name", "last_name", "email", "phone","username","is_active"
         ]
 
 class CustomerViewSerializer(serializers.ModelSerializer):
@@ -147,7 +148,7 @@ class CustomerViewSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
     phone = serializers.CharField(source="user.phone", read_only=True)
-    is_active= serializers.CharField(source="user.is_active", read_only=True)
+    is_active= serializers.BooleanField(source="user.is_active", read_only=True)
     class Meta:
         model = models.Customer
         fields = [
@@ -245,3 +246,8 @@ class OfficeAccountCreateSerializer(serializers.Serializer):
 #             setattr(instance, attr, value)
 #         instance.save()
 #         return instance
+
+class UserCustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ['id', 'first_name', 'last_name', 'email', 'phone']

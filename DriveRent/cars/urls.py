@@ -12,16 +12,23 @@ urlpatterns = [
     
     path('office/<int:office_id>/ratings/', views.OfficeRatingAminListCreateView.as_view(), name='list'),
 
+    path('category/list-create/', views.CarCategoryListCreateView.as_view(), name='office-list-create'),
+    path('category/<int:id_car_type>/', views.CarCategoryRetrieveUpdateView.as_view(), name='office-detail'),
+
     ##### manager
     ##################cars
     path('list-create/', views.CarListCreateView.as_view(), name='car-list-create'),
     path('detail/<int:pk>/', views.CarUpdateDestroyView.as_view(), name='car-detail'),
     path('serche/', views.CarSearchView.as_view(), name='car-serche'),
+    
+    
+    
+    
     ##### Customer
     path('home/', views.HomeCustomerView.as_view(), name='home'),
     path('list/', views.CarlistViewView.as_view(), name='car-list-view'),
     path('serche-customer/', views.CarSearchCustomerView.as_view(), name='car-serche-customer'),
-    path('detail/<int:id_car>/', views.CarDetailView.as_view(), name='car-detail'),
+    path('car-detail/<int:id_car>/', views.CarDetailView.as_view(), name='car-detail'),
     path('reserve/', views.CreateReservationView.as_view(), name='reserve-car'),
     path('reserve/cancel/<int:pk>/',  views.CancelReservationView.as_view(), name='cancel-reservation'),  
     path('my-temporary-reservations/', views.CustomerTemporaryReservationsView.as_view(), name='customer-temporary-reservations'),
