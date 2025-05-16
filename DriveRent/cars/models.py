@@ -44,6 +44,8 @@ class Office(models.Model):
     id_office = models.AutoField(primary_key=True, verbose_name="معرف المكتب")
     name = models.CharField(max_length=255, verbose_name="اسم المكتب")
     location = models.CharField(max_length=255, verbose_name="موقع المكتب")
+    image = models.ImageField(upload_to=PathAndRename('image_office'), blank=True, null=True)
+    status_office=models.BooleanField(default=True)
     phone_number_1 = models.CharField(max_length=20, verbose_name="رقم التواصل 1")
     phone_number_2 = models.CharField(max_length=20, verbose_name="رقم التواصل 2", blank=True, null=True)
 

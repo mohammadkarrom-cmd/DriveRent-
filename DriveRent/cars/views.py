@@ -32,13 +32,28 @@ def remove_background(image_field):
 
 #####################
 class CarListCreateView(generics.ListCreateAPIView):
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['manager','employee'])]
-    queryset = models.Car.objects.all()
     serializer_class = serializers.CarSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['manager', 'employee'])]
+
+    def get_office(self):
+        user = self.request.user
+        office_account = get_object_or_404(models.OfficeAccount, user=user)
+        return office_account.office
+
+    def get_queryset(self):
+        office = self.get_office()
+        return models.Car.objects.filter(owner_office=office)
+
+    def list(self, request, *args, **kwargs):
+        cars = self.get_queryset()
+        serializer = self.get_serializer(cars, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
+        office = self.get_office()
         images = {
             "image1": self.request.FILES.get("image1"),
             "image2": self.request.FILES.get("image2"),
@@ -49,15 +64,24 @@ class CarListCreateView(generics.ListCreateAPIView):
             if image:
                 images[key] = remove_background(image)
 
-        serializer.save(**images)
+        serializer.save(owner_office=office, **images)
         
 #####################
-class CarUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['manager','employee'])]
-    queryset = models.Car.objects.all()
+class CarUpdateDestroyView(generics.RetrieveUpdateAPIView):
     serializer_class = serializers.CarSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['manager', 'employee'])]
+
+    def get_office(self):
+        user = self.request.user
+        office_account = get_object_or_404(models.OfficeAccount, user=user)
+        return office_account.office
+
+    def get_queryset(self):
+        office = self.get_office()
+        return models.Car.objects.filter(owner_office=office)
 
     def perform_update(self, serializer):
         images = {
@@ -71,16 +95,22 @@ class CarUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
                 images[key] = remove_background(image)
 
         serializer.save(**images)
-        
 #####################
 class CarSearchView(generics.GenericAPIView):
     def get_permissions(self):
         return [IsRole(allowed_roles=['manager','employee'])]
     serializer_class = serializers.CarSerializer
     # permission_classes = [AllowAny]
+    def get_office(self):
+        user = self.request.user
+        office_account = get_object_or_404(models.OfficeAccount, user=user)
+        return office_account.office
 
+    def get_queryset(self):
+        office = self.get_office()
+        return models.Car.objects.filter(owner_office=office)
     def get_cars(self, brand=None, model=None):
-        cars = models.Car.objects.all()
+        cars = self.get_queryset()
 
         if brand:
             cars = cars.filter(brand__icontains=brand)

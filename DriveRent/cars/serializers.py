@@ -167,7 +167,7 @@ class OfficeAccountSerializer(serializers.ModelSerializer):
             raise ValidationError({"detail": "حدث خطأ أثناء إنشاء المستخدم. تأكد من عدم تكرار البيانات."})
 
         office = self.context['office']
-        return models.OfficeAccount.objects.create(user=user, office=office, **validated_data)
+        return models.OfficeAccount.objects.create(user=user, office=office)
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
