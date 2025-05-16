@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
-import "../globals.css";
 import AppProvider from "@/lib/providers";
+import { Backgrounds, TextPrimary } from "@/lib/ui/class/classNames";
+import clsx from "clsx";
+import type { Metadata } from "next";
 import CommonLayout from "../components/layout/commonLayout";
 import NavLinks from "../components/layout/commonLayout/NavLinks";
-import clsx from "clsx";
-import { Backgrounds, TextPrimary } from "@/lib/ui/class/classNames"
 import MobileNavMenu from "../components/layout/mobile/MobileNavMenu";
+import "../globals.css";
 
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" dir="rtl">
-      <body className={clsx(Backgrounds, TextPrimary, "scroll-smooth")}>
+      <body className={clsx(Backgrounds, TextPrimary, "scroll-smooth h-[100vh]")}>
         <>
           <span id="CardBackgrounds" className="bg-background-card-light dark:bg-background-card-dark size-0"></span>
 

@@ -23,7 +23,7 @@ export const paths = {
         home: "/admin",
         office: {
             list: "/admin/office",
-            managers: (id: number) => `/admin/office/${id}`
+            managers: (id: number, name: string) => `/admin/office/${id}/${name}`
         },
         customers: {
             list: "/admin/customers"

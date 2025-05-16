@@ -36,6 +36,15 @@ export const endpoints = {
             list: "/car/office/list-create/",
             add: "/car/office/list-create/",
             edit: (id: number) => `/car/office/${id}/`,
+            accounts: {
+                list: (id: string | number) => `/car/office/${id}/accounts/`,
+                add: (id: string | number) => `/car/office/${id}/accounts/`,
+                edit: (id: string | number) => `/car/office/accounts/${id}/`,
+            }
+        },
+        users: {
+            list: "/account/customer/user-list/",
+            view: (id: number) => `/account/customer/user/${id}/`
         }
     },
     customer: {

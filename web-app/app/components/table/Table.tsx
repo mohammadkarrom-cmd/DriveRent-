@@ -1,11 +1,12 @@
 "use client"
 
-import TableHeader from './TableHeader'
-import React, { useState } from 'react'
-import TableBody from './TableBody'
-import clsx from 'clsx'
 import { splitArrayIntoChunks } from '@/lib/utils/arrays'
+import { Typography } from '@material-tailwind/react'
+import clsx from 'clsx'
+import { useState } from 'react'
 import SimplePagination from '../Pagination/SimplePagination'
+import TableBody from './TableBody'
+import TableHeader from './TableHeader'
 
 type Props = {
     tableHead: TableHead[],
@@ -34,7 +35,18 @@ const Table = ({ tableHead, tableRows, height, size }: Props) => {
                             tableRows={chunkedRows[currentPage]}
                             height={height}
                         />
-                        : <></>
+                        : <div 
+                        className='w-full h-full p-5 flex justify-center items-center'
+                        >
+                            <Typography
+                            variant='h2'
+                            role='p'
+                            color='green'
+                            className='w-fit'
+                            >
+                                لا يوجد صفوف
+                            </Typography>
+                        </div>
                 }
             </table>
             <div

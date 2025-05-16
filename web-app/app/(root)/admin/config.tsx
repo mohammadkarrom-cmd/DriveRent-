@@ -18,7 +18,7 @@ export const adminLinks: MenuLinkType[] = [
     {
         label: "المستخدمين",
         icon: <FaUsers />,
-        path: paths.manager.employees.index,
+        path: paths.admin.customers.list,
         Links: undefined
     },
 ]; 

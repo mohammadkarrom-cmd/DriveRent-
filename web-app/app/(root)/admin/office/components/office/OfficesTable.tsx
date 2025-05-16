@@ -1,8 +1,10 @@
+import { paths } from "@/app/components/layout/config-nav"
 import Table from "@/app/components/table/Table"
 import { CardBackgrounds } from "@/lib/ui/class/classNames"
 import { Button, Card, CardBody } from "@/lib/ui/MTFix"
 import { AxiosResponse } from "axios"
 import clsx from "clsx"
+import Link from "next/link"
 import { FaBuilding } from "react-icons/fa"
 import { FaMapLocationDot, FaPhoneFlip } from "react-icons/fa6"
 import { MdManageAccounts } from "react-icons/md"
@@ -59,7 +61,6 @@ const OfficesTable = ({ offices, mutate }: Props) => {
           <EditOffice
             mutate={mutate}
             office={row}
-            officeId={row.id_office}
           />
         )
       },
@@ -72,17 +73,19 @@ const OfficesTable = ({ offices, mutate }: Props) => {
       type: "string",
       render(row: OfficeType) {
         return (
-          <Button
-            variant='filled'
-            color="blue"
-            className='flex gap-0.5 shadow-none'
-            size='sm'
-          >
-            <MdManageAccounts
-              size={15}
-            />
-            عرض مدراء المكتب
-          </Button>
+          <Link href={paths.admin.office.managers(row.id_office,row.name)} >
+            <Button
+              variant='filled'
+              color="blue"
+              className='flex gap-0.5 shadow-none'
+              size='sm'
+            >
+              <MdManageAccounts
+                size={15}
+              />
+              عرض مدراء المكتب
+            </Button>
+          </Link>
         )
       },
     },

@@ -1,6 +1,8 @@
 import { endpoints } from '@/app/api/common';
 import MyFormProvider from '@/app/components/form/MyFormProvider';
+import RHFCheckbox from '@/app/components/form/RHFCheckbox';
 import RHFInput from '@/app/components/form/RHFInput';
+import RHFSingleImageDropzone from '@/app/components/form/RHFSingleImageDropzone';
 import dataMutate from '@/lib/api/data/dataMutate';
 import { addOfficeSchema, AddOfficeSchemaType } from '@/lib/api/data/zod/schemas';
 import { METHODS } from '@/lib/api/setup/api';
@@ -21,11 +23,8 @@ import { KeyedMutator } from 'swr';
 type Props = {
     mutate: KeyedMutator<AxiosResponse<unknown, unknown>>,
     office: OfficeType,
-    officeId: number
 }
-const EditOffice = ({ mutate, office, officeId }: Props) => {
-    console.log(officeId);
-    
+const EditOffice = ({ mutate, office }: Props) => {
     const { theme } = useSettingsContext();
 
     const open = useBoolean({ initialState: false });
@@ -35,7 +34,9 @@ const EditOffice = ({ mutate, office, officeId }: Props) => {
         name: office.name,
         location: office.location,
         phone_number_1: office.phone_number_1,
-        phone_number_2: office.phone_number_2
+        phone_number_2: office.phone_number_2,
+        image: office.image,
+        status_office: office.status_office
     }
 
     const methods = useForm({
@@ -45,7 +46,18 @@ const EditOffice = ({ mutate, office, officeId }: Props) => {
 
     const onSubmit = async (data: AddOfficeSchemaType) => {
         loading.onTrue();
-        const promise = dataMutate(endpoints.admin.office.edit(officeId), METHODS.PUT, data, {
+        let formData = {}
+        if (typeof data.image !== "object") {
+            // const blob = await fetchImageAsBlob(data.image) as File;
+            // data.image = new File([blob], "OfficeImage.jpg", { type: blob.type });
+            const {image,...leastData} = data;
+            console.log(image)
+            
+            formData = leastData;
+        } else {
+            formData = data
+        }
+        const promise = dataMutate(endpoints.admin.office.edit(office.id_office), METHODS.PATCH, formData, {
             headers: {
                 "Content-Type": "multipart/form-data"
             }
@@ -102,40 +114,59 @@ const EditOffice = ({ mutate, office, officeId }: Props) => {
                     onSubmit={onSubmit}
                 >
                     <DialogBody
-                        className='grid grid-cols-1 gap-5 md:grid-cols-2'
+                        className='flex justify-between items-start gap-5'
                     >
-                        <RHFInput
-                            label='اسم المكتب'
-                            type='text'
-                            color={theme === "dark" ? 'white' : "black"}
-                            icon={<FaBuilding size={25} />}
-                            name='name'
-                            helperText=''
-                        />
-                        <RHFInput
-                            label='موقع المكتب'
-                            type='text'
-                            color={theme === "dark" ? 'white' : "black"}
-                            icon={<FaMapLocationDot size={25} />}
-                            name='location'
-                            helperText=''
-                        />
-                        <RHFInput
-                            label='رقم الهاتف الأول'
-                            type='text'
-                            color={theme === "dark" ? 'white' : "black"}
-                            icon={<FaPhoneFlip size={25} />}
-                            name='phone_number_1'
-                            helperText=''
-                        />
-                        <RHFInput
-                            label='رقم الهاتف الثاني'
-                            type='text'
-                            color={theme === "dark" ? 'white' : "black"}
-                            icon={<FaPhoneFlip size={25} />}
-                            name='phone_number_2'
-                            helperText=''
-                        />
+                        <section
+                            className='grid grid-cols-1 gap-5  w-full mt-1'
+                        >
+                            <RHFInput
+                                label='اسم المكتب'
+                                type='text'
+                                color={theme === "dark" ? 'white' : "black"}
+                                icon={<FaBuilding size={25} />}
+                                name='name'
+                                helperText=''
+                            />
+                            <RHFInput
+                                label='موقع المكتب'
+                                type='text'
+                                color={theme === "dark" ? 'white' : "black"}
+                                icon={<FaMapLocationDot size={25} />}
+                                name='location'
+                                helperText=''
+                            />
+                            <RHFInput
+                                label='رقم الهاتف الأول'
+                                type='text'
+                                color={theme === "dark" ? 'white' : "black"}
+                                icon={<FaPhoneFlip size={25} />}
+                                name='phone_number_1'
+                                helperText=''
+                            />
+                            <RHFInput
+                                label='رقم الهاتف الثاني'
+                                type='text'
+                                color={theme === "dark" ? 'white' : "black"}
+                                icon={<FaPhoneFlip size={25} />}
+                                name='phone_number_2'
+                                helperText=''
+                            />
+                            <RHFCheckbox
+                                color='green'
+                                label='حالة المكتب'
+                                name='status_office'
+
+                            />
+                        </section>
+                        <section
+                            className='w-full'
+                        >
+                            <RHFSingleImageDropzone
+                                label='صورة المكتب'
+                                name='image'
+                                className='h-72 lg:h-80 w-full aspect-square object-contain mx-auto my-2 '
+                            />
+                        </section>
                     </DialogBody>
                     <DialogFooter className='gap-5'>
                         <Button

@@ -74,7 +74,9 @@ type customerType = {
     first_name: string
     id_number: string
     last_name: string
-    phone: string
+    phone: string,
+    email?: string
+    username?: string
 }
 
 type customerTemporaryReservationsType = {
@@ -95,5 +97,48 @@ type OfficeType = {
     name: string,
     location: string,
     phone_number_1: string,
-    phone_number_2: string
+    phone_number_2: string,
+    image: string,
+    status_office: boolean
+}
+
+type OfficeManger = {
+    id_office_account: number,
+    created_at: string,
+    updated_at: string,
+    user: {
+        id: number,
+        first_name: string,
+        last_name: string,
+        email: string,
+        username: string,
+        phone: string,
+        account_type: string,
+        is_active: boolean
+    }
+}
+
+type AdminCustomerType = {
+    first_name: string
+    last_name: string
+    phone: string,
+    email: string
+    username: string,
+    id_customer: number
+}
+
+type AdminCustomerDetailsType = {
+    first_name: string
+    id_number: string
+    last_name: string
+    phone: string
+    email: string
+    username: string
+    id_customer: number
+    id_user: number
+    is_active: boolean
+    id_front_image: string
+    id_back_image: string
+    driving_license_image: string
+
 }

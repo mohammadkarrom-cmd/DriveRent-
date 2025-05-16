@@ -1,6 +1,8 @@
 import { endpoints } from '@/app/api/common';
 import MyFormProvider from '@/app/components/form/MyFormProvider';
+import RHFCheckbox from '@/app/components/form/RHFCheckbox';
 import RHFInput from '@/app/components/form/RHFInput';
+import RHFSingleImageDropzone from '@/app/components/form/RHFSingleImageDropzone';
 import dataMutate from '@/lib/api/data/dataMutate';
 import { addOfficeSchema, AddOfficeSchemaType } from '@/lib/api/data/zod/schemas';
 import { METHODS } from '@/lib/api/setup/api';
@@ -31,7 +33,9 @@ const AddOffice = ({ mutate }: Props) => {
         location: "",
         name: "",
         phone_number_1: "",
-        phone_number_2: ""
+        phone_number_2: "",
+        image: null,
+        status_office: false
     }
 
     const methods = useForm({
@@ -95,40 +99,60 @@ const AddOffice = ({ mutate }: Props) => {
                     onSubmit={onSubmit}
                 >
                     <DialogBody
-                        className='grid grid-cols-1 gap-5 md:grid-cols-2'
+                        className='flex justify-between items-start gap-5'
                     >
-                        <RHFInput
-                            label='اسم المكتب'
-                            type='text'
-                            color={theme === "dark" ? 'white' : "black"}
-                            icon={<FaBuilding size={25} />}
-                            name='name'
-                            helperText=''
-                        />
-                        <RHFInput
-                            label='موقع المكتب'
-                            type='text'
-                            color={theme === "dark" ? 'white' : "black"}
-                            icon={<FaMapLocationDot size={25} />}
-                            name='location'
-                            helperText=''
-                        />
-                        <RHFInput
-                            label='رقم الهاتف الأول'
-                            type='text'
-                            color={theme === "dark" ? 'white' : "black"}
-                            icon={<FaPhoneFlip size={25} />}
-                            name='phone_number_1'
-                            helperText=''
-                        />
-                        <RHFInput
-                            label='رقم الهاتف الثاني'
-                            type='text'
-                            color={theme === "dark" ? 'white' : "black"}
-                            icon={<FaPhoneFlip size={25} />}
-                            name='phone_number_2'
-                            helperText=''
-                        />
+                        <section
+                            className='grid grid-cols-1 gap-5  w-full mt-1'
+                        >
+
+                            <RHFInput
+                                label='اسم المكتب'
+                                type='text'
+                                color={theme === "dark" ? 'white' : "black"}
+                                icon={<FaBuilding size={25} />}
+                                name='name'
+                                helperText=''
+                            />
+                            <RHFInput
+                                label='موقع المكتب'
+                                type='text'
+                                color={theme === "dark" ? 'white' : "black"}
+                                icon={<FaMapLocationDot size={25} />}
+                                name='location'
+                                helperText=''
+                            />
+                            <RHFInput
+                                label='رقم الهاتف الأول'
+                                type='text'
+                                color={theme === "dark" ? 'white' : "black"}
+                                icon={<FaPhoneFlip size={25} />}
+                                name='phone_number_1'
+                                helperText=''
+                            />
+                            <RHFInput
+                                label='رقم الهاتف الثاني'
+                                type='text'
+                                color={theme === "dark" ? 'white' : "black"}
+                                icon={<FaPhoneFlip size={25} />}
+                                name='phone_number_2'
+                                helperText=''
+                            />
+                            <RHFCheckbox
+                                color='green'
+                                label='حالة المكتب'
+                                name='status_office'
+
+                            />
+                        </section>
+                        <section
+                            className='w-full'
+                        >
+                            <RHFSingleImageDropzone
+                                label='صورة المكتب'
+                                name='image'
+                                className='h-72 lg:h-80 w-full aspect-square object-contain mx-auto my-2 '
+                            />
+                        </section>
                     </DialogBody>
                     <DialogFooter className='gap-5'>
                         <Button
