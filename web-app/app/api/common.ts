@@ -31,6 +31,13 @@ export const endpoints = {
             return `car/serche/?brand=${brand}&model=${model}`
         }
     },
+    admin: {
+        office: {
+            list: "/car/office/list-create/",
+            add: "/car/office/list-create/",
+            edit: (id: number) => `/car/office/${id}/`,
+        }
+    },
     customer: {
         reserveCar: "/car/reserve/",
         temporaryReservations: "/car/my-temporary-reservations/",

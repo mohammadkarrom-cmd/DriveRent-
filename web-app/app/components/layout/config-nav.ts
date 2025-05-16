@@ -9,14 +9,24 @@ export const paths = {
     home: "/",
     login: "/auth/login",
     register: "/auth/register",
-    admin: {
-        home: "/admin",
+    manager: {
+        home: "/manager",
         cars: {
-            index: "/admin/cars",
-            view: "/admin/cars/table"
+            index: "/manager/cars",
+            view: "/manager/cars/table"
         },
         employees: {
-            index: "/admin/employees"
+            index: "/manager/employees"
+        }
+    },
+    admin: {
+        home: "/admin",
+        office: {
+            list: "/admin/office",
+            managers: (id: number) => `/admin/office/${id}`
+        },
+        customers: {
+            list: "/admin/customers"
         }
     },
     employee: {
