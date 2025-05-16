@@ -89,3 +89,11 @@ type customerTemporaryReservationsType = {
     type_reservation: string,
     car: CarType
 }
+
+type OfficeType = {
+    id_office: number,
+    name: string,
+    location: string,
+    phone_number_1: string,
+    phone_number_2: string
+}

@@ -1,8 +1,6 @@
 import { paths } from "@/app/components/layout/config-nav";
-import { BsMicrosoftTeams } from "react-icons/bs";
-import { FaChartLine } from "react-icons/fa";
-import { IoLogoModelS } from "react-icons/io";
-import { IoCarSport } from "react-icons/io5";
+import { BsBuildingFill } from "react-icons/bs";
+import { FaChartLine, FaUsers } from "react-icons/fa";
 
 export const adminLinks: MenuLinkType[] = [
     {
@@ -12,21 +10,15 @@ export const adminLinks: MenuLinkType[] = [
         Links: undefined
     },
     {
-        label: "السيارات",
-        icon: <IoLogoModelS />,
-        path: paths.admin.cars.index,
-        Links: [
-            {
-                label: "عرض السيارات",
-                path: paths.admin.cars.view,
-                icon: <IoCarSport />
-            }
-        ]
+        label: "المكاتب",
+        icon: <BsBuildingFill />,
+        path: paths.admin.office.list,
+        Links: undefined
     },
     {
-        label: "الموظفين",
-        icon: <BsMicrosoftTeams />,
-        path: paths.admin.employees.index,
+        label: "المستخدمين",
+        icon: <FaUsers />,
+        path: paths.manager.employees.index,
         Links: undefined
     },
 ]; 

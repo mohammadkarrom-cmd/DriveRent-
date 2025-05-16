@@ -5,7 +5,7 @@ export const registerSchema = z.object({
   first_name: z.string().min(3, "يجب أن يكون الاسم الأول مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون الاسم الأول مكونًا من 20 حرفًا كحد أقصى"),
   last_name: z.string().min(3, "يجب أن يكون اسم العائلة مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون اسم العائلة مكونًا من 20 حرفًا كحد أقصى"),
   email: z.string().email("يجب أن يكون البريد الإلكتروني صالحًا ( @.[gmail,email].com)").min(3, "يجب أن يكون اسم العائلة مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون اسم العائلة مكونًا من 20 حرفًا كحد أقصى"),
-  phone: z.string().regex(/^09\d{8}$/, { message: "رقم الهاتف السوري غير صالح. يجب أن يبدأ بـ '09' ويتكون من 100 أرقام." }),
+  phone: z.string().regex(/^09\d{8}$/, { message: "رقم الهاتف السوري غير صالح. يجب أن يبدأ بـ '09' ويتكون من 10 أرقام." }),
   id_number: z.string().regex(/^\d{9}$/, { message: "رقم الهوية السورية غير صالح. يجب أن يتكون من 9 أرقام.", }),
   id_front_image: z.instanceof(File, { message: "صورة الوجه الأمامي للهوية  مطلوب" }),
   id_back_image: z.instanceof(File, { message: "صورة الوجه الخلفي للهوية  مطلوب" }),
@@ -143,3 +143,22 @@ export const updateEmployeeSchema = z.object({
 });
 
 export type UpdateEmployeeSchemaType = z.infer<typeof updateEmployeeSchema>;
+
+export const addOfficeSchema = z.object({
+  name: z.string()
+    .min(3, "يجب أن يكون اسم المكتب مكونًا من 3 أحرف على الأقل")
+    .max(20, "يجب أن يكون اسم المكتب مكونًا من 20 حرفًا كحد أقصى"),
+  location: z.string()
+    .min(3, "يجب أن يكون موقع المكتب مكونًا من 3 أحرف على الأقل")
+    .max(20, "يجب أن يكون موقع المكتب مكونًا من 20 حرفًا كحد أقصى"),
+  phone_number_1: z.string()
+    .regex(/^09\d{8}$/, {
+      message: "رقم الهاتف السوري غير صالح. يجب أن يبدأ بـ '09' ويتكون من 10 أرقام."
+    }),
+  phone_number_2: z.string()
+    .regex(/^09\d{8}$/, {
+      message: "رقم الهاتف السوري غير صالح. يجب أن يبدأ بـ '09' ويتكون من 10 أرقام."
+    }),
+});
+
+export type AddOfficeSchemaType = z.infer<typeof addOfficeSchema>

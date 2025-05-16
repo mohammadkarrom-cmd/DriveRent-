@@ -7,6 +7,7 @@ export const experimentalText = " Lorem ipsum dolor sit amet consectetur adipisi
 export const ROLES = {
     MANGER: "manager",
     CUSTOMER: "customer",
-    EMPLOYEE: "employee"
+    EMPLOYEE: "employee",
+    ADMIN: "admin"
 }
 

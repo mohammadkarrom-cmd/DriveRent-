@@ -1,30 +1,30 @@
 "use client"
 
+import { endpoints } from '@/app/api/common'
 import MyFormProvider from '@/app/components/form/MyFormProvider'
 import RHFInput from '@/app/components/form/RHFInput'
+import RHFSelect from '@/app/components/form/RHFSelect'
+import dataMutate from '@/lib/api/data/dataMutate'
+import { updateEmployeeSchema, UpdateEmployeeSchemaType } from '@/lib/api/data/zod/schemas'
+import { METHODS } from '@/lib/api/setup/api'
 import { useSettingsContext } from '@/lib/context/settings/setting-context'
 import useBoolean from '@/lib/hooks/use-boolean'
 import { Backgrounds, CardBackgrounds, CardBackgroundsReverse, TextPrimary, TextPrimaryReverse } from '@/lib/ui/class/classNames'
 import { Button, Dialog, DialogBody, DialogFooter, DialogHeader, IconButton, Option, Tooltip, Typography } from '@/lib/ui/MTFix'
 import { zodResolver } from '@hookform/resolvers/zod'
-import clsx from 'clsx'
-import { useForm } from 'react-hook-form'
-import { IoIosMail } from 'react-icons/io'
-import { updateEmployeeSchema, UpdateEmployeeSchemaType } from '@/lib/api/data/zod/schemas'
-import { MdOutlineShortText } from 'react-icons/md'
-import { RiShieldUserFill } from 'react-icons/ri'
-import { FaPhoneFlip } from 'react-icons/fa6'
-import RHFSelect from '@/app/components/form/RHFSelect'
-import { IoEye } from 'react-icons/io5'
-import { PiEyeClosedDuotone } from 'react-icons/pi'
-import dataMutate from '@/lib/api/data/dataMutate'
-import { endpoints } from '@/app/api/common'
-import { METHODS } from '@/lib/api/setup/api'
-import { KeyedMutator } from 'swr'
 import { AxiosError, AxiosResponse } from 'axios'
-import { toast } from 'react-toastify'
-import { FaUserEdit } from 'react-icons/fa'
+import clsx from 'clsx'
 import { unset } from 'lodash'
+import { useForm } from 'react-hook-form'
+import { FaUserEdit } from 'react-icons/fa'
+import { FaPhoneFlip } from 'react-icons/fa6'
+import { IoIosMail } from 'react-icons/io'
+import { IoEye } from 'react-icons/io5'
+import { MdOutlineShortText } from 'react-icons/md'
+import { PiEyeClosedDuotone } from 'react-icons/pi'
+import { RiShieldUserFill } from 'react-icons/ri'
+import { toast } from 'react-toastify'
+import { KeyedMutator } from 'swr'
 
 type Props = {
     mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
@@ -64,7 +64,6 @@ const EditEmployee = ({ mutate, employee }: Props) => {
         await promise.then(() => {
             mutate();
             toast.success("تم تعديل الحساب بنجاح ")
-            methods.reset(defaultValues)
             open.onFalse();
         }).catch(error => {
             if (error instanceof AxiosError && error.status === 400) {

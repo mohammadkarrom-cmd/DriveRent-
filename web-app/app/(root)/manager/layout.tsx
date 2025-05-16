@@ -8,7 +8,7 @@ import { CardBackgrounds } from '@/lib/ui/class/classNames'
 import { Card, CardBody, CardHeader } from '@/lib/ui/MTFix'
 import clsx from 'clsx'
 import { ReactNode } from 'react'
-import { adminLinks } from './config'
+import { managerLinks } from './config'
 
 
 type Props = {
@@ -19,7 +19,7 @@ const AdminLayout = ({ children }: Props) => {
     return (
         <AuthGuard>
             <RoleGuard
-                roles={[ROLES.ADMIN]}
+                roles={[ROLES.MANGER]}
             >
                 <section className='flex '>
                     <Card className={clsx(CardBackgrounds, "h-screen w-full max-w-80 p-4 text-inherit rounded-none hidden lg:block")}>
@@ -35,7 +35,7 @@ const AdminLayout = ({ children }: Props) => {
                             className='p-0'
                         >
                             <SidebarLinks
-                                links={adminLinks}
+                                links={managerLinks}
                             />
                         </CardBody>
                     </Card>
@@ -48,7 +48,7 @@ const AdminLayout = ({ children }: Props) => {
                                 className='p-0'
                             >
                                 <SidebarLinks
-                                    links={adminLinks}
+                                    links={managerLinks}
                                 />
                             </CardBody>
                         </Card>
