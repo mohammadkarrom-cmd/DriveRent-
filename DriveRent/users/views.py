@@ -178,8 +178,16 @@ class CustomerCreateView(generics.CreateAPIView):
         customer = serializer.save()
         
         user = customer.user
+
+        if not user.is_active:
+            return Response(
+                {
+                    "message": "تم إنشاء الحساب بنجاح. يرجى انتظار تفعيل الحساب من قبل الإدارة.",
+                },
+                status=status.HTTP_201_CREATED
+            )
+
         refresh = RefreshToken.for_user(user)
-        
         return Response(
             {
                 "message": "تم إنشاء الحساب بنجاح",
@@ -196,7 +204,6 @@ class CustomerCreateView(generics.CreateAPIView):
             },
             status=status.HTTP_201_CREATED
         )
-
 
 ###############
 class CustomerUserListView(generics.ListAPIView):

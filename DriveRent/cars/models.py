@@ -20,7 +20,7 @@ status_list=(
         (2, 'حجز مؤقت'),
         (3, 'محجوزة'),
         (4, 'منتهية الصلاحية'),  
-
+        (5, 'مباعة'),  
     )
 type_reservation_list=(
         (1, 'يومي'),
@@ -46,6 +46,7 @@ class Office(models.Model):
     location = models.CharField(max_length=255, verbose_name="موقع المكتب")
     image = models.ImageField(upload_to=PathAndRename('image_office'), blank=True, null=True)
     status_office=models.BooleanField(default=True)
+    ratings =models.PositiveSmallIntegerField(blank=True, null=True)
     phone_number_1 = models.CharField(max_length=20, verbose_name="رقم التواصل 1")
     phone_number_2 = models.CharField(max_length=20, verbose_name="رقم التواصل 2", blank=True, null=True)
 
@@ -70,12 +71,36 @@ class OfficeAccount(models.Model):
         return f"حساب {self.user} - مكتب {self.office.name}"
     
     
+    
+class OfficeRating(models.Model):
+    id_office_rating=models.AutoField(primary_key=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    office = models.ForeignKey('Office', on_delete=models.CASCADE, verbose_name="المكتب")
+    rating = models.PositiveSmallIntegerField(blank=True, null=True)  
+    comment = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('customer', 'office')  
+
+    def __str__(self):
+        return f"{self.customer} rated {self.office} ({self.rating})"
+    
+    
+class CarCategory(models.Model):
+    id_car_type = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, unique=True, verbose_name="نوع السيارة")
+
+    def __str__(self):
+        return self.name
+    
+    
 class Car(models.Model):
     id_car=models.AutoField(primary_key=True)
     brand = models.CharField(max_length=255)
     model = models.CharField(max_length=255)
     description = models.TextField()
-    category = models.IntegerField(choices=category_list)
+    category = models.ForeignKey(CarCategory, on_delete=models.SET_NULL, null=True, blank=True)
     is_available_daily = models.BooleanField(default=True)
     is_available_monthly = models.BooleanField(default=False)
     is_available_yearly = models.BooleanField(default=False)

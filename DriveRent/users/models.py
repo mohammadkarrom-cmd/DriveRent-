@@ -4,7 +4,7 @@ from django.utils.deconstruct import deconstructible
 import os
 import uuid
 ACCOUNT_TYPE_CHOICES = (
-        ('admin', 'مدير'),
+        ('admin', 'أدمن'),
         ('manager', 'مدير'),
         ('employee', 'موظف'),
         ('customer', 'زبون'),
