@@ -14,6 +14,9 @@ from django.core.cache import cache
 from users import serializers
 from users import models
 from .permissions import IsRole
+from cars import models as models_cars
+from django.shortcuts import get_object_or_404
+
 #######################################
 class LoginView(TokenObtainPairView):
     serializer_class = serializers.LoginSerializer
@@ -120,13 +123,6 @@ class CustomTokenRefreshView(TokenRefreshView):
         return response
     
 #####################
-class UserListCreateView(generics.ListCreateAPIView):
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['manager'])]
-    queryset = models.User.objects.filter(account_type__in=['manager', 'employee'])
-    serializer_class = serializers.UserSerializer
-    permission_classes = [AllowAny]
-########
 class UserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     def get_permissions(self):
         return [IsRole(allowed_roles=['manager'])]
@@ -218,3 +214,67 @@ class CustomerUserView(generics.RetrieveAPIView):
     permission_classes = [AllowAny]
     
     
+    
+class OfficeAccountListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.OfficeAccountCreateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager'])]
+
+    def get_queryset(self):
+        user = self.request.user
+        try:
+            office = models_cars.OfficeAccount.objects.get(user=user).office
+        except models_cars.OfficeAccount.DoesNotExist:
+            return models.User.objects.none()
+        office_users = models_cars.OfficeAccount.objects.filter(office=office).values_list('user_id', flat=True)
+        return models.User.objects.filter(id__in=office_users, account_type__in=["employee", "manager"])
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        data = [
+            {
+                "id": user.id,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+                "username": user.username,
+                "phone": user.phone,
+                "account_type": user.account_type,
+                "is_active": user.is_active,
+            }
+            for user in queryset
+        ]
+        return Response(data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            office = models_cars.OfficeAccount.objects.get(user=user).office
+        except models_cars.OfficeAccount.DoesNotExist:
+            return Response({"detail": "الحساب الحالي لا ينتمي إلى أي مكتب."}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(data=request.data, context={"office": office})
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        return Response(serializer.to_representation(instance), status=status.HTTP_201_CREATED)
+    
+    
+class OfficeAccountRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = serializers.OfficeAccountCreateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager'])]
+
+    def get_object(self):
+        manager = self.request.user
+        office = get_object_or_404(models_cars.OfficeAccount, user=manager).office
+
+        target_user_id = self.kwargs['user_id']
+        # التحقق من أن المستخدم المطلوب ينتمي لنفس المكتب
+        get_object_or_404(models_cars.OfficeAccount, user_id=target_user_id, office=office)
+
+        # نعيد كائن المستخدم مباشرة للتعديل
+        return get_object_or_404(models.User, id=target_user_id)

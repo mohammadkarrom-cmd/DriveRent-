@@ -8,14 +8,10 @@ urlpatterns = [
 
     path('office/<int:office_id>/accounts/', views.OfficeAccountListCreateView.as_view(), name='officeaccount-list-create'),
     path('office/accounts/<int:id_office_account>/', views.OfficeAccountRetrieveUpdateDestroyView.as_view(), name='officeaccount-detail'),
-    
-    path('send-test-email/', views.SendEmail.as_view()),
-
-    
-    
-    ##### cars
+    ##### manager
+    ##################cars
     path('list-create/', views.CarListCreateView.as_view(), name='car-list-create'),
-    path('updata-delete/<int:pk>/', views.CarUpdateDestroyView.as_view(), name='car-detail'),
+    path('detail/<int:pk>/', views.CarUpdateDestroyView.as_view(), name='car-detail'),
     path('serche/', views.CarSearchView.as_view(), name='car-serche'),
     ##### Customer
     path('home/', views.HomeCustomerView.as_view(), name='home'),

@@ -5,8 +5,9 @@ from django.contrib.auth import  authenticate
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from users import models
+from django.db import IntegrityError
 from django.contrib.auth import get_user_model
-
+from cars import models as models_cars
 # from .models import (
 #     User,
 #     Customer,
@@ -153,3 +154,94 @@ class CustomerViewSerializer(serializers.ModelSerializer):
            "id_customer", "id_user","username", "first_name", "last_name", "email", "phone",'is_active',
             "id_number", "id_front_image", "id_back_image", "driving_license_image"
         ]
+
+
+class OfficeAccountCreateSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True)
+    email = serializers.EmailField()
+    first_name = serializers.CharField(max_length=30)
+    last_name = serializers.CharField(max_length=30)
+    phone = serializers.CharField(required=False, allow_blank=True)
+    account_type = serializers.ChoiceField(choices=[("employee", "موظف"), ("manager", "مدير")])
+    is_active = serializers.BooleanField(default=True)
+
+    def create(self, validated_data):
+        username = validated_data.get("username")
+
+        if models.User.objects.filter(username=username).exists():
+            raise ValidationError({"username": "اسم المستخدم مستخدم مسبقًا."})
+
+        if models.User.objects.filter(email=validated_data.get("email")).exists():
+            raise ValidationError({"email": "البريد الإلكتروني مستخدم مسبقًا."})
+
+        try:
+            user = models.User(
+                username=username,
+                email=validated_data.pop("email"),
+                first_name=validated_data.pop("first_name"),
+                last_name=validated_data.pop("last_name"),
+                phone=validated_data.pop("phone", ""),
+                account_type=validated_data.pop("account_type"),
+                is_active=validated_data.pop("is_active", True),
+            )
+            user.set_password(validated_data.pop("password"))
+            user.save()
+        except IntegrityError:
+            raise ValidationError({"detail": "حدث خطأ أثناء إنشاء المستخدم."})
+
+        office = self.context.get("office")
+        if not office:
+            raise ValidationError({"office": "لم يتم تمرير المكتب."})
+
+        return models_cars.OfficeAccount.objects.create(user=user, office=office)
+
+    def update(self, instance, validated_data):
+        if models.User.objects.exclude(id=instance.id).filter(username=validated_data["username"]).exists():
+            raise ValidationError({"username": "اسم المستخدم مستخدم مسبقًا."})
+
+        if models.User.objects.exclude(id=instance.id).filter(email=validated_data["email"]).exists():
+            raise ValidationError({"email": "البريد الإلكتروني مستخدم مسبقًا."})
+
+        instance.username = validated_data.get("username", instance.username)
+        instance.email = validated_data.get("email", instance.email)
+        instance.first_name = validated_data.get("first_name", instance.first_name)
+        instance.last_name = validated_data.get("last_name", instance.last_name)
+        instance.phone = validated_data.get("phone", instance.phone)
+        instance.account_type = validated_data.get("account_type", instance.account_type)
+        instance.is_active = validated_data.get("is_active", instance.is_active)
+
+        if "password" in validated_data:
+            instance.set_password(validated_data["password"])
+
+        instance.save()
+        return instance
+
+
+    def to_representation(self, instance):
+        return {
+            "id": instance.id,
+            "first_name": instance.first_name,
+            "last_name": instance.last_name,
+            "email": instance.email,
+            "username": instance.username,
+            "phone": instance.phone,
+            "account_type": instance.account_type,
+            "is_active": instance.is_active,
+        }
+        
+        
+# class OfficeUserUpdateSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ['first_name', 'last_name', 'email', 'username', 'phone', 'account_type', 'is_active']
+#         extra_kwargs = {
+#             'username': {'required': True},
+#             'email': {'required': True},
+#         }
+
+#     def update(self, instance, validated_data):
+#         for attr, value in validated_data.items():
+#             setattr(instance, attr, value)
+#         instance.save()
+#         return instance
