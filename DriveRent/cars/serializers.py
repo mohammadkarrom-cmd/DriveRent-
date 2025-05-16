@@ -8,9 +8,13 @@ from django.db import IntegrityError
 from users import serializers as users_serializers
 
 class CarSerializer(serializers.ModelSerializer):
+    category_disaply=serializers.CharField(source='category.name' ,read_only=True)
     class Meta:
         model = models.Car
         fields = '__all__'
+        read_only_fields = ['category_disaply']
+        
+
         
 class ReservationViewCustomerSerializer(serializers.ModelSerializer):
     class Meta:

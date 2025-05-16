@@ -18,7 +18,7 @@ urlpatterns = [
     ##### manager
     ##################cars
     path('list-create/', views.CarListCreateView.as_view(), name='car-list-create'),
-    path('detail/<int:pk>/', views.CarUpdateDestroyView.as_view(), name='car-detail'),
+    path('detail/<int:id_car>/', views.CarUpdateDestroyView.as_view(), name='car-detail'),
     path('serche/', views.CarSearchView.as_view(), name='car-serche'),
     
     

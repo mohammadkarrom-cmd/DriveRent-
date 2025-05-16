@@ -49,8 +49,14 @@ class CarListCreateView(generics.ListCreateAPIView):
 
     def list(self, request, *args, **kwargs):
         cars = self.get_queryset()
-        serializer = self.get_serializer(cars, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        category_list=models.CarCategory.objects.all()
+        serializer_cars = self.get_serializer(cars, many=True)
+        serializer_category_list = serializers.CarCategorySerializer(category_list, many=True)
+        return Response({
+            "cars":serializer_cars.data,
+            "category_list":serializer_category_list.data
+
+            }, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
         office = self.get_office()
@@ -70,9 +76,7 @@ class CarListCreateView(generics.ListCreateAPIView):
 class CarUpdateDestroyView(generics.RetrieveUpdateAPIView):
     serializer_class = serializers.CarSerializer
     permission_classes = [IsAuthenticated]
-
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['manager', 'employee'])]
+    lookup_field = 'id_car'
 
     def get_office(self):
         user = self.request.user
@@ -82,6 +86,9 @@ class CarUpdateDestroyView(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         office = self.get_office()
         return models.Car.objects.filter(owner_office=office)
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
     def perform_update(self, serializer):
         images = {
@@ -94,7 +101,6 @@ class CarUpdateDestroyView(generics.RetrieveUpdateAPIView):
             if image:
                 images[key] = remove_background(image)
 
-        serializer.save(**images)
 #####################
 class CarSearchView(generics.GenericAPIView):
     def get_permissions(self):
@@ -109,7 +115,7 @@ class CarSearchView(generics.GenericAPIView):
     def get_queryset(self):
         office = self.get_office()
         return models.Car.objects.filter(owner_office=office)
-    def get_cars(self, brand=None, model=None):
+    def get_cars(self, brand=None, model=None,category=None):
         cars = self.get_queryset()
 
         if brand:
@@ -117,19 +123,25 @@ class CarSearchView(generics.GenericAPIView):
 
         if model:
             cars = cars.filter(model__icontains=model)
-
+            
+        if category:
+            cars = cars.filter(category=category)
+            
         if not cars.exists():
-            raise Http404("لا توجد استمارات متطابقة مع البحث")
+            return None
         return cars
 
     def get(self, request, *args, **kwargs):
         brand = request.query_params.get('brand')
         model = request.query_params.get('model')
+        category = request.query_params.get('category')
 
         if not brand and not model:
             return Response({'message': 'ادخل قيم في خيارات البحث'}, status=status.HTTP_400_BAD_REQUEST)
 
-        cars = self.get_cars(brand=brand, model=model)
+        cars = self.get_cars(brand=brand, model=model,category=category)
+        if not cars:
+            return Response({"message":"لا توجد سيارات متطابقة مع البحث"},status=status.HTTP_404_NOT_FOUND)
 
         cars_serializer = self.serializer_class(cars, many=True, context={'request': request})
 
