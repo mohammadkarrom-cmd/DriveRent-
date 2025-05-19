@@ -9,11 +9,14 @@ from users import serializers as users_serializers
 
 class CarSerializer(serializers.ModelSerializer):
     category_disaply=serializers.CharField(source='category.name' ,read_only=True)
+    status_disaply=serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = models.Car
         fields = '__all__'
         read_only_fields = ['category_disaply']
         
+    def get_status_disaply(self,obj):
+        return dict(models.status_list).get(obj.status, "غير معروف")
 
         
 class ReservationViewCustomerSerializer(serializers.ModelSerializer):

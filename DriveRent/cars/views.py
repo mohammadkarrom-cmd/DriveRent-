@@ -14,6 +14,7 @@ from rembg import remove
 from PIL import Image
 import io
 from django.core.files.base import ContentFile
+from users import models as models_users
 def remove_background(image_field):
     """إزالة الخلفية من صورة وإرجاع الصورة المعدلة."""
     if not image_field:
@@ -249,11 +250,11 @@ class CarDetailView(generics.GenericAPIView):
         car_serialized = self.get_serializer(car).data
         reservations_serialized = serializers.ReservationViewCustomerSerializer(reservations, many=True).data
 
-        return Response(
-                # "car": car_serialized,
-                # "reservations": reservations_serialized
-                car_serialized,
-            status=status.HTTP_200_OK
+        return Response({
+                "car": car_serialized,
+                "reservations": reservations_serialized
+                # car_serialized,
+        },status=status.HTTP_200_OK
         )
 
     
@@ -576,6 +577,33 @@ class OfficeRatingAminListCreateView(generics.ListAPIView):
         ratings=self.get_serializer(ratings,many=True)
         return Response(ratings.data,status=status.HTTP_200_OK)
 
+class MnagerOfficeRatingAminListCreateView(generics.ListAPIView):
+    serializer_class = serializers.OfficeRatingAdminSerializer
+    permission_classes = [AllowAny]
+
+    def get_office(self):
+        user = self.request.user
+        office_account = get_object_or_404(models.OfficeAccount, user=user).office.id_office
+        office=get_object_or_404(models.Office,id_office=office_account)
+        return office
+
+    def get_queryset(self):
+        office = self.get_office()
+        return models.OfficeRating.objects.filter(office=office)
+
+    def list(self, request, *args, **kwargs):
+        ratings=self.get_queryset()
+        ratings=self.get_serializer(ratings,many=True)
+        rating=self.get_office().ratings
+        return Response(
+            {
+              "total_rating": rating,
+              "ratings" : ratings.data
+                
+            },status=status.HTTP_200_OK)
+
+
+
 
 class CarCategoryListCreateView(generics.ListCreateAPIView):
     queryset = models.CarCategory.objects.all()
@@ -587,3 +615,74 @@ class CarCategoryRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = serializers.CarCategorySerializer
     permission_classes = [AllowAny]
     lookup_field = 'id_car_type'
+    
+    
+class CustomerCarListCreateView(generics.ListCreateAPIView):
+    serializer_class = serializers.CarSerializer
+    permission_classes = [IsAuthenticated]
+
+    # def get_permissions(self):
+    #     return [IsRole(allowed_roles=['manager', 'employee'])]
+
+    def get_customer(self):
+        user = self.request.user
+        customer = get_object_or_404(models_users.Customer, user=user)
+        return customer
+
+    def get_queryset(self):
+        customer = self.get_customer()
+        return models.Car.objects.filter(owner_customer=customer)
+
+    def list(self, request, *args, **kwargs):
+        cars = self.get_queryset()
+        category_list=models.CarCategory.objects.all()
+        serializer_cars = self.get_serializer(cars, many=True)
+        serializer_category_list = serializers.CarCategorySerializer(category_list, many=True)
+        return Response({
+            "cars":serializer_cars.data,
+            "category_list":serializer_category_list.data
+
+            }, status=status.HTTP_200_OK)
+
+    def perform_create(self, serializer):
+        customer = self.get_customer()
+        images = {
+            "image1": self.request.FILES.get("image1"),
+            "image2": self.request.FILES.get("image2"),
+            "image3": self.request.FILES.get("image3"),
+        }
+
+        for key, image in images.items():
+            if image:
+                images[key] = remove_background(image)
+
+        serializer.save(owner_customer=customer, **images)
+        
+        
+class CustomerCarUpdateDestroyView(generics.RetrieveUpdateAPIView):
+    serializer_class = serializers.CarSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id_car'
+
+    def get_customer(self):
+        user = self.request.user
+        customer = get_object_or_404(models_users.Customer, user=user).id_customer
+        return customer
+
+    def get_queryset(self):
+        customer = self.get_customer()
+        return models.Car.objects.filter(owner_customer=customer)
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def perform_update(self, serializer):
+        images = {
+            "image1": self.request.FILES.get("image1"),
+            "image2": self.request.FILES.get("image2"),
+            "image3": self.request.FILES.get("image3"),
+        }
+
+        for key, image in images.items():
+            if image:
+                images[key] = remove_background(image)

@@ -8,6 +8,8 @@ from users import models
 from django.db import IntegrityError
 from django.contrib.auth import get_user_model
 from cars import models as models_cars
+from rest_framework.validators import UniqueValidator
+
 # from .models import (
 #     User,
 #     Customer,
@@ -92,7 +94,6 @@ class CustomerCreateSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(max_length=30)
     email = serializers.EmailField()
     phone = serializers.CharField(max_length=20, required=False, allow_blank=True)
-
     class Meta:
         model = models.Customer
         fields = [
@@ -103,7 +104,8 @@ class CustomerCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if models.User.objects.filter(username=data.get("username")).exists():
             raise ValidationError({"message": "حصل خطأ ما"})  
-
+        if models.Customer.objects.filter(id_number=data.get("id_number")).exists():
+            raise ValidationError({"message": "الرقم الوطني المدخل مسجل سابقاً تحقق من الرقم"})  
         return data
 
     def create(self, validated_data):

@@ -35,14 +35,6 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
 }
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp-relay.brevo.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = '8d205b001@smtp-brevo.com'  
-EMAIL_HOST_PASSWORD = 'N0Yrw7GqMQ4DXz6W'  
-# DEFAULT_FROM_EMAIL = 'اسم شركتك <your_email@example.com>'
-# Application definition
 
 INSTALLED_APPS = [
     'rest_framework',
@@ -177,12 +169,3 @@ Q_CLUSTER = {
     'bulk': 10,
     'orm': 'default'  
 }
-
-
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.mailgun.org'  # تأكد من أنه مطابق للاستضافة
-# EMAIL_PORT = 587   # استخدم `465` لأنه يتطلب `SSL`
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'postmaster@sandbox2602f1a9340c4be597f6b74693ca8ea9.mailgun.org'  # بريد المرسل
-# EMAIL_HOST_PASSWORD = '217edc394e0e8145d5b2fef3c49ca9d4-667818f5-8abe531e' # استخدم كلمة المرور الصحيحة
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
