@@ -23,6 +23,15 @@ status_list=(
         (5, 'منتهي الصلاحية'),  
         (6, 'مباعة'),  
     )
+status_reservation_list=(
+        (1, 'حجز مؤقت'),
+        (2, 'حجز مؤكد'),
+        (3, 'حجز منتهي الصلاحية'),  
+        (4, 'حجز ملغي '),  
+        (5,'حجز وهمي')
+
+    )
+
 type_reservation_list=(
         (1, 'أجار يومي'),
         (2, 'أجار شهري'),
@@ -130,7 +139,7 @@ class Reservation(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     type_reservation = models.IntegerField(choices=type_reservation_list)
-    status_reservation = models.IntegerField(choices=status_list)
+    status_reservation = models.IntegerField(choices=status_reservation_list)
     time_reservation = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -28,32 +28,31 @@ class ReservationViewCustomerSerializer(serializers.ModelSerializer):
 class ReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Reservation
-        fields = ['car', 'start_date', 'type_reservation']  # المستخدم لا يحتاج لإدخال `end_date`
+        fields = ['car', 'start_date', 'type_reservation']  
 
-    def validate(self, data):
-        """التحقق من توفر السيارة"""
-        car = data['car']
-        start_date = data['start_date']
-        type_reservation = data['type_reservation']
+    # def validate(self, data):
+    #     """التحقق من توفر السيارة"""
+    #     car = data['car']
+    #     start_date = data['start_date']
+    #     type_reservation = data['type_reservation']
 
-        # حساب `end_date` بناءً على `type_reservation`
-        duration = {
-            1: timedelta(days=1),
-            2: timedelta(days=30),
-            3: timedelta(days=365)
-        }.get(type_reservation, timedelta(days=1))
+    #     duration = {
+    #         1: timedelta(days=1),
+    #         2: timedelta(days=30),
+    #         3: timedelta(days=365)
+    #     }.get(type_reservation, timedelta(days=1))
 
-        end_date = start_date + duration
+    #     end_date = start_date + duration
 
-        if models.Reservation.objects.filter(
-            car=car, 
-            start_date__lt=end_date, 
-            end_date__gt=start_date,
-            status_reservation__in=[2, 3]  
-        ).exists():
-            raise serializers.ValidationError("⚠️ السيارة غير متاحة في هذه الفترة.")
+    #     if models.Reservation.objects.filter(
+    #         car=car, 
+    #         start_date__lt=end_date, 
+    #         end_date__gt=start_date,
+    #         status_reservation__in=[2, 3]  
+    #     ).exists():
+    #         raise serializers.ValidationError("⚠️ السيارة غير متاحة في هذه الفترة.")
 
-        return data
+    #     return data
     
     
 class ReservationDetialSerializer(serializers.ModelSerializer):
@@ -79,7 +78,7 @@ class ReservationDetialSerializer(serializers.ModelSerializer):
         """
         حساب الوقت المتبقي قبل الإلغاء التلقائي للحجز المؤقت وإرجاعه كـ `timedelta`
         """
-        if obj.status_reservation == 2:  
+        if obj.status_reservation == 1:  
             elapsed_time = (now() - obj.time_reservation).total_seconds()
             remaining_seconds = max(0, 2 * 60 * 60 - elapsed_time)  # حساب الثواني المتبقية
 
@@ -100,7 +99,7 @@ class ReservationDetialSerializer(serializers.ModelSerializer):
         """
         إرجاع النصوص بدلاً من معرف `status_reservation`
         """
-        return dict(models.status_list).get(obj.status_reservation, "غير معروف")
+        return dict(models.status_reservation_list).get(obj.status_reservation, "غير معروف")
     
     
 class CustomerSerializer(serializers.ModelSerializer):
@@ -118,12 +117,39 @@ class ReservationSrecheSerializer(serializers.ModelSerializer):
     """سيريلز الحجز مع تفاصيل العميل والسيارة"""
     customer = CustomerSerializer()  
     car = CarSerializer()  
-
+    remaining_time=serializers.SerializerMethodField()
+    type_reservation=serializers.SerializerMethodField()
+    status_reservation=serializers.SerializerMethodField()
     class Meta:
         model = models.Reservation
-        fields = ['id_reservation', 'start_date', 'end_date', 'type_reservation', 'status_reservation', 'time_reservation', 'car', 'customer']
+        fields = ['id_reservation', 'start_date', 'end_date', 'type_reservation', 'status_reservation','remaining_time', 'time_reservation', 'car', 'customer']
         
-        
+    def get_remaining_time(self, obj):
+        """
+        حساب الوقت المتبقي قبل الإلغاء التلقائي للحجز المؤقت وإرجاعه كـ `timedelta`
+        """
+        if obj.status_reservation == 1:  
+            elapsed_time = (now() - obj.time_reservation).total_seconds()
+            remaining_seconds = max(0, 2 * 60 * 60 - elapsed_time)  # حساب الثواني المتبقية
+
+            # استخراج الدقائق والثواني من الوقت المتبقي
+            minutes = int(remaining_seconds // 60)  # تحويل الثواني إلى دقائق
+            seconds = int(remaining_seconds % 60)   # استخراج الثواني المتبقية
+
+            return {"mint": minutes, "second": seconds}  # إرجاع القيم كمصفوفة JSON
+
+        return None  
+    def get_type_reservation(self, obj):
+        """
+        إرجاع النصوص بدلاً من معرف `type_reservation`
+        """
+        return dict(models.type_reservation_list).get(obj.type_reservation, "غير معروف")
+
+    def get_status_reservation(self, obj):
+        """
+        إرجاع النصوص بدلاً من معرف `status_reservation`
+        """
+        return dict(models.status_reservation_list).get(obj.status_reservation, "غير معروف")
         
 
 class OfficeSerializer(serializers.ModelSerializer):

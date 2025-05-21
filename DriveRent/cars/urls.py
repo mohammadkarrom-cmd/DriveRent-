@@ -39,8 +39,11 @@ urlpatterns = [
 
 
     ##### Office Employee
-    path('office/temporary-reservations/', views.OfficeEmployeeTemporaryReservationsView.as_view(), name='office-temporary-reservations'),
-    path('office/confirm-reservation/<int:pk>/', views.ConfirmReservationView.as_view(), name='confirm-reservation'),
+    path('list/reservations/', views.OfficeEmployeeReservationsView.as_view(), name='office-all-reservations'),
+    path('list/temporary-reservations/', views.OfficeEmployeeTemporaryReservationsView.as_view(), name='office-temporary-reservations'),
+    path('list/fake-reservations/', views.OfficeEmployeeFakeReservationsView.as_view(), name='office-fake-reservations'),
+    path('confirm-reservation/<int:pk>/', views.ConfirmReservationView.as_view(), name='confirm-reservation'),
     path('reservations/cancel/<int:pk>/', views.CancelEmployeeReservationView.as_view(), name='cancel-reservation'),
+    path('confirm-fake-reservations/<int:pk>/', views.ConfirmFakeReservationView.as_view(), name='confirm-fake-reservation'),
 
 ]
