@@ -22,6 +22,8 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from cars.tasks import expire_reservation
 from cars import models, serializers
+from django.db.models import Avg
+
 type_reservation_list = {
     1: timedelta(days=1),  
     2: timedelta(days=30),  
@@ -865,3 +867,70 @@ class CustomerCarUpdateDestroyView(generics.RetrieveUpdateAPIView):
         for key, image in images.items():
             if image:
                 images[key] = remove_background(image)
+
+#####################
+class CustomerEvaluableOfficesListView(generics.ListAPIView):
+    """
+    List offices that the authenticated customer can evaluate:
+    - The customer must have at least one completed reservation (status_reservation=2) with the office.
+    - The customer must not have already evaluated the office.
+    """
+    serializer_class = serializers.OfficeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        customer = models.Customer.objects.get(user=self.request.user)
+        completed_reservations = models.Reservation.objects.filter(
+            customer=customer,
+            status_reservation=2  # "مؤكد"
+        ).values_list('car__owner_office', flat=True).distinct()
+        already_evaluated = models.OfficeRating.objects.filter(
+            customer=customer
+        ).values_list('office', flat=True)
+        return models.Office.objects.filter(
+            id_office__in=completed_reservations
+        ).exclude(id_office__in=already_evaluated)
+
+class CustomerEvaluateOfficeView(generics.CreateAPIView):
+    """
+    يسمح للزبون بتقييم المكتب في حال:
+    - لديه حجز مكتمل مع المكتب.
+    - لم يقم بتقييم نفس المكتب من قبل.
+    """
+    serializer_class = serializers.OfficeRatingCreateSerializer
+    permission_classes = [AllowAny]
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        customer = getattr(user, 'customer', None)
+        if not customer:
+            raise serializers.ValidationError({"message": "لا يمكن التحقق من حساب الزبون."})
+
+        office_id = self.kwargs.get('office_id')
+        office = get_object_or_404(models.Office, id_office=office_id)
+
+        # تحقق من وجود حجز مكتمل مع المكتب
+        has_completed_reservation = models.Reservation.objects.filter(
+            customer=customer,
+            car__owner_office=office,
+            status_reservation=2
+        ).exists()
+
+        if not has_completed_reservation:
+            raise serializers.ValidationError({"message": "لا يمكنك تقييم هذا المكتب لعدم وجود حجز مكتمل."})
+
+        # تحقق من عدم التقييم المسبق
+        already_evaluated = models.OfficeRating.objects.filter(
+            customer=customer,
+            office=office
+        ).exists()
+
+        if already_evaluated:
+            raise serializers.ValidationError({"message": "لقد قمت بتقييم هذا المكتب مسبقًا."})
+
+        serializer.save(customer=customer, office=office)
+
+        # تحديث متوسط التقييم للمكتب
+        avg_rating = models.OfficeRating.objects.filter(office=office).aggregate(avg=Avg('rating'))['avg'] or 0
+        office.ratings = avg_rating
+        office.save()

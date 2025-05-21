@@ -37,6 +37,11 @@ urlpatterns = [
     path('reserve/cancel/<int:pk>/',  views.CancelReservationView.as_view(), name='cancel-reservation'),  
     path('my-temporary-reservations/', views.CustomerTemporaryReservationsView.as_view(), name='customer-temporary-reservations'),
 
+    # Customer: List offices the customer can evaluate
+    path('customer/evaluable-offices/', views.CustomerEvaluableOfficesListView.as_view(), name='customer-evaluable-offices'),
+
+    # Customer: Evaluate an office (only if in the list above)
+    path('customer/evaluate-office/<int:office_id>/', views.CustomerEvaluateOfficeView.as_view(), name='customer-evaluate-office'),
 
     ##### Office Employee
     path('list/reservations/', views.OfficeEmployeeReservationsView.as_view(), name='office-all-reservations'),

@@ -325,3 +325,11 @@ class CarCategorySerializer(serializers.ModelSerializer):
 
 
 
+class OfficeRatingCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.OfficeRating
+        fields = ['rating', 'comment']  # Add other fields as needed
+        extra_kwargs = {
+            'rating': {'required': True, 'min_value': 1, 'max_value': 5},
+            'comment': {'required': False}
+        }
