@@ -17,15 +17,25 @@ category_list=(
     )
 status_list=(
         (1, 'متاحة'),
-        (2, 'حجز مؤقت'),
-        (3, 'محجوزة'),
-        (4, 'منتهية الصلاحية'),  
-        (5, 'مباعة'),  
+        (2, 'حجز مؤقت للأجار'),
+        (3, 'محجوزة للأجار'),
+        (4, 'حجز مؤقت للبيع'),
+        (5, 'منتهي الصلاحية'),  
+        (6, 'مباعة'),  
     )
+status_reservation_list=(
+        (1, 'حجز مؤقت'),
+        (2, 'حجز مؤكد'),
+        (3, 'حجز منتهي الصلاحية'),  
+        (4, 'حجز ملغي '),  
+        (5,'حجز وهمي')
+
+    )
+
 type_reservation_list=(
-        (1, 'يومي'),
-        (2, 'شهري'),
-        (3, 'سنوي'),
+        (1, 'أجار يومي'),
+        (2, 'أجار شهري'),
+        (3, 'أجار سنوي'),
         (4,'شراء')
     )
 
@@ -46,7 +56,7 @@ class Office(models.Model):
     location = models.CharField(max_length=255, verbose_name="موقع المكتب")
     image = models.ImageField(upload_to=PathAndRename('image_office'), blank=True, null=True)
     status_office=models.BooleanField(default=True)
-    ratings =models.PositiveSmallIntegerField(blank=True, null=True)
+    ratings =models.FloatField(blank=True, null=True)  
     phone_number_1 = models.CharField(max_length=20, verbose_name="رقم التواصل 1")
     phone_number_2 = models.CharField(max_length=20, verbose_name="رقم التواصل 2", blank=True, null=True)
 
@@ -76,7 +86,7 @@ class OfficeRating(models.Model):
     id_office_rating=models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     office = models.ForeignKey('Office', on_delete=models.CASCADE, verbose_name="المكتب")
-    rating = models.PositiveSmallIntegerField(blank=True, null=True)  
+    rating = models.FloatField(blank=True, null=True)  
     comment = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -129,7 +139,7 @@ class Reservation(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     type_reservation = models.IntegerField(choices=type_reservation_list)
-    status_reservation = models.IntegerField(choices=status_list)
+    status_reservation = models.IntegerField(choices=status_reservation_list)
     time_reservation = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
