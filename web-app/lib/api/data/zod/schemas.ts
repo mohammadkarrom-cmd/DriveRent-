@@ -160,7 +160,7 @@ export const addOfficeSchema = z.object({
       message: "رقم الهاتف السوري غير صالح. يجب أن يبدأ بـ '09' ويتكون من 10 أرقام."
     }),
   image: z.instanceof(File, { message: "صورة المكتب مطلوبة" }).or(z.string()),
-  status_office: z.boolean({message: "حالة المكتب مطلوبة"})
+  status_office: z.boolean({ message: "حالة المكتب مطلوبة" })
 });
 
 export type AddOfficeSchemaType = z.infer<typeof addOfficeSchema>
@@ -171,7 +171,7 @@ export const addOfficeAccountSchema = z.object({
   email: z.string().email("يجب أن يكون البريد الإلكتروني صالحًا ( @.[gmail,email].com)").min(3, "يجب أن يكون اسم العائلة مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون اسم العائلة مكونًا من 20 حرفًا كحد أقصى"),
   username: z.string().min(3, "يجب أن يكون اسم المستخدم مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون اسم المستخدم مكونًا من 20 حرفًا كحد أقصى"),
   account_type: z.enum(['manager', 'employee']),
-  is_active: z.boolean({message: "حالة الحساب مطلوبة"}),
+  is_active: z.boolean({ message: "حالة الحساب مطلوبة" }),
   phone: z.string().regex(/^09\d{8}$/, { message: "رقم الهاتف السوري غير صالح. يجب أن يبدأ بـ '09' ويتكون من 10 أرقام." }),
   password: z.string().min(8, 'يجب أن تكون كلمة المرور مكونة من 8 أحرف على الأقل').max(20, "يجب أن تكون كلمة المرور مكونة من 20 حرفًا كحد أقصى"),
   confirm_password: z.string().min(8, 'يجب أن تكون كلمة المرور المؤكدة مكونة من 8 أحرف على الأقل').max(20, "يجب أن تكون كلمة المرور المؤكدة مكونة من 20 حرفًا كحد أقصى"),
@@ -182,19 +182,27 @@ export const addOfficeAccountSchema = z.object({
 
 export type AddOfficeAccountSchemaType = z.infer<typeof addOfficeAccountSchema>;
 
- export const editOfficeAccountSchema = z.object({
-   first_name: z.string().min(3, "يجب أن يكون الاسم الأول مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون الاسم الأول مكونًا من 20 حرفًا كحد أقصى"),
-   last_name: z.string().min(3, "يجب أن يكون اسم العائلة مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون اسم العائلة مكونًا من 20 حرفًا كحد أقصى"),
-   email: z.string().email("يجب أن يكون البريد الإلكتروني صالحًا ( @.[gmail,email].com)").min(3, "يجب أن يكون اسم العائلة مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون اسم العائلة مكونًا من 20 حرفًا كحد أقصى"),
-   username: z.string().min(3, "يجب أن يكون اسم المستخدم مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون اسم المستخدم مكونًا من 20 حرفًا كحد أقصى"),
-   account_type: z.enum(['manager', 'employee']),
-   is_active: z.boolean({message: "حالة الحساب مطلوبة"}),
-   phone: z.string().regex(/^09\d{8}$/, { message: "رقم الهاتف السوري غير صالح. يجب أن يبدأ بـ '09' ويتكون من 10 أرقام." }),
-   password: z.string().min(8, 'يجب أن تكون كلمة المرور مكونة من 8 أحرف على الأقل').max(20, "يجب أن تكون كلمة المرور مكونة من 20 حرفًا كحد أقصى").nullable(),
-   confirm_password: z.string().min(8, 'يجب أن تكون كلمة المرور المؤكدة مكونة من 8 أحرف على الأقل').max(20, "يجب أن تكون كلمة المرور المؤكدة مكونة من 20 حرفًا كحد أقصى").nullable(),
- }).refine((data) => (data.password === data.confirm_password), {
-   message: "كلمتا المرور غير متطابقتين",
-   path: ["confirm_password"],  
- });
+export const editOfficeAccountSchema = z.object({
+  first_name: z.string().min(3, "يجب أن يكون الاسم الأول مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون الاسم الأول مكونًا من 20 حرفًا كحد أقصى"),
+  last_name: z.string().min(3, "يجب أن يكون اسم العائلة مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون اسم العائلة مكونًا من 20 حرفًا كحد أقصى"),
+  email: z.string().email("يجب أن يكون البريد الإلكتروني صالحًا ( @.[gmail,email].com)").min(3, "يجب أن يكون اسم العائلة مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون اسم العائلة مكونًا من 20 حرفًا كحد أقصى"),
+  username: z.string().min(3, "يجب أن يكون اسم المستخدم مكونًا من 3 أحرف على الأقل").max(20, "يجب أن يكون اسم المستخدم مكونًا من 20 حرفًا كحد أقصى"),
+  account_type: z.enum(['manager', 'employee']),
+  is_active: z.boolean({ message: "حالة الحساب مطلوبة" }),
+  phone: z.string().regex(/^09\d{8}$/, { message: "رقم الهاتف السوري غير صالح. يجب أن يبدأ بـ '09' ويتكون من 10 أرقام." }),
+  password: z.string().min(8, 'يجب أن تكون كلمة المرور مكونة من 8 أحرف على الأقل').max(20, "يجب أن تكون كلمة المرور مكونة من 20 حرفًا كحد أقصى").nullable(),
+  confirm_password: z.string().min(8, 'يجب أن تكون كلمة المرور المؤكدة مكونة من 8 أحرف على الأقل').max(20, "يجب أن تكون كلمة المرور المؤكدة مكونة من 20 حرفًا كحد أقصى").nullable(),
+}).refine((data) => (data.password === data.confirm_password), {
+  message: "كلمتا المرور غير متطابقتين",
+  path: ["confirm_password"],
+});
 
- export type EditOfficeAccountSchemaType = z.infer<typeof editOfficeAccountSchema>;
+export type EditOfficeAccountSchemaType = z.infer<typeof editOfficeAccountSchema>;
+
+export const categorySchema = z.object({
+  name: z.string()
+    .min(3, "يجب ان يكون اسم التصنيف مكون من ثلاث أحرف علر الأقل")
+    .max(20, "يجب ان يكون اسم التصنيف مكون من ثلاث أحرف علر الأكثر")
+});
+
+export type CategorySchemaType = z.infer<typeof categorySchema>;

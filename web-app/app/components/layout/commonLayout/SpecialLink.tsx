@@ -21,7 +21,7 @@ const SpecialLink = () => {
                         status === "authenticated" &&
                             user?.role === ROLES.MANGER
                             ? <NavLink
-                                href="/admin"
+                                href={paths.manager.cars.index}
                                 className="flex gap-1 items-center"
                                 includes
                             >

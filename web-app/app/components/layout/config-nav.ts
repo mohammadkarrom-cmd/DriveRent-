@@ -27,7 +27,8 @@ export const paths = {
         },
         customers: {
             list: "/admin/customers"
-        }
+        },
+        categories: "/admin/categories"
     },
     employee: {
         cars: {

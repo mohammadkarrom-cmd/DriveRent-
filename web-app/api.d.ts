@@ -1,3 +1,4 @@
+
 type LoginType = {
     first_name: string,
     last_name: string,
@@ -140,5 +141,9 @@ type AdminCustomerDetailsType = {
     id_front_image: string
     id_back_image: string
     driving_license_image: string
+}
 
+type CategoryType = {
+    name: string
+    id_car_type: number
 }
