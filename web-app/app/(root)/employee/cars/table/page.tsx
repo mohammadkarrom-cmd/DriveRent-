@@ -1,4 +1,4 @@
-import CarsMangerContent from '@/app/(root)/manager/cars/table/components/CarsMangerContent';
+import CarsMangerContent from '@/app/(root)/manager/cars/components/CarsMangerContent';
 
 const CarTablePage = async () => {
 

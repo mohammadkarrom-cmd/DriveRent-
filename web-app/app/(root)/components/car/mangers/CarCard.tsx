@@ -1,17 +1,17 @@
 import MyCarousel from '@/app/components/views/MyCarousel'
+import { carCategoryParser } from '@/lib/api/data/carCategory'
 import { CardBackgrounds, TextPrimary, TextSecondary } from '@/lib/ui/class/classNames'
 import { Card, CardBody, CardHeader, Chip, Typography } from '@/lib/ui/MTFix'
 import { TextSlice } from '@/lib/utils/textFormaters'
+import { AxiosResponse } from 'axios'
 import clsx from 'clsx'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { BiSolidCategory } from 'react-icons/bi'
 import { GiSteeringWheel } from 'react-icons/gi'
 import { IoLogoModelS } from 'react-icons/io'
 import { PiCurrencyDollarBold } from 'react-icons/pi'
-import dynamic from 'next/dynamic'
-import { carCategoryParser } from '@/lib/api/data/carCategory'
 import { KeyedMutator } from 'swr'
-import { AxiosResponse } from 'axios'
 
 const EditCarModalHandler = dynamic(() => import('../edit/EditCarModalHandler'));
 const DeleteCar = dynamic(() => import('../delete/DeleteCar'));
@@ -138,10 +138,10 @@ const CarCard = ({ car, mutate }: Props) => {
                 <section
                     className='flex justify-between items-center gap-5 pb-5'
                 >
-                    <EditCarModalHandler
+                    {/* <EditCarModalHandler
                         car={car}
                         mutate={mutate}
-                    />
+                    /> */}
                     <DeleteCar
                         brand={car.brand}
                         carId={car.id_car}

@@ -10,7 +10,7 @@ export const endpoints = {
     cars: {
         list: "/car/list-create/",
         add: "/car/list-create/",
-        update: (id: number) => `/car/updata-delete/${id}/`,
+        update: (id: number) => `/car/detail/${id}/`,
         car: (id: number) => `/car/detail/${id}/`,
         cars: "/car/list/",
         customerSearch: (categoryId?: string, rentTypeId?: string) => {
@@ -45,6 +45,11 @@ export const endpoints = {
         users: {
             list: "/account/customer/user-list/",
             view: (id: number) => `/account/customer/user/${id}/`
+        },
+        categories: {
+            list: 'car/category/list-create/',
+            add: 'car/category/list-create/',
+            edit: (id:number) => `car/category/${id}/`,
         }
     },
     customer: {
