@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.contrib.auth import  authenticate
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from users import models
@@ -27,6 +26,13 @@ class LoginSerializer(TokenObtainPairSerializer):
             raise serializers.ValidationError(
                 {"message": "يجب إدخال اسم المستخدم وكلمة المرور"}
             )
+        user = authenticate(request=self.context.get('request'), username=username, password=password)
+
+        if not user:
+            raise serializers.ValidationError(
+                {"message": "بيانات الدخول غير صحيحة"}
+            )
+
 
         try:
             user = User.objects.get(username=username)

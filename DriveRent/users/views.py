@@ -16,8 +16,11 @@ from users import models
 from .permissions import IsRole
 from cars import models as models_cars
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from axes.decorators import axes_dispatch
 
 #######################################
+@method_decorator(axes_dispatch, name='dispatch') 
 class LoginView(TokenObtainPairView):
     serializer_class = serializers.LoginSerializer
 
@@ -36,7 +39,7 @@ class LoginView(TokenObtainPairView):
         }
         if user.account_type == 'customer':
             customer = getattr(user, 'customer', None) 
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')  
             tokens = {  
                 'refresh': serializer.validated_data['refresh'],
                 'access': serializer.validated_data['access'],
@@ -54,7 +57,7 @@ class LoginView(TokenObtainPairView):
         redirect_url = account_type_redirect_map.get(user.account_type)
         
         if redirect_url:
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')  
             tokens = {
                 'refresh': serializer.validated_data['refresh'],
                 'access': serializer.validated_data['access'],
