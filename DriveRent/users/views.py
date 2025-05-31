@@ -135,9 +135,9 @@ class UserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     
 
 class BulkUserActionAPIView(APIView):
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['manager'])]
-    permission_classes=[AllowAny]
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]
     
     def post(self, request, *args, **kwargs):
         user_ids = request.data.get("id") or request.query_params.get("id")
@@ -210,25 +210,23 @@ class CustomerCreateView(generics.CreateAPIView):
 
 ###############
 class CustomerUserListView(generics.ListAPIView):
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['admin'])]
     queryset = models.Customer.objects.all()
     serializer_class = serializers.CustomerViewListSerializer
     permission_classes = [AllowAny]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]
     
 class CustomerUserView(generics.RetrieveAPIView):
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['admin'])]
     queryset = models.Customer.objects.all()
     serializer_class = serializers.CustomerViewSerializer
-    permission_classes = [AllowAny]
-    
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]    
     
     
 class OfficeAccountListCreateView(generics.ListCreateAPIView):
     serializer_class = serializers.OfficeAccountCreateSerializer
     permission_classes = [IsAuthenticated]
-
     def get_permissions(self):
         return [IsRole(allowed_roles=['manager'])]
 
@@ -274,7 +272,6 @@ class OfficeAccountListCreateView(generics.ListCreateAPIView):
 class OfficeAccountRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.OfficeAccountCreateSerializer
     permission_classes = [IsAuthenticated]
-
     def get_permissions(self):
         return [IsRole(allowed_roles=['manager'])]
 

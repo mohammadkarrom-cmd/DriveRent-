@@ -6,8 +6,8 @@ urlpatterns = [
     path('office/list-create/', views.OfficeListCreateView.as_view(), name='office-list-create'),
     path('office/<int:id_office>/', views.OfficeRetrieveUpdateView.as_view(), name='office-detail'),
 
-    path('office/<int:office_id>/accounts/', views.OfficeAccountListCreateView.as_view(), name='officeaccount-list-create'),
-    path('office/accounts/<int:id_office_account>/', views.OfficeAccountRetrieveUpdateDestroyView.as_view(), name='officeaccount-detail'),
+    path('office/<int:office_id>/accounts/', views.OfficeAccountListCreateView.as_view(), name='office-account-list-create'),
+    path('office/accounts/<int:id_office_account>/', views.OfficeAccountRetrieveUpdateDestroyView.as_view(), name='offic-account-detail'),
     
     
     path('office/<int:office_id>/ratings/', views.OfficeRatingAminListCreateView.as_view(), name='list'),

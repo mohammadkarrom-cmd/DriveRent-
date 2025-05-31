@@ -50,9 +50,9 @@ def remove_background(image_field):
 class CarListCreateView(generics.ListCreateAPIView):
     serializer_class = serializers.CarSerializer
     permission_classes = [IsAuthenticated]
-
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['manager', 'employee'])]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager'])]
+    
 
     def get_office(self):
         user = self.request.user
@@ -92,6 +92,8 @@ class CarListCreateView(generics.ListCreateAPIView):
 class CarUpdateDestroyView(generics.RetrieveUpdateAPIView):
     serializer_class = serializers.CarSerializer
     permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager'])]
     lookup_field = 'id_car'
 
     def get_office(self):
@@ -116,13 +118,15 @@ class CarUpdateDestroyView(generics.RetrieveUpdateAPIView):
         for key, image in images.items():
             if image:
                 images[key] = remove_background(image)
+        serializer.save(**images)
 
 #####################
 class CarSearchView(generics.GenericAPIView):
-    def get_permissions(self):
-        return [IsRole(allowed_roles=['manager','employee'])]
     serializer_class = serializers.CarSerializer
-    # permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager'])]
+    
     def get_office(self):
         user = self.request.user
         office_account = get_object_or_404(models.OfficeAccount, user=user)
@@ -302,9 +306,10 @@ class CarDetailView(generics.GenericAPIView):
 class CreateReservationView(generics.CreateAPIView):
     queryset = models.Reservation.objects.all()
     serializer_class = serializers.ReservationSerializer
-
+    permission_classes = [IsAuthenticated]
     def get_permissions(self):
         return [IsRole(allowed_roles=['customer'])]
+
 
     def calculate_end_date(self, start_date, type_reservation):
         durations = {
@@ -409,11 +414,9 @@ class CreateReservationView(generics.CreateAPIView):
         )
 
 class CancelReservationView(generics.UpdateAPIView):
-    """
-    إلغاء الحجز المؤقت قبل انتهاء المهلة الزمنية (ساعتين)، مع إعادة السيارة إلى حالة متاحة.
-    """
     queryset = models.Reservation.objects.all()
 
+    permission_classes = [IsAuthenticated]
     def get_permissions(self):
         return [IsRole(allowed_roles=['customer'])]
 
@@ -442,10 +445,10 @@ class CancelReservationView(generics.UpdateAPIView):
 
 
 class CustomerTemporaryReservationsView(generics.ListAPIView):
+    serializer_class = serializers.ReservationDetialSerializer
+    permission_classes = [IsAuthenticated]
     def get_permissions(self):
         return [IsRole(allowed_roles=['customer'])]
-    serializer_class = serializers.ReservationDetialSerializer
-    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """إرجاع قائمة بالحجوزات المؤقتة (`status_reservation=1`) الخاصة بالزبون"""
@@ -461,12 +464,11 @@ class CustomerTemporaryReservationsView(generics.ListAPIView):
     
     
 class OfficeEmployeeReservationsView(generics.ListAPIView):
-
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['employee','manager'])]
     serializer_class = serializers.ReservationSrecheSerializer
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['employee'])]
+    
     def get_queryset(self):
         queryset = models.Reservation.objects.all()
         search_query = Q()
@@ -507,12 +509,11 @@ class OfficeEmployeeReservationsView(generics.ListAPIView):
 
     
 class OfficeEmployeeTemporaryReservationsView(generics.ListAPIView):
-
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['employee','manager'])]
     serializer_class = serializers.ReservationSrecheSerializer
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['employee'])]
+    
     def get_queryset(self):
         queryset = models.Reservation.objects.filter(status_reservation=1)
         search_query = Q()
@@ -548,12 +549,11 @@ class OfficeEmployeeTemporaryReservationsView(generics.ListAPIView):
 
     
 class OfficeEmployeeFakeReservationsView(generics.ListAPIView):
-
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['employee','manager'])]
     serializer_class = serializers.ReservationSrecheSerializer
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['employee'])]
+    
     def get_queryset(self):
         queryset = models.Reservation.objects.filter(status_reservation=5)
         search_query = Q()
@@ -591,11 +591,11 @@ class OfficeEmployeeFakeReservationsView(generics.ListAPIView):
     
     
 class ConfirmReservationView(generics.UpdateAPIView):
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['employee'])]
     queryset = models.Reservation.objects.all()
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['employee'])]
+    
     def update(self, request, *args, **kwargs):
         reservation = self.get_object()
 
@@ -621,11 +621,11 @@ class ConfirmReservationView(generics.UpdateAPIView):
  
     
 class ConfirmFakeReservationView(generics.UpdateAPIView):
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['employee'])]
     queryset = models.Reservation.objects.all()
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['employee'])]
+    
     def update(self, request, *args, **kwargs):
         reservation = self.get_object()
 
@@ -650,12 +650,12 @@ class ConfirmFakeReservationView(generics.UpdateAPIView):
 
 
 class CancelEmployeeReservationView(generics.UpdateAPIView):
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['employee'])]
     queryset = models.Reservation.objects.all()
     serializer_class = serializers.ReservationSerializer
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['employee'])]
+    
     def update(self, request, *args, **kwargs):
         reservation = self.get_object()
 
@@ -682,19 +682,27 @@ class CancelEmployeeReservationView(generics.UpdateAPIView):
 class OfficeListCreateView(generics.ListCreateAPIView):
     queryset = models.Office.objects.all()
     serializer_class = serializers.OfficeSerializer
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]
+    
+    
 class OfficeRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     queryset = models.Office.objects.all()
     serializer_class = serializers.OfficeSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]
+    
     lookup_field = 'id_office'
     
     
 class OfficeAccountListCreateView(generics.ListCreateAPIView):
     serializer_class = serializers.OfficeAccountSerializer
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]
+    
     def get_queryset(self):
         office_id = self.kwargs.get('office_id')
         return models.OfficeAccount.objects.filter(office__id_office=office_id)
@@ -711,43 +719,16 @@ class OfficeAccountRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVi
     queryset = models.OfficeAccount.objects.all()
     serializer_class = serializers.OfficeAccountSerializer
     lookup_field = 'id_office_account'
-    permission_classes = [AllowAny]
-    
-from django.core.mail import send_mail
-from django.conf import settings
-class SendEmail(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-    
-    def send_emails_to_users(self, users):
-        subject = 'Email sent successfully:'
-        message = 'هذا هو محتوى البريد الإلكتروني.'
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]
         
-        for user in users:
-            self.send_custom_email(user, subject, message)
-    
-    def send_custom_email(self, recipient_email, subject, message):
-        try:
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL, 
-                [recipient_email],  
-                fail_silently=False,
-            )
-        except Exception as e:
-            print(f"Error occurred: {e}") 
-            return Response({'error': str(e)}, status=500)
-
-    def post(self, request, *args, **kwargs):
-        user_email = 'abdohouir@gmail.com' 
-        self.send_emails_to_users([user_email])
-        return Response({'message': 'Email sent successfully!'}, status=status.HTTP_200_OK)
-    
-   
 class OfficeRatingAminListCreateView(generics.ListAPIView):
     serializer_class = serializers.OfficeRatingAdminSerializer
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]
+    
     def get_queryset(self):
         office_id = self.kwargs.get('office_id')
         get_object_or_404(models.Office,id_office=office_id)
@@ -760,8 +741,10 @@ class OfficeRatingAminListCreateView(generics.ListAPIView):
 
 class MnagerOfficeRatingAminListCreateView(generics.ListAPIView):
     serializer_class = serializers.OfficeRatingAdminSerializer
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager'])]
+    
     def get_office(self):
         user = self.request.user
         office_account = get_object_or_404(models.OfficeAccount, user=user).office.id_office
@@ -789,21 +772,24 @@ class MnagerOfficeRatingAminListCreateView(generics.ListAPIView):
 class CarCategoryListCreateView(generics.ListCreateAPIView):
     queryset = models.CarCategory.objects.all()
     serializer_class = serializers.CarCategorySerializer
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]
+    
 class CarCategoryRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     queryset = models.CarCategory.objects.all()
     serializer_class = serializers.CarCategorySerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]
     lookup_field = 'id_car_type'
     
     
 class CustomerCarListCreateView(generics.ListCreateAPIView):
     serializer_class = serializers.CarSerializer
     permission_classes = [IsAuthenticated]
-
-    # def get_permissions(self):
-    #     return [IsRole(allowed_roles=['manager', 'employee'])]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['customer'])]
 
     def get_customer(self):
         user = self.request.user
@@ -843,6 +829,8 @@ class CustomerCarListCreateView(generics.ListCreateAPIView):
 class CustomerCarUpdateDestroyView(generics.RetrieveUpdateAPIView):
     serializer_class = serializers.CarSerializer
     permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['customer'])]
     lookup_field = 'id_car'
 
     def get_customer(self):
@@ -867,17 +855,15 @@ class CustomerCarUpdateDestroyView(generics.RetrieveUpdateAPIView):
         for key, image in images.items():
             if image:
                 images[key] = remove_background(image)
+        serializer.save(**images)
 
 #####################
 class CustomerEvaluableOfficesListView(generics.ListAPIView):
-    """
-    List offices that the authenticated customer can evaluate:
-    - The customer must have at least one completed reservation (status_reservation=2) with the office.
-    - The customer must not have already evaluated the office.
-    """
     serializer_class = serializers.OfficeSerializer
     permission_classes = [IsAuthenticated]
-
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['customer'])]
+    
     def get_queryset(self):
         customer = models.Customer.objects.get(user=self.request.user)
         completed_reservations = models.Reservation.objects.filter(
@@ -892,14 +878,11 @@ class CustomerEvaluableOfficesListView(generics.ListAPIView):
         ).exclude(id_office__in=already_evaluated)
 
 class CustomerEvaluateOfficeView(generics.CreateAPIView):
-    """
-    يسمح للزبون بتقييم المكتب في حال:
-    - لديه حجز مكتمل مع المكتب.
-    - لم يقم بتقييم نفس المكتب من قبل.
-    """
     serializer_class = serializers.OfficeRatingCreateSerializer
-    permission_classes = [AllowAny]
-
+    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['customer'])]
+    
     def perform_create(self, serializer):
         user = self.request.user
         customer = getattr(user, 'customer', None)
