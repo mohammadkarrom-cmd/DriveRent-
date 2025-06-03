@@ -1,5 +1,4 @@
 import MyCarousel from '@/app/components/views/MyCarousel'
-import { carCategoryParser } from '@/lib/api/data/carCategory'
 import { CardBackgrounds, TextPrimary, TextSecondary } from '@/lib/ui/class/classNames'
 import { Card, CardBody, CardHeader, Chip, Typography } from '@/lib/ui/MTFix'
 import { TextSlice } from '@/lib/utils/textFormaters'
@@ -19,10 +18,11 @@ const DeleteCar = dynamic(() => import('../delete/DeleteCar'));
 
 type Props = {
     car: CarType
+    categories: CategoryType[],
     mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
 }
 
-const CarCard = ({ car, mutate }: Props) => {
+const CarCard = ({ car, mutate,categories }: Props) => {
     return (
         <Card
             className={clsx(CardBackgrounds, TextPrimary, 'xl:flex-row justify-between')}
@@ -75,7 +75,7 @@ const CarCard = ({ car, mutate }: Props) => {
                         {car.brand}
                     </Typography>
                     <Chip
-                        value={car.status === 1 ? "متاحة" : car.status === 2 ? "حجز مؤقت" : car.status === 3 ? "محجوزة" : "منتهية الصلاحية"}
+                        value={car.status_disaply}
                         variant='filled'
                         color={car.status === 1 ? "green" : car.status === 2 ? "amber" : car.status === 3 ? "blue" : "red"}
                     />
@@ -95,7 +95,7 @@ const CarCard = ({ car, mutate }: Props) => {
                         className='flex gap-1 items-center'
                     >
                         <GiSteeringWheel />
-                        {carCategoryParser(car.category)}
+                        {car.category_disaply}
                     </Typography>
                 </section>
                 <section
@@ -138,10 +138,11 @@ const CarCard = ({ car, mutate }: Props) => {
                 <section
                     className='flex justify-between items-center gap-5 pb-5'
                 >
-                    {/* <EditCarModalHandler
+                    <EditCarModalHandler
                         car={car}
                         mutate={mutate}
-                    /> */}
+                        categories={categories}
+                    />
                     <DeleteCar
                         brand={car.brand}
                         carId={car.id_car}

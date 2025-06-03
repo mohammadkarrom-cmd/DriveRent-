@@ -2,7 +2,7 @@ import { paths } from '@/app/components/layout/config-nav'
 import MyCarousel from '@/app/components/views/MyCarousel'
 import { carCategoryParser } from '@/lib/api/data/carCategory'
 import { CardBackgrounds, TextPrimary, TextSecondary } from '@/lib/ui/class/classNames'
-import { Card, CardBody, CardHeader, CardFooter, Typography, Chip, Button } from '@/lib/ui/MTFix'
+import { Button, Card, CardBody, CardFooter, CardHeader, Chip, Typography } from '@/lib/ui/MTFix'
 import clsx from 'clsx'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -55,10 +55,21 @@ const CarNormalCard = ({ car }: Props) => {
                                 <GiSteeringWheel />
                                 {carCategoryParser(car.category)}
                             </Typography>
+                            <Typography
+                                variant='paragraph'
+                                className='w-fit flex items-center gap-1'
+                            >
+                                <IoLogoModelS />
+                                {
+                                    car.owner_office
+                                        ? `المكتب : ${car.owner_office}`
+                                        : `المالك : ${car.owner_customer}`
+                                }
+                            </Typography>
                         </section>
                     </div>
                     <Chip
-                        value={car.status === 1 ? "متاحة" : car.status === 2 ? "حجز مؤقت" : car.status === 3 ? "محجوزة" : "منتهية الصلاحية"}
+                        value={car.status}
                         variant='filled'
                         color={car.status === 1 ? "green" : car.status === 2 ? "amber" : car.status === 3 ? "blue" : "red"}
                         className='h-fit'

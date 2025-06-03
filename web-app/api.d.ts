@@ -21,11 +21,12 @@ type RefreshType = {
 }
 
 type CarType = {
-    id_car: number,
+    id_car: number
     brand: string
     model: string
     description: string
     category: number
+    category_disaply: string
     is_available_daily: boolean
     is_available_monthly: boolean
     is_available_yearly: boolean
@@ -35,8 +36,12 @@ type CarType = {
     image1: string
     image2: string
     image3: string
-    status: number
+    status: number | string
+    status_disaply: string
+    owner_office: null | string
+    owner_customer: null | string
 }
+
 
 type EmployeeType = {
     id: number,
@@ -146,4 +151,28 @@ type AdminCustomerDetailsType = {
 type CategoryType = {
     name: string
     id_car_type: number
+}
+
+type MangerCarsListResponseType = {
+    cars: CarType[]
+    category_list: CategoryType[]
+}
+
+type RatingType = {
+    id_office_rating: number,
+    customer: string,
+    office: string,
+    rating: number,
+    comment: string,
+    created_at: string
+}
+
+type OfficeRatingType = {
+    total_rating: number,
+    ratings: RattingType[]
+}
+
+type AllCarsType = {
+    cars: CarType[]
+    cars_category: CategoryType[]
 }

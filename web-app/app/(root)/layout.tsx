@@ -39,6 +39,7 @@ export default function RootLayout({
           <span id="BorderSecondary" className="border-text-light-secondary dark:border-text-dark-secondary size-0"></span>
 
           <span id="shadowPrimary" className="shadow-background-default-dark dark:shadow-background-default-light"></span>
+          <span id="shadowSecondary" className="shadow-background-card-dark dark:shadow-background-card-light"></span>
         </>
         <AppProvider>
           <CommonLayout

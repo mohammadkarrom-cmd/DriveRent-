@@ -1,14 +1,16 @@
 
-import dynamic from "next/dynamic";
 import NormalLoading from "@/app/components/loaders/NormalLoading";
+import dynamic from "next/dynamic";
 
-const AdminPageContent = dynamic(() => import("./components/AdminPageContent"), { loading: () => <NormalLoading /> });
+const AdminPageContent2 = dynamic(() => import("./components/AdminPageContent2"), { loading: () => <NormalLoading /> });
 
 function AdminDashboardPage() {
 
 
-  return <AdminPageContent />
-  
+  return <>
+    <AdminPageContent2 />
+  </>
+
 }
 
 export default AdminDashboardPage

@@ -13,3 +13,5 @@ export const BorderSecondary = "border-text-light-secondary dark:border-text-dar
 
 
 export const shadowPrimary = "shadow-background-default-dark dark:shadow-background-default-light";
+export const shadowSecondary = "shadow-background-card-dark dark:shadow-background-card-light";
+

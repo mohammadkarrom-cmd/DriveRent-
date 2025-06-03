@@ -1,37 +1,38 @@
 "use client"
 
+import { endpoints } from '@/app/api/common'
 import MyFormProvider from '@/app/components/form/MyFormProvider'
 import RHFCheckbox from '@/app/components/form/RHFCheckbox'
 import RHFInput from '@/app/components/form/RHFInput'
+import RHFSelect from '@/app/components/form/RHFSelect'
+import RHFSingleImageDropzone from '@/app/components/form/RHFSingleImageDropzone'
+import RHFTextArea from '@/app/components/form/RHFTextArea'
+import MyCarousel from '@/app/components/views/MyCarousel'
+import dataMutate, { fetchImageAsBlob } from '@/lib/api/data/dataMutate'
+import { updateCarSchema, UpdateCarSchema } from '@/lib/api/data/zod/schemas'
+import { METHODS } from '@/lib/api/setup/api'
 import { useSettingsContext } from '@/lib/context/settings/setting-context'
 import useBoolean from '@/lib/hooks/use-boolean'
 import { Backgrounds, CardBackgrounds, CardBackgroundsReverse, TextPrimary, TextPrimaryReverse } from '@/lib/ui/class/classNames'
 import { Button, Dialog, DialogBody, DialogFooter, DialogHeader, IconButton, Option, Tooltip } from '@/lib/ui/MTFix'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AxiosError, AxiosResponse } from 'axios'
 import clsx from 'clsx'
 import { useForm } from 'react-hook-form'
 import { BiSolidCategory, BiSolidCommentEdit } from 'react-icons/bi'
 import { IoLogoModelS } from 'react-icons/io'
 import { PiCurrencyDollarBold } from 'react-icons/pi'
-import RHFSingleImageDropzone from '@/app/components/form/RHFSingleImageDropzone'
-import MyCarousel from '@/app/components/views/MyCarousel'
-import { updateCarSchema, UpdateCarSchema } from '@/lib/api/data/zod/schemas'
-import RHFTextArea from '@/app/components/form/RHFTextArea'
-import RHFSelect from '@/app/components/form/RHFSelect'
-import dataMutate, { fetchImageAsBlob } from '@/lib/api/data/dataMutate'
-import { AxiosError, AxiosResponse } from 'axios'
-import { KeyedMutator } from 'swr'
-import { METHODS } from '@/lib/api/setup/api'
-import { endpoints } from '@/app/api/common'
 import { toast } from 'react-toastify'
+import { KeyedMutator } from 'swr'
 
 type Props = {
     car: CarType
+    categories: CategoryType[],
     mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
 }
 
 
-function EditCarModalHandler({ car, mutate }: Props) {
+function EditCarModalHandler({ car, mutate, categories }: Props) {
     const { theme } = useSettingsContext();
     const open = useBoolean({ initialState: false });
     const loading = useBoolean({ initialState: false });
@@ -199,36 +200,15 @@ function EditCarModalHandler({ car, mutate }: Props) {
                                     name='category'
                                     isNumber
                                 >
-                                    <Option
-                                        value='1'
-                                        className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                                    >
-                                        فاخرة
-                                    </Option>
-                                    <Option
-                                        value='2'
-                                        className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                                    >
-                                        اقتصادية
-                                    </Option>
-                                    <Option
-                                        value='3'
-                                        className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                                    >
-                                        رياضية
-                                    </Option>
-                                    <Option
-                                        value='4'
-                                        className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                                    >
-                                        شاحنة خفيفة (بيك أب)
-                                    </Option>
-                                    <Option
-                                        value='5'
-                                        className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                                    >
-                                        كهربائية
-                                    </Option>
+                                    {
+                                        categories.map(category => (
+                                            <Option
+                                                value={category.id_car_type.toString()}
+                                            >
+                                                {category.name}
+                                            </Option>
+                                        ))
+                                    }
                                 </RHFSelect>
                                 <RHFSelect
                                     label='حالة السيارة'

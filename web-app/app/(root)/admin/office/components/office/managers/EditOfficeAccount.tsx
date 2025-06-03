@@ -84,9 +84,9 @@ const EditOfficeAccount = ({ mutate, account }: Props) => {
                 color='green'
                 variant='filled'
                 onClick={open.onTrue}
-                className='flex gap-1 items-center'
+                className='flex gap-1 items-center whitespace-nowrap'
             >
-                <IoIosPersonAdd size={20} /> تعديل حساب جديد
+                <IoIosPersonAdd size={20} /> تعديل الحساب
             </Button>
 
             <Dialog

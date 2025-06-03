@@ -1,37 +1,38 @@
 "use client"
 
+import { endpoints } from '@/app/api/common'
 import MyFormProvider from '@/app/components/form/MyFormProvider'
 import RHFCheckbox from '@/app/components/form/RHFCheckbox'
 import RHFInput from '@/app/components/form/RHFInput'
+import RHFSelect from '@/app/components/form/RHFSelect'
+import RHFSingleImageDropzone from '@/app/components/form/RHFSingleImageDropzone'
+import RHFTextArea from '@/app/components/form/RHFTextArea'
+import MyCarousel from '@/app/components/views/MyCarousel'
+import dataMutate from '@/lib/api/data/dataMutate'
+import { addCarSchema, AddCarSchema } from '@/lib/api/data/zod/schemas'
+import { METHODS } from '@/lib/api/setup/api'
 import { useSettingsContext } from '@/lib/context/settings/setting-context'
 import useBoolean from '@/lib/hooks/use-boolean'
 import { Backgrounds, CardBackgrounds, TextPrimary } from '@/lib/ui/class/classNames'
 import { Button, Dialog, DialogBody, DialogFooter, DialogHeader, Option, Typography } from '@/lib/ui/MTFix'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AxiosError, AxiosResponse } from 'axios'
 import clsx from 'clsx'
 import { useForm } from 'react-hook-form'
 import { BiSolidCategory } from 'react-icons/bi'
 import { IoLogoModelS } from 'react-icons/io'
-import { PiCurrencyDollarBold } from 'react-icons/pi'
-import RHFSingleImageDropzone from '@/app/components/form/RHFSingleImageDropzone'
-import MyCarousel from '@/app/components/views/MyCarousel'
-import { addCarSchema, AddCarSchema } from '@/lib/api/data/zod/schemas'
 import { IoCarSport } from 'react-icons/io5'
-import dataMutate from '@/lib/api/data/dataMutate'
-import { endpoints } from '@/app/api/common'
-import { METHODS } from '@/lib/api/setup/api'
-import RHFTextArea from '@/app/components/form/RHFTextArea'
-import RHFSelect from '@/app/components/form/RHFSelect'
-import { KeyedMutator } from 'swr'
-import { AxiosError, AxiosResponse } from 'axios'
+import { PiCurrencyDollarBold } from 'react-icons/pi'
 import { toast } from 'react-toastify'
+import { KeyedMutator } from 'swr'
 
 
 type Props = {
+    categories: CategoryType[],
     mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
 }
 
-const AddCar = ({ mutate }: Props) => {
+const AddCar = ({ mutate, categories }: Props) => {
     const { theme } = useSettingsContext();
     const open = useBoolean({ initialState: false });
     const loading = useBoolean({ initialState: false });
@@ -177,36 +178,15 @@ const AddCar = ({ mutate }: Props) => {
                                     >
                                         غير محدد
                                     </Option>
-                                    <Option
-                                        value='1'
-                                        className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                                    >
-                                        فاخرة
-                                    </Option>
-                                    <Option
-                                        value='2'
-                                        className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                                    >
-                                        اقتصادية
-                                    </Option>
-                                    <Option
-                                        value='3'
-                                        className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                                    >
-                                        رياضية
-                                    </Option>
-                                    <Option
-                                        value='4'
-                                        className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                                    >
-                                        شاحنة خفيفة (بيك أب)
-                                    </Option>
-                                    <Option
-                                        value='5'
-                                        className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                                    >
-                                        كهربائية
-                                    </Option>
+                                    {
+                                        categories.map(category => (
+                                            <Option
+                                                value={category.id_car_type.toString()}
+                                            >
+                                                {category.name}
+                                            </Option>
+                                        ))
+                                    }
                                 </RHFSelect>
                                 <section
                                     className='flex justify-around w-full items-center text-nowrap flex-wrap'

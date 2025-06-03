@@ -24,12 +24,13 @@ export const endpoints = {
                 return false;
             }
         },
-        adminSearch: (brand?: string, model?: string) => {
-            if (!brand && !model) {
+        adminSearch: (brand?: string, model?: string, category?: string) => {
+            if (!brand && !model && !category) {
                 return false;
             }
-            return `car/serche/?brand=${brand}&model=${model}`
-        }
+            return `car/serche/?brand=${brand}&model=${model}&category=${category}`
+        },
+        rating: "/car/ratings/"
     },
     admin: {
         office: {
@@ -49,7 +50,7 @@ export const endpoints = {
         categories: {
             list: 'car/category/list-create/',
             add: 'car/category/list-create/',
-            edit: (id:number) => `car/category/${id}/`,
+            edit: (id: number) => `car/category/${id}/`,
         }
     },
     customer: {
@@ -58,10 +59,10 @@ export const endpoints = {
         cancel: (id: number) => `/car/reserve/cancel/${id}/`
     },
     employee: {
-        list: "/account/user/",
-        add: "/account/user/",
-        delete: (id: number) => `/account/user/${id}/`,
-        update: (id: number) => `/account/user/${id}/`,
+        list: "/account/office/accounts/",
+        add: "/account/office/accounts/",
+        delete: (id: number) => `/account/office/account/${id}/`,
+        update: (id: number) => `/account/office/account/${id}/`,
         switch: "/account/bulk-action/",
         confirmReservation: (id: number) => `/car/office/confirm-reservation/${id}/`,
         cancelReservation: (id: number) => `/car/reservations/cancel/${id}/`,
@@ -75,6 +76,9 @@ export const endpoints = {
     reservations: {
         temporary: {
             list: "/car/office/temporary-reservations/"
+        },
+        all: {
+            list: "/car/list/reservations/"
         }
     },
     home: "/car/home/"

@@ -3,24 +3,24 @@
 import Error from '@/app/(root)/error';
 import Loading from '@/app/(root)/loading';
 import { endpoints } from '@/app/api/common';
+import Empty from '@/app/components/views/Empty';
 import fetchApi from '@/lib/api/data/dataFetcher';
-import React, { useState } from 'react'
+import { useSettingsContext } from '@/lib/context/settings/setting-context';
+import useBoolean from '@/lib/hooks/use-boolean';
+import { Backgrounds, CardBackgrounds, shadowPrimary, TextPrimary } from '@/lib/ui/class/classNames';
+import { Button, Card, CardHeader, Input, Option, Select, Typography } from '@/lib/ui/MTFix';
+import { AxiosError } from 'axios';
+import clsx from 'clsx';
+import { useState } from 'react';
+import { MdOutlineShortText } from 'react-icons/md';
+import { TbBrandGoogleBigQuery } from 'react-icons/tb';
+import { toast } from 'react-toastify';
 import useSWR from 'swr';
 import ReservationsTable from './ReservationsTable';
-import { AxiosError } from 'axios';
-import Empty from '@/app/components/views/Empty';
-import { Button, Card, CardHeader, Input, Option, Select, Typography } from '@/lib/ui/MTFix';
-import { MdOutlineShortText } from 'react-icons/md';
-import { useSettingsContext } from '@/lib/context/settings/setting-context';
-import clsx from 'clsx';
-import { Backgrounds, CardBackgrounds, shadowPrimary, TextPrimary } from '@/lib/ui/class/classNames';
-import { TbBrandGoogleBigQuery } from 'react-icons/tb';
-import useBoolean from '@/lib/hooks/use-boolean';
-import { toast } from 'react-toastify';
 
 
 const Reservations = () => {
-  const { data: reservations, error, mutate, isLoading } = useSWR(endpoints.reservations.temporary.list, fetchApi);
+  const { data: reservations, error, mutate, isLoading } = useSWR(endpoints.reservations.all.list, fetchApi);
   const { theme } = useSettingsContext();
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");

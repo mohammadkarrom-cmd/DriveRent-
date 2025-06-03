@@ -38,7 +38,7 @@ const TopCarCard = ({ car }: Props) => {
             <CardBody
                 className='m-0 px-5 py-0 md:py-5 gap-1 flex flex-col'
             >
-                <section className='w-full flex justify-between'>
+                <section className='w-full flex justify-between gap-5 flex-wrap'>
                     <Typography
                         variant='h4'
                         className='flex gap-1 items-center'
@@ -47,7 +47,7 @@ const TopCarCard = ({ car }: Props) => {
                         {car.brand}
                     </Typography>
                     <Chip
-                        value={car.status === 1 ? "متاحة" : car.status === 2 ? "حجز مؤقت" : car.status === 3 ? "محجوزة" : "منتهية الصلاحية"}
+                        value={car.status}
                         variant='filled'
                         color={car.status === 1 ? "green" : car.status === 2 ? "amber" : car.status === 3 ? "blue" : "red"}
                     />
@@ -66,6 +66,17 @@ const TopCarCard = ({ car }: Props) => {
                     >
                         <GiSteeringWheel />
                         {carCategoryParser(car.category)}
+                    </Typography>
+                    <Typography
+                        variant='paragraph'
+                        className='w-fit flex items-center gap-1'
+                    >
+                        <IoLogoModelS />
+                        {
+                            car.owner_office 
+                            ? `المكتب : ${car.owner_office}`
+                            : `المالك : ${car.owner_customer}`
+                        }
                     </Typography>
                 </section>
                 <section className='flex gap-x-20 flex-wrap'>

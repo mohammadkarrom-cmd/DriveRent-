@@ -1,19 +1,20 @@
 
 import NormalLoading from "@/app/components/loaders/NormalLoading"
-import dynamic from "next/dynamic"
-import { AnimatePresence, motion } from "framer-motion"
 import { Typography } from "@material-tailwind/react"
-import AddCar from "../add/AddCar"
-import { KeyedMutator } from "swr"
 import { AxiosResponse } from "axios"
+import { AnimatePresence, motion } from "framer-motion"
+import dynamic from "next/dynamic"
+import { KeyedMutator } from "swr"
+import AddCar from "../add/AddCar"
 const CarCard = dynamic(() => import("@/app/(root)/components/car/mangers/CarCard"), { loading: () => <NormalLoading />, ssr: false })
 
 type Props = {
     cars: CarType[]
+    categories: CategoryType[]
     mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
 }
 
-const CarsList = ({ cars, mutate }: Props) => {
+const CarsList = ({ cars, mutate, categories }: Props) => {
     return (
         <>
             {
@@ -30,6 +31,7 @@ const CarsList = ({ cars, mutate }: Props) => {
                                 >
                                     <CarCard
                                         car={car}
+                                        categories={categories}
                                         mutate={mutate}
                                     />
                                 </motion.div>
@@ -39,10 +41,12 @@ const CarsList = ({ cars, mutate }: Props) => {
                     </ol>
                     : <div className="flex justify-center items-center gap-5 p-5 flex-col">
                         <Typography>
-                            no cars available
+                            لا يوجد اي سيارات حاليا
+                            قم باضافة سيارة جديدة الأن
                         </Typography>
                         <AddCar
                             mutate={mutate}
+                            categories={categories}
                         />
                     </div>
             }

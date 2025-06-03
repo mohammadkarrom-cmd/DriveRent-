@@ -2,18 +2,18 @@
 
 
 import { endpoints } from '@/app/api/common'
+import NormalLoading from '@/app/components/loaders/NormalLoading'
 import Empty from '@/app/components/views/Empty'
-import fetchApi from '@/lib/api/data/dataFetcher'
 import MyCarousel from '@/app/components/views/MyCarousel'
-import {  Typography } from '@/lib/ui/MTFix'
-import clsx from 'clsx'
+import fetchApi from '@/lib/api/data/dataFetcher'
 import { TextPrimary } from '@/lib/ui/class/classNames'
+import { Typography } from '@/lib/ui/MTFix'
+import clsx from 'clsx'
 import { uniqueId } from 'lodash'
+import dynamic from 'next/dynamic'
 import useSWR from 'swr'
 import Error from '../../error'
 import Loading from '../../loading'
-import dynamic from 'next/dynamic'
-import NormalLoading from '@/app/components/loaders/NormalLoading'
 
 const TopCarCard  = dynamic(() => import("../../components/car/TopCarCard"), { loading: () => <NormalLoading />, ssr: false });
 const CarsList  = dynamic(() => import("../../components/home/CarsList"), { loading: () => <NormalLoading />, ssr: false });
@@ -26,9 +26,9 @@ const CarsPageContent = () => {
     if (error) return <Error error={error} />;
     if (isLoading) return <Loading />
 
-    const cars = carsData.data as CarType[]
+    const cars = carsData.data as AllCarsType
 
-    if (!cars || cars?.length === 0) {
+    if (!cars || cars?.cars.length === 0) {
         return Empty({ title: "sorry no cars available yet" })
     }
     const recommendedCars = {
@@ -36,35 +36,15 @@ const CarsPageContent = () => {
         cars: []
     };
 
-    const categories = [
+    const categories = cars.cars_category.map(cat => (
         {
-            title: "فاخرة",
-            value: 1,
-            cars: []
-        },
-        {
-            title: "اقتصادية",
-            value: 2,
-            cars: []
-        },
-        {
-            title: "رياضية",
-            value: 3,
-            cars: []
-        },
-        {
-            title: "شاحنة خفيفة (بيك أب)",
-            value: 4,
-            cars: []
-        },
-        {
-            title: "كهربائية",
-            value: 5,
+            title:cat.name,
+            value: cat.id_car_type,
             cars: []
         }
-    ]
+    ))
 
-    cars.forEach(car => {
+    cars.cars.forEach(car => {
         if (car.status === 1) {
             recommendedCars.cars.push(car)
         };

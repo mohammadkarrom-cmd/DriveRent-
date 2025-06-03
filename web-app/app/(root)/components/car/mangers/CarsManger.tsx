@@ -1,26 +1,26 @@
 "use client"
 
-import { BorderPrimary, CardBackgrounds, TextPrimary } from '@/lib/ui/class/classNames';
-import { Button, Card, CardBody, CardFooter, CardHeader, Typography } from '@/lib/ui/MTFix'
-import clsx from 'clsx';
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
-import NormalLoading from '@/app/components/loaders/NormalLoading';
-import CarsMangerHeader from './CarsMangerHeader';
-import { splitArrayIntoChunks } from '@/lib/utils/arrays';
-import SimplePagination from '@/app/components/Pagination/SimplePagination';
-import { KeyedMutator } from 'swr';
-import { AxiosError, AxiosResponse } from 'axios';
-import { TbBrandGoogleBigQuery } from 'react-icons/tb';
-import useBoolean from '@/lib/hooks/use-boolean';
 import { endpoints } from '@/app/api/common';
-import { toast } from 'react-toastify';
+import NormalLoading from '@/app/components/loaders/NormalLoading';
+import SimplePagination from '@/app/components/Pagination/SimplePagination';
 import fetchApi from '@/lib/api/data/dataFetcher';
+import useBoolean from '@/lib/hooks/use-boolean';
+import { BorderPrimary, CardBackgrounds, TextPrimary } from '@/lib/ui/class/classNames';
+import { Button, Card, CardBody, CardFooter, CardHeader, Typography } from '@/lib/ui/MTFix';
+import { splitArrayIntoChunks } from '@/lib/utils/arrays';
+import { AxiosError, AxiosResponse } from 'axios';
+import clsx from 'clsx';
+import dynamic from 'next/dynamic';
+import { useState } from 'react';
+import { TbBrandGoogleBigQuery } from 'react-icons/tb';
+import { toast } from 'react-toastify';
+import { KeyedMutator } from 'swr';
+import CarsMangerHeader from './CarsMangerHeader';
 
 const CarsList = dynamic(() => import("@/app/(root)/components/car/mangers/CarsList"), { loading: () => <NormalLoading />, ssr: false })
 
 type Props = {
-    cars: CarType[],
+    response: MangerCarsListResponseType,
     mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
 }
 
@@ -28,10 +28,12 @@ type searchResponseType = {
     cars: CarType[]
 };
 
-const CarsManger = ({ cars, mutate }: Props) => {
+const CarsManger = ({ response, mutate }: Props) => {
+    const cars = response.cars
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [brand, setBrand] = useState<string>("");
     const [model, setModel] = useState<string>("");
+    const [category, setCategory] = useState<string>("");
 
     const loading = useBoolean({ initialState: false });
     const firstInter = useBoolean({ initialState: true });
@@ -42,7 +44,7 @@ const CarsManger = ({ cars, mutate }: Props) => {
 
     const handleSearch = async () => {
         loading.onTrue();
-        const query = endpoints.cars.adminSearch(brand, model);
+        const query = endpoints.cars.adminSearch(brand, model,category);
 
         if (!query) {
             toast.warning("ادخل قيم في خيارات البحث", { toastId: "customer-search-warning" })
@@ -85,6 +87,9 @@ const CarsManger = ({ cars, mutate }: Props) => {
                     setModel={setModel}
                     brand={brand}
                     setBrand={setBrand}
+                    category={category}
+                    setCategory={setCategory}
+                    categories={response.category_list}
                 />
                 <Button
                     variant='gradient'
@@ -105,6 +110,7 @@ const CarsManger = ({ cars, mutate }: Props) => {
                         >
                             <CarsList
                                 cars={chunkedCars[currentPage]}
+                                categories={response.category_list}
                                 mutate={mutate}
                             />
                         </CardBody>
@@ -126,6 +132,7 @@ const CarsManger = ({ cars, mutate }: Props) => {
                                 <CarsList
                                     cars={result[currentPage]}
                                     mutate={mutate}
+                                    categories={response.category_list}
                                 />
                             </CardBody>
                             <CardFooter>

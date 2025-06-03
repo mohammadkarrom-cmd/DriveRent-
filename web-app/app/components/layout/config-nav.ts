@@ -35,7 +35,8 @@ export const paths = {
             index: "/employee/cars",
             view: "/employee/cars/table"
         },
-        reservations: "/employee/reservations"
+        reservations: "/employee/reservations",
+        allRev: "/employee/reservations/all"
     },
     cars: {
         cars: "/cars",

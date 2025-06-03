@@ -8,7 +8,18 @@ export const employeeLinks: MenuLinkType[] = [
         label: "الحجوزات",
         icon: <TbTransactionDollar />,
         path: paths.employee.reservations,
-        Links: undefined
+        Links: [
+            {
+                label: "جميع الحجوزات",
+                path: paths.employee.allRev,
+                icon: <TbTransactionDollar />
+            },
+            {
+                label: "الحجوزات",
+                icon: <TbTransactionDollar />,
+                path: paths.employee.reservations,
+            }
+        ]
     },
     {
         label: "السيارات",

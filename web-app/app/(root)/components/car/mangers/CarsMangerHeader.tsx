@@ -1,18 +1,23 @@
 "use client"
 import { useSettingsContext } from '@/lib/context/settings/setting-context';
-import { Input } from '@/lib/ui/MTFix'
+import { Backgrounds, shadowPrimary, TextPrimary } from '@/lib/ui/class/classNames';
+import { Input, Option, Select } from '@/lib/ui/MTFix';
+import clsx from 'clsx';
 import { Dispatch, SetStateAction } from 'react';
 import { BiSolidCategory } from 'react-icons/bi';
 import { IoLogoModelS } from 'react-icons/io';
 
 type Props = {
     model: string
-    setModel:Dispatch<SetStateAction<string>>
+    setModel: Dispatch<SetStateAction<string>>
     brand: string
-    setBrand:Dispatch<SetStateAction<string>>
+    setBrand: Dispatch<SetStateAction<string>>
+    category: string
+    setCategory: Dispatch<SetStateAction<string>>,
+    categories: CategoryType[]
 }
 
-const CarsMangerHeader = ({ model,setModel,brand,setBrand }: Props) => {
+const CarsMangerHeader = ({ model, setModel, brand, setBrand, category, setCategory, categories }: Props) => {
     const { theme } = useSettingsContext();
 
     return (
@@ -31,7 +36,7 @@ const CarsMangerHeader = ({ model,setModel,brand,setBrand }: Props) => {
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
             />
-             <Input
+            <Input
                 label='النموذج'
                 type='search'
                 labelProps={{
@@ -45,6 +50,34 @@ const CarsMangerHeader = ({ model,setModel,brand,setBrand }: Props) => {
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
             />
+            <Select
+                label='التصنيف'
+                color='green'
+                value={category}
+                onChange={(value) => {
+                    console.log(value);
+                    setCategory(value);
+                }}
+                menuProps={{
+                    className: clsx(Backgrounds, shadowPrimary, TextPrimary, "shadow border-none z-[999]")
+                }}
+            >
+                <Option
+                    value=''
+                    className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
+                >
+                    غير محدد
+                </Option>
+                {
+                    categories.map(category => (
+                        <Option
+                            value={category.id_car_type.toString()}
+                        >
+                            {category.name}
+                        </Option>
+                    ))
+                }
+            </Select>
         </div>
     )
 }
