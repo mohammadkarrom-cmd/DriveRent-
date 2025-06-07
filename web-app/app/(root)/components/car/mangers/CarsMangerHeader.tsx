@@ -21,7 +21,37 @@ const CarsMangerHeader = ({ model, setModel, brand, setBrand, category, setCateg
     const { theme } = useSettingsContext();
 
     return (
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-5 min-h-fit'>
+            <Select
+                label='التصنيف'
+                color='green'
+                value={category}
+                onChange={(value) => {
+                    setCategory(value);
+                    console.log(typeof value);
+                }}
+                tabIndex={100}
+                menuProps={{
+                    className: clsx(Backgrounds, shadowPrimary, TextPrimary, "shadow border-none z-50"),
+                    tabIndex: 100
+                }}
+            >
+                <Option
+                    value=''
+                    className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
+                >
+                    غير محدد
+                </Option>
+                {
+                    categories.map(category => (
+                        <Option
+                            value={category.id_car_type.toString()}
+                        >
+                            {category.name}
+                        </Option>
+                    ))
+                }
+            </Select>
             <Input
                 label='العلامة التجارية'
                 type='search'
@@ -50,34 +80,6 @@ const CarsMangerHeader = ({ model, setModel, brand, setBrand, category, setCateg
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
             />
-            <Select
-                label='التصنيف'
-                color='green'
-                value={category}
-                onChange={(value) => {
-                    console.log(value);
-                    setCategory(value);
-                }}
-                menuProps={{
-                    className: clsx(Backgrounds, shadowPrimary, TextPrimary, "shadow border-none z-[999]")
-                }}
-            >
-                <Option
-                    value=''
-                    className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                >
-                    غير محدد
-                </Option>
-                {
-                    categories.map(category => (
-                        <Option
-                            value={category.id_car_type.toString()}
-                        >
-                            {category.name}
-                        </Option>
-                    ))
-                }
-            </Select>
         </div>
     )
 }

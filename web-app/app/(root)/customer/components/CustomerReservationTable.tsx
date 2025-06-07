@@ -1,15 +1,15 @@
 
+import Table from '@/app/components/table/Table';
+import CountDown from '@/app/components/views/CountDown';
+import { CardBackgrounds } from '@/lib/ui/class/classNames';
+import { Card, CardBody, Chip } from '@/lib/ui/MTFix';
+import { AxiosResponse } from 'axios';
+import clsx from 'clsx';
 import { BsFillPatchQuestionFill } from 'react-icons/bs';
 import { FaCalendarCheck, FaHourglassEnd, FaHourglassStart, FaIdCard } from 'react-icons/fa';
 import { IoCarSport } from 'react-icons/io5';
-import { Card, CardBody, Chip } from '@/lib/ui/MTFix'
-import Table from '@/app/components/table/Table';
-import { CardBackgrounds } from '@/lib/ui/class/classNames';
-import clsx from 'clsx';
-import CustomerReservation from './CustomerReservation';
-import { AxiosResponse } from 'axios';
 import { KeyedMutator } from 'swr';
-import CountDown from '@/app/components/views/CountDown';
+import CustomerReservation from './CustomerReservation';
 
 
 type Props = {
@@ -99,7 +99,7 @@ const CustomerReservationTable = ({ reservations, refetch }: Props) => {
                 <Chip
                     value={row.status_reservation}
                     variant='filled'
-                    color={row.status_reservation === "محجوزة" ? "green" : row.status_reservation === "حجز مؤقت" ? "amber" : row.status_reservation === "منتهية الصلاحية" ? "red" : "blue"}
+                    color={row.status_reservation === "حجز مؤكد" ? "green" : row.status_reservation === "حجز مؤقت" ? "amber" :( row.status_reservation === "حجز منتهي الصلاحية" || row.status_reservation === "حجز ملغي") ? "red" : "blue"}
                     className='w-fit'
                 />
             )

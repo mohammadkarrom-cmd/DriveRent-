@@ -12,9 +12,10 @@ type Props = {
     cars: CarType[]
     categories: CategoryType[]
     mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
+    isCustomer?: boolean
 }
 
-const CarsList = ({ cars, mutate, categories }: Props) => {
+const CarsList = ({ cars, mutate, categories,isCustomer }: Props) => {
     return (
         <>
             {
@@ -47,6 +48,7 @@ const CarsList = ({ cars, mutate, categories }: Props) => {
                         <AddCar
                             mutate={mutate}
                             categories={categories}
+                            isCustomer={isCustomer}
                         />
                     </div>
             }

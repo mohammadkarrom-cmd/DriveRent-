@@ -3,7 +3,6 @@
 
 import { endpoints } from '@/app/api/common'
 import CountDown from '@/app/components/views/CountDown'
-import { carCategoryParser, carStatusParser } from '@/lib/api/data/carCategory'
 import dataMutate from '@/lib/api/data/dataMutate'
 import { METHODS } from '@/lib/api/setup/api'
 import useBoolean from '@/lib/hooks/use-boolean'
@@ -152,42 +151,62 @@ const CustomerReservation = ({ Reservation, refetch }: Props) => {
                 variant='paragraph'
               >
                 <GiSteeringWheel className='inline-block me-1.5' />
-                {`التصنيف ${carCategoryParser(Reservation.car.category)}`}
+                {`التصنيف ${Reservation.car.category_disaply}`}
               </Typography>
               <Typography
                 variant='paragraph'
               >
                 <MdOutlineShortText className='inline-block me-1.5' />
-                {`حالة السيارة ${carStatusParser(Reservation.car.status)}`}
+                {`حالة السيارة ${Reservation.car.status_disaply}`}
               </Typography>
             </div>
             <div
               className='flex justify-start items-center gap-10 flex-wrap'
             >
-              <Typography
-                variant='paragraph'
-              >
-                {`سعر الإيجار اليومي ${Reservation.car.daily_rent_price}`}
-                <PiCurrencyDollarBold
-                  className='text-primary-main inline-block me-1.5'
-                />
-              </Typography>
-              <Typography
-                variant='paragraph'
-              >
-                {`سعر الإيجار الشهري ${Reservation.car.monthly_rent_price}`}
-                <PiCurrencyDollarBold
-                  className='text-primary-main inline-block me-1.5'
-                />
-              </Typography>
-              <Typography
-                variant='paragraph'
-              >
-                {`سعر الإيجار السنوي ${Reservation.car.yearly_rent_price}`}
-                <PiCurrencyDollarBold
-                  className='text-primary-main inline-block me-1.5'
-                />
-              </Typography>
+              {
+                Reservation.car.is_available_daily &&
+                <Typography
+                  variant='paragraph'
+                >
+                  {`سعر الإيجار اليومي ${Reservation.car.daily_rent_price}`}
+                  <PiCurrencyDollarBold
+                    className='text-primary-main inline-block me-1.5'
+                  />
+                </Typography>
+              }
+              {
+                Reservation.car.is_available_monthly &&
+                <Typography
+                  variant='paragraph'
+                >
+                  {`سعر الإيجار الشهري ${Reservation.car.monthly_rent_price}`}
+                  <PiCurrencyDollarBold
+                    className='text-primary-main inline-block me-1.5'
+                  />
+                </Typography>
+              }
+              {
+                Reservation.car.is_available_yearly &&
+                <Typography
+                  variant='paragraph'
+                >
+                  {`سعر الإيجار السنوي ${Reservation.car.yearly_rent_price}`}
+                  <PiCurrencyDollarBold
+                    className='text-primary-main inline-block me-1.5'
+                  />
+                </Typography>
+              }
+              {
+                Reservation.car.is_for_sale &&
+                <Typography
+                  variant='paragraph'
+                >
+                  {`سعر المبيع ${Reservation.car.sale_price}`}
+                  <PiCurrencyDollarBold
+                    className='text-primary-main inline-block me-1.5'
+                  />
+                </Typography>
+              }
             </div>
             <figure
               className='flex justify-between gap-5 px-5 flex-wrap'

@@ -11,7 +11,7 @@ export const endpoints = {
         list: "/car/list-create/",
         add: "/car/list-create/",
         update: (id: number) => `/car/detail/${id}/`,
-        car: (id: number) => `/car/detail/${id}/`,
+        car: (id: number) => `/car/customer/detail/${id}/`,
         cars: "/car/list/",
         customerSearch: (categoryId?: string, rentTypeId?: string) => {
             if (categoryId && !rentTypeId) {
@@ -56,7 +56,20 @@ export const endpoints = {
     customer: {
         reserveCar: "/car/reserve/",
         temporaryReservations: "/car/my-temporary-reservations/",
-        cancel: (id: number) => `/car/reserve/cancel/${id}/`
+        cancel: (id: number) => `/car/reserve/cancel/${id}/`,
+        evaluations: {
+            evaluableOffices: "/car/customer/evaluable-offices/"
+        },
+        customerCars: {
+            list: "/car/customer/list-create/",
+            add: "/car/customer/list-create/",
+            search: (brand?: string, model?: string, category?: string) => {
+                if (!brand && !model && !category) {
+                    return false;
+                }
+                return `/car/customer/list-create/?brand=${brand}&model=${model}&category=${category}`
+            },
+        }
     },
     employee: {
         list: "/account/office/accounts/",
@@ -64,18 +77,24 @@ export const endpoints = {
         delete: (id: number) => `/account/office/account/${id}/`,
         update: (id: number) => `/account/office/account/${id}/`,
         switch: "/account/bulk-action/",
-        confirmReservation: (id: number) => `/car/office/confirm-reservation/${id}/`,
+        confirmReservation: (id: number) => `/car/confirm-reservation/${id}/`,
         cancelReservation: (id: number) => `/car/reservations/cancel/${id}/`,
         searchReservation: (first_name?: string, last_name?: string, phone?: string, id_number?: string, status_reservation?: string) => {
             if (!first_name && !last_name && !phone && !id_number && !status_reservation) {
                 return false;
             }
-            return `car/office/temporary-reservations/?first_name=${first_name}&last_name=${last_name}&phone=${phone}&id_number=${id_number}&status_reservation=${status_reservation}`
+            return `/car/list/reservations/?first_name=${first_name}&last_name=${last_name}&phone=${phone}&id_number=${id_number}&status_reservation=${status_reservation}`
+        },
+        searchTempReservation: (first_name?: string, last_name?: string, phone?: string, id_number?: string, status_reservation?: string) => {
+            if (!first_name && !last_name && !phone && !id_number && !status_reservation) {
+                return false;
+            }
+            return `/car/list/temporary-reservations/?first_name=${first_name}&last_name=${last_name}&phone=${phone}&id_number=${id_number}`
         }
     },
     reservations: {
         temporary: {
-            list: "/car/office/temporary-reservations/"
+            list: "/car/list/temporary-reservations/"
         },
         all: {
             list: "/car/list/reservations/"

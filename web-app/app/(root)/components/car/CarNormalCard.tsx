@@ -71,7 +71,7 @@ const CarNormalCard = ({ car }: Props) => {
                     <Chip
                         value={car.status}
                         variant='filled'
-                        color={car.status === 1 ? "green" : car.status === 2 ? "amber" : car.status === 3 ? "blue" : "red"}
+                        color={car.status === "متاحة" ? "green" :( car.status === "حجز مؤقت للأجار" ||  car.status === "حجز مؤقت للبيع") ? "amber" : (car.status === "محجوزة للأجار" ||car.status === "مباعة") ? "blue" : "red"}
                         className='h-fit'
                     />
                 </section>
@@ -80,33 +80,54 @@ const CarNormalCard = ({ car }: Props) => {
                 className='w-full p-0 pt-1'
             >
                 <section className={clsx(TextSecondary, 'flex justify-between flex- px-3')}>
-                    <Typography
-                        variant='small'
-                        className='flex gap-1 items-center'
-                    >
-                        <PiCurrencyDollarBold
-                            className='text-primary-main'
-                        />
-                        {car.daily_rent_price + "/يومي"}
-                    </Typography>
-                    <Typography
-                        variant='small'
-                        className='flex gap-1 items-center'
-                    >
-                        <PiCurrencyDollarBold
-                            className='text-primary-main'
-                        />
-                        {car.monthly_rent_price + "/شهري"}
-                    </Typography>
-                    <Typography
-                        variant='small'
-                        className='flex gap-1 items-center'
-                    >
-                        <PiCurrencyDollarBold
-                            className='text-primary-main'
-                        />
-                        {car.yearly_rent_price + "/سنوي"}
-                    </Typography>
+                    {
+                        car.is_available_daily &&
+                        <Typography
+                            variant='small'
+                            className='flex gap-1 items-center'
+                        >
+                            <PiCurrencyDollarBold
+                                className='text-primary-main'
+                            />
+                            {car.daily_rent_price + "/يومي"}
+                        </Typography>
+                    }
+                    {
+                        car.is_available_monthly &&
+                        <Typography
+                            variant='small'
+                            className='flex gap-1 items-center'
+                        >
+                            <PiCurrencyDollarBold
+                                className='text-primary-main'
+                            />
+                            {car.monthly_rent_price + "/شهري"}
+                        </Typography>
+                    }
+                    {
+                        car.is_available_yearly &&
+                        <Typography
+                            variant='small'
+                            className='flex gap-1 items-center'
+                        >
+                            <PiCurrencyDollarBold
+                                className='text-primary-main'
+                            />
+                            {car.yearly_rent_price + "/سنوي"}
+                        </Typography>
+                    }
+                    {
+                        car.is_for_sale &&
+                        <Typography
+                            variant='small'
+                            className='flex gap-1 items-center'
+                        >
+                            <PiCurrencyDollarBold
+                                className='text-primary-main'
+                            />
+                            {car.sale_price + "/مبيع"}
+                        </Typography>
+                    }
                 </section>
                 <MyCarousel
                     autoplay={false}

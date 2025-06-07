@@ -2,7 +2,7 @@
 
 
 import { endpoints } from '@/app/api/common'
-import { carCategoryParser, carStatusParser, reservationParser } from '@/lib/api/data/carCategory'
+import { carCategoryParser } from '@/lib/api/data/carCategory'
 import dataMutate from '@/lib/api/data/dataMutate'
 import { METHODS } from '@/lib/api/setup/api'
 import useBoolean from '@/lib/hooks/use-boolean'
@@ -134,7 +134,7 @@ const Reservation = ({ Reservation, refetch }: Props) => {
                             variant='paragraph'
                         >
                             <GiHouseKeys className='inline-block me-1.5' />
-                            {`نوع الحجز ${reservationParser(Reservation.type_reservation)}`}
+                            {`نوع الحجز ${Reservation.type_reservation}`}
                         </Typography>
                     </section>
                     <section>
@@ -195,7 +195,7 @@ const Reservation = ({ Reservation, refetch }: Props) => {
                                 variant='paragraph'
                             >
                                 <MdOutlineShortText className='inline-block me-1.5' />
-                                {`حالة السيارة ${carStatusParser(Reservation.car.status)}`}
+                                {`حالة السيارة ${Reservation.status_reservation}`}
                             </Typography>
                         </div>
                         <div
@@ -254,7 +254,7 @@ const Reservation = ({ Reservation, refetch }: Props) => {
                     </section>
                 </DialogBody>
                 {
-                    Reservation.status_reservation === 2 &&
+                    Reservation.status_reservation === "حجز مؤقت" &&
                     <DialogFooter className='gap-5'>
                         <Button
                             variant="filled"

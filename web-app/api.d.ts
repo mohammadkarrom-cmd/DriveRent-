@@ -30,9 +30,11 @@ type CarType = {
     is_available_daily: boolean
     is_available_monthly: boolean
     is_available_yearly: boolean
+    is_for_sale: boolean
     daily_rent_price: number
     monthly_rent_price: number
     yearly_rent_price: number
+    sale_price: number
     image1: string
     image2: string
     image3: string
@@ -69,9 +71,9 @@ type reservationsType = {
     end_date: string
     id_reservation: number
     start_date: string
-    status_reservation: number
+    status_reservation: string
     time_reservation: string
-    type_reservation: number,
+    type_reservation: string,
     customer?: customerType,
     car: CarType
 }

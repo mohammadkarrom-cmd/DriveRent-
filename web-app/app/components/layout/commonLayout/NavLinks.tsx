@@ -1,8 +1,8 @@
-import React, { createElement } from 'react'
-import NavLink from '../nav/NavLink'
-import { appNavLinks } from '../config-nav'
-import SpecialLink from './SpecialLink'
 import { uniqueId } from 'lodash'
+import { createElement } from 'react'
+import { appNavLinks } from '../config-nav'
+import NavLink from '../nav/NavLink'
+import SpecialLink from './SpecialLink'
 
 
 const NavLinks = () => {
@@ -23,11 +23,7 @@ const NavLinks = () => {
                     </li>
                 ))
             }
-            <li
-                key={uniqueId()}
-            >
-               <SpecialLink />
-            </li>
+            <SpecialLink />
         </ul>
     )
 }

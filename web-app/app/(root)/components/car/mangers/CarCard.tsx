@@ -22,7 +22,7 @@ type Props = {
     mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
 }
 
-const CarCard = ({ car, mutate,categories }: Props) => {
+const CarCard = ({ car, mutate, categories }: Props) => {
     return (
         <Card
             className={clsx(CardBackgrounds, TextPrimary, 'xl:flex-row justify-between')}
@@ -128,6 +128,18 @@ const CarCard = ({ car, mutate,categories }: Props) => {
                         />
                         {car.yearly_rent_price + "/سنوي"}
                     </Typography>
+                    {
+                        car.is_for_sale &&
+                        <Typography
+                            variant='small'
+                            className='flex gap-1 items-center'
+                        >
+                            <PiCurrencyDollarBold
+                                className='text-primary-main'
+                            />
+                            {car.sale_price + "/مبيع"}
+                        </Typography>
+                    }
                 </section>
                 <Typography
                     variant='small'

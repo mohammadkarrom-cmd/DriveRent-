@@ -21,14 +21,15 @@ const CarsList = dynamic(() => import("@/app/(root)/components/car/mangers/CarsL
 
 type Props = {
     response: MangerCarsListResponseType,
-    mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
+    mutate: KeyedMutator<AxiosResponse<unknown, unknown>>,
+    isCustomer?: boolean
 }
 
 type searchResponseType = {
     cars: CarType[]
 };
 
-const CarsManger = ({ response, mutate }: Props) => {
+const CarsManger = ({ response, mutate,isCustomer }: Props) => {
     const cars = response.cars
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [brand, setBrand] = useState<string>("");
@@ -44,7 +45,7 @@ const CarsManger = ({ response, mutate }: Props) => {
 
     const handleSearch = async () => {
         loading.onTrue();
-        const query = endpoints.cars.adminSearch(brand, model,category);
+        const query = isCustomer? endpoints.customer.customerCars.search(brand, model,category) : endpoints.cars.adminSearch(brand, model,category);
 
         if (!query) {
             toast.warning("ادخل قيم في خيارات البحث", { toastId: "customer-search-warning" })
@@ -77,10 +78,10 @@ const CarsManger = ({ response, mutate }: Props) => {
             shadow={false}
         >
             <CardHeader
-                floated={false}
+                // floated={false}
                 shadow={false}
                 color='transparent'
-                className={clsx('text-inherit p-5 m-0 mb-5 border-b rounded-b-none ', BorderPrimary)}
+                className={clsx('text-inherit p-5 m-0 mb-5 border-b rounded-b-none', BorderPrimary)}
             >
                 <CarsMangerHeader
                     model={model}
@@ -106,12 +107,13 @@ const CarsManger = ({ response, mutate }: Props) => {
                 firstInter.value
                     ? <>
                         <CardBody
-                            className='flex items-center justify-center p-0'
+                            className='flex items-center justify-center p-0 z-0'
                         >
                             <CarsList
                                 cars={chunkedCars[currentPage]}
                                 categories={response.category_list}
                                 mutate={mutate}
+                                isCustomer={isCustomer}
                             />
                         </CardBody>
                         <CardFooter>

@@ -29,10 +29,11 @@ import { KeyedMutator } from 'swr'
 
 type Props = {
     categories: CategoryType[],
-    mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
+    mutate: KeyedMutator<AxiosResponse<unknown, unknown>>,
+    isCustomer?: boolean
 }
 
-const AddCar = ({ mutate, categories }: Props) => {
+const AddCar = ({ mutate, categories,isCustomer }: Props) => {
     const { theme } = useSettingsContext();
     const open = useBoolean({ initialState: false });
     const loading = useBoolean({ initialState: false });
@@ -63,10 +64,11 @@ const AddCar = ({ mutate, categories }: Props) => {
     const isAvailableDaily = watch("is_available_daily");
     const isAvailableMonthly = watch("is_available_monthly");
     const isAvailableYearly = watch("is_available_yearly");
+    const isForSale = watch("is_for_sale");
 
     const onSubmit = async (data: AddCarSchema) => {
         loading.onTrue();
-        const promise = dataMutate(endpoints.cars.add, METHODS.POST, { status: 1, ...data }, {
+        const promise = dataMutate(isCustomer? endpoints.customer.customerCars.add : endpoints.cars.add, METHODS.POST, { status: 1, ...data }, {
             headers: {
                 "Content-Type": "multipart/form-data"
             }
@@ -218,6 +220,15 @@ const AddCar = ({ mutate, categories }: Props) => {
                                             className: clsx(TextPrimary, "text-sm")
                                         }}
                                     />
+                                    <RHFCheckbox
+                                        color='green'
+                                        label='متاح البيع'
+                                        name='is_for_sale'
+                                        helperText=''
+                                        labelProps={{
+                                            className: clsx(TextPrimary, "text-sm")
+                                        }}
+                                    />
                                 </section>
                                 {
                                     isAvailableDaily &&
@@ -265,6 +276,22 @@ const AddCar = ({ mutate, categories }: Props) => {
                                             />
                                         }
                                         name='yearly_rent_price'
+                                        helperText=''
+                                    />
+                                }
+                                {
+                                    isForSale &&
+                                    <RHFInput
+                                        label='سعر البيع'
+                                        type='number'
+                                        color={theme === "dark" ? 'white' : "black"}
+                                        icon={
+                                            <PiCurrencyDollarBold
+                                                className='text-primary-main'
+                                                size={23}
+                                            />
+                                        }
+                                        name='sale_price'
                                         helperText=''
                                     />
                                 }

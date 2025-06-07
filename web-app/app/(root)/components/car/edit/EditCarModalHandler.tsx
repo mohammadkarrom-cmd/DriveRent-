@@ -47,12 +47,15 @@ function EditCarModalHandler({ car, mutate, categories }: Props) {
         is_available_daily: car.is_available_daily,
         is_available_monthly: car.is_available_monthly,
         is_available_yearly: car.is_available_yearly,
+        is_for_sale: car.is_for_sale,
         daily_rent_price: car.daily_rent_price,
         monthly_rent_price: car.monthly_rent_price,
         yearly_rent_price: car.yearly_rent_price,
+        sale_price: car.sale_price,
         image1: car.image1,
         image2: car.image2,
         image3: car.image3,
+
     };
 
     const methods = useForm<UpdateCarSchema>({
@@ -65,6 +68,7 @@ function EditCarModalHandler({ car, mutate, categories }: Props) {
     const isAvailableDaily = watch("is_available_daily");
     const isAvailableMonthly = watch("is_available_monthly");
     const isAvailableYearly = watch("is_available_yearly");
+    const isForSale = watch("is_for_sale");
 
     const onSubmit = async (data: UpdateCarSchema) => {
         loading.onTrue();
@@ -271,6 +275,15 @@ function EditCarModalHandler({ car, mutate, categories }: Props) {
                                             className: clsx(TextPrimary, "text-sm")
                                         }}
                                     />
+                                     <RHFCheckbox
+                                        color='green'
+                                        label='متاح البيع'
+                                        name='is_for_sale'
+                                        helperText=''
+                                        labelProps={{
+                                            className: clsx(TextPrimary, "text-sm")
+                                        }}
+                                    />
                                 </section>
                                 {
                                     isAvailableDaily &&
@@ -318,6 +331,22 @@ function EditCarModalHandler({ car, mutate, categories }: Props) {
                                             />
                                         }
                                         name='yearly_rent_price'
+                                        helperText=''
+                                    />
+                                }
+                                {
+                                    isForSale &&
+                                    <RHFInput
+                                        label='سعر البيع'
+                                        type='number'
+                                        color={theme === "dark" ? 'white' : "black"}
+                                        icon={
+                                            <PiCurrencyDollarBold
+                                                className='text-primary-main'
+                                                size={23}
+                                            />
+                                        }
+                                        name='sale_price'
                                         helperText=''
                                     />
                                 }

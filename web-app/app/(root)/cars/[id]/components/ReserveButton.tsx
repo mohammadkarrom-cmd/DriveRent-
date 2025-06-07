@@ -8,24 +8,25 @@ import { METHODS } from '@/lib/api/setup/api'
 import { useAuthContext } from '@/lib/context/auth/auth-context'
 import useBoolean from '@/lib/hooks/use-boolean'
 import { Backgrounds, CardBackgrounds, shadowPrimary, TextPrimary } from '@/lib/ui/class/classNames'
-import { Button, Dialog, DialogHeader, DialogFooter, DialogBody, Option, Select, Input } from '@/lib/ui/MTFix'
+import { Button, Dialog, DialogBody, DialogFooter, DialogHeader, Input, Option, Select } from '@/lib/ui/MTFix'
 import clsx from 'clsx'
 import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { PiCurrencyDollarBold } from 'react-icons/pi'
 import { toast } from 'react-toastify'
 
 type Props = {
-    car: CarType
+    car: CarType,
+    available: boolean
 }
 
 type reservationRequest = {
     car: number,
     start_date: string,
-    type_reservation: number
+    type_reservation: number,
 }
 
-const ReserveButton = ({ car }: Props) => {
+const ReserveButton = ({ car,available }: Props) => {
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
@@ -81,6 +82,7 @@ const ReserveButton = ({ car }: Props) => {
                     size='lg'
                     className='text-center w-full lg:w-fit'
                     onClick={open.onTrue}
+                    disabled={!available}
                 >
                     حجز
                 </Button>

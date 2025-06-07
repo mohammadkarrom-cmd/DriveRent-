@@ -7,8 +7,8 @@ import Empty from '@/app/components/views/Empty';
 import fetchApi from '@/lib/api/data/dataFetcher';
 import { useSettingsContext } from '@/lib/context/settings/setting-context';
 import useBoolean from '@/lib/hooks/use-boolean';
-import { Backgrounds, CardBackgrounds, shadowPrimary, TextPrimary } from '@/lib/ui/class/classNames';
-import { Button, Card, CardHeader, Input, Option, Select, Typography } from '@/lib/ui/MTFix';
+import { CardBackgrounds } from '@/lib/ui/class/classNames';
+import { Button, Card, CardHeader, Input, Typography } from '@/lib/ui/MTFix';
 import { AxiosError } from 'axios';
 import clsx from 'clsx';
 import { useState } from 'react';
@@ -19,14 +19,13 @@ import useSWR from 'swr';
 import ReservationsTable from './ReservationsTable';
 
 
-const Reservations = () => {
-  const { data: reservations, error, mutate, isLoading } = useSWR(endpoints.reservations.all.list, fetchApi);
+const TemporaryReservations = () => {
+  const { data: reservations, error, mutate, isLoading } = useSWR(endpoints.reservations.temporary.list, fetchApi);
   const { theme } = useSettingsContext();
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [id, setId] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
-  const [reversionType, setReversionType] = useState<string>("");
 
   const [result, setResult] = useState<reservationsType[]>([]);
 
@@ -36,7 +35,7 @@ const Reservations = () => {
   const handleSearch = async () => {
     loading.onTrue();
 
-    const query = endpoints.employee.searchReservation(firstName, lastName, phone, id, reversionType);
+    const query = endpoints.employee.searchTempReservation(firstName, lastName, phone, id);
 
     if (!query) {
       toast.warning("ادخل قيم في خيارات البحث", { toastId: "customer-search-warning" })
@@ -88,48 +87,6 @@ const Reservations = () => {
         className={clsx(CardBackgrounds, " m-0 p-5 grid grid-cols-1 md:grid-cols-2 gap-5 rounded-b-none")}
         shadow={false}
       >
-        <div
-          className='md:col-span-2'
-        >
-          <Select
-            label='نوع الحجز'
-            color='green'
-            name='category'
-            menuProps={{
-              className: clsx(Backgrounds, shadowPrimary, TextPrimary, "shadow border-none overflow-scroll "),
-            }}
-            labelProps={{
-              dir: "ltr"
-            }}
-            value={reversionType}
-            onChange={(value) => setReversionType(value)}
-          >
-            <Option
-              value=''
-              className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-            >
-              غير محدد
-            </Option>
-            <Option
-              value='1'
-              className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-            >
-              حجز مؤقت
-            </Option>
-            <Option
-              value='2'
-              className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-            >
-              محجوزة
-            </Option>
-            <Option
-              value='4'
-              className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-            >
-              منتهية الصلاحية
-            </Option>
-          </Select>
-        </div>
         <Input
           label='الاسم الأول'
           type='search'
@@ -232,4 +189,4 @@ const Reservations = () => {
   )
 }
 
-export default Reservations
+export default TemporaryReservations

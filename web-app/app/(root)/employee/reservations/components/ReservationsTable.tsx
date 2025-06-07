@@ -1,14 +1,13 @@
 import Table from '@/app/components/table/Table';
 import { CardBackgrounds } from '@/lib/ui/class/classNames';
-import { Card, CardBody, Chip } from '@/lib/ui/MTFix'
+import { Card, CardBody, Chip } from '@/lib/ui/MTFix';
+import { AxiosResponse } from 'axios';
 import clsx from 'clsx';
 import { BsFillPatchQuestionFill } from 'react-icons/bs';
 import { FaCalendarCheck, FaHourglassEnd, FaHourglassStart, FaIdCard } from 'react-icons/fa';
 import { IoCarSport } from 'react-icons/io5';
-import Reservation from './Reservation';
-import { carStatusParser } from '@/lib/api/data/carCategory';
 import { KeyedMutator } from 'swr';
-import { AxiosResponse } from 'axios';
+import Reservation from './Reservation';
 
 type Props = {
     reservations: reservationsType[],
@@ -106,9 +105,9 @@ const ReservationsTable = ({ reservations, refetch }: Props) => {
             icon: <BsFillPatchQuestionFill size={17.5} />,
             render: (row: reservationsType) => (
                 <Chip
-                    value={carStatusParser(row.status_reservation)}
+                    value={row.status_reservation}
                     variant='filled'
-                    color={row.status_reservation === 4 ? "red" : row.status_reservation === 2 ? "amber" : row.status_reservation === 3 ? "green" : "blue"}
+                    color={row.status_reservation === "حجز ملغي " ? "red" : row.status_reservation === "حجز مؤقت" ? "amber" : row.status_reservation === "حجز مؤكد" ? "green" : "blue"}
                     className='w-fit'
                 />
             )

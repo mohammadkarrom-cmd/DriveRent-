@@ -3,7 +3,7 @@ import { FaTelegram } from "react-icons/fa6";
 import { IoIosHome } from "react-icons/io";
 import { IoCarSport } from "react-icons/io5";
 import { RiInstagramFill } from "react-icons/ri";
-import { TbBrandGoogleBigQuery, TbListDetails } from "react-icons/tb";
+import { TbBrandGoogleBigQuery } from "react-icons/tb";
 
 export const paths = {
     home: "/",
@@ -31,12 +31,11 @@ export const paths = {
         categories: "/admin/categories"
     },
     employee: {
-        cars: {
-            index: "/employee/cars",
-            view: "/employee/cars/table"
-        },
-        reservations: "/employee/reservations",
-        allRev: "/employee/reservations/all"
+        reservations: {
+            index: "/employee/reservations",
+            temporary: "/employee/reservations/temporary",
+            all: "/employee/reservations/all"
+        }
     },
     cars: {
         cars: "/cars",
@@ -44,7 +43,8 @@ export const paths = {
         search: "/cars/search"
     },
     customer: {
-        temporaryReservations: "/customer/temporary-reservations"
+        temporaryReservations: "/customer/temporary-reservations",
+        cars: "/customer/cars"
     }
 };
 
@@ -106,9 +106,3 @@ export const footerLinks: FooterLinkType[] = [
         ]
     }
 ];
-
-export const temporaryReservationsLink: AppNavLinkType = {
-    label: "الحجوزات",
-    href: paths.customer.temporaryReservations,
-    icon: TbListDetails
-}

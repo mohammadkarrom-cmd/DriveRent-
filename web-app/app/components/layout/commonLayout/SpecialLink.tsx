@@ -2,9 +2,10 @@
 import { ROLES } from "@/app/constants";
 import { useAuthContext } from "@/lib/context/auth/auth-context";
 import { Spinner } from "@material-tailwind/react";
+import { IoCarSport } from "react-icons/io5";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { TbListDetails } from "react-icons/tb";
-import { paths, temporaryReservationsLink } from "../config-nav";
+import { paths } from "../config-nav";
 import NavLink from "../nav/NavLink";
 
 
@@ -31,7 +32,7 @@ const SpecialLink = () => {
 
                             : user?.role === ROLES.EMPLOYEE
                                 ? <NavLink
-                                    href={paths.employee.reservations}
+                                    href={paths.employee.reservations.all}
                                     className="flex gap-1 items-center"
                                     includes
                                 >
@@ -48,13 +49,23 @@ const SpecialLink = () => {
                                         <MdAdminPanelSettings />
                                         لوحة التحكم
                                     </NavLink>
-                                    : user?.role === ROLES.CUSTOMER && <NavLink href={temporaryReservationsLink.href}
-                                        className="flex gap-1 items-center"
-                                        includes
-                                    >
-                                        <TbListDetails />
-                                        {temporaryReservationsLink.label}
-                                    </NavLink>
+                                    : user?.role === ROLES.CUSTOMER &&
+                                    <>
+                                        <NavLink href={paths.customer.temporaryReservations}
+                                            className="flex gap-1 items-center"
+                                            includes
+                                        >
+                                            <TbListDetails />
+                                            الحجوزات
+                                        </NavLink>
+                                        <NavLink href={paths.customer.cars}
+                                            className="flex gap-1 items-center"
+                                            includes
+                                        >
+                                            <IoCarSport />
+                                            سيارتي
+                                        </NavLink>
+                                    </>
 
                     )
             }

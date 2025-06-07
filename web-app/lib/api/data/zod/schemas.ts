@@ -35,9 +35,11 @@ export const updateCarSchema = z.object({
   is_available_daily: z.boolean(),
   is_available_monthly: z.boolean(),
   is_available_yearly: z.boolean(),
+  is_for_sale: z.boolean(),
   daily_rent_price: z.number().nonnegative('يجب أن يكون سعر الإيجار اليومي رقمًا إيجابيًا').optional(),
   monthly_rent_price: z.number().nonnegative('يجب أن يكون سعر الإيجار الشهري رقمًا إيجابيًا').optional(),
   yearly_rent_price: z.number().nonnegative('يجب أن يكون سعر الإيجار السنوي رقمًا إيجابيًا').optional(),
+  sale_price: z.number({ message: "سعر البيع" }).nonnegative('يجب أن يكون سعر البيع رقمًا إيجابيًا').optional(),
   image1: z.instanceof(File, { message: "الصورة الأولى للسيارة مطلوبة" }).or(z.string()),
   image2: z.instanceof(File, { message: "الصورة الثانية للسيارة مطلوبة" }).or(z.string()),
   image3: z.instanceof(File, { message: "الصورة الثالثة للسيارة مطلوبة" }).or(z.string()),
@@ -65,6 +67,14 @@ export const updateCarSchema = z.object({
 }, {
   message: "سعر الإيجار السنوي مطلوب عندما تكون السيارة متاحة للإيجار السنوي",
   path: ["yearly_rent_price"],
+}).refine((data) => {
+  if (data.is_for_sale && !data.sale_price) {
+    return false;
+  }
+  return true;
+}, {
+  message: "سعر الببع مطلوب عندما تكون السيارة متاحة للبيع",
+  path: ["sale_price"],
 });
 
 export type UpdateCarSchema = z.infer<typeof updateCarSchema>;
@@ -77,9 +87,11 @@ export const addCarSchema = z.object({
   is_available_daily: z.boolean(),
   is_available_monthly: z.boolean(),
   is_available_yearly: z.boolean(),
+  is_for_sale: z.boolean(),
   daily_rent_price: z.number({ message: "سعر الإيجار اليومي مطلوب" }).nonnegative('يجب أن يكون سعر الإيجار اليومي رقمًا إيجابيًا').optional(),
   monthly_rent_price: z.number({ message: "سعر الإيجار الشهري مطلوب" }).nonnegative('يجب أن يكون سعر الإيجار الشهري رقمًا إيجابيًا').optional(),
   yearly_rent_price: z.number({ message: "سعر الإيجار السنوي مطلوب" }).nonnegative('يجب أن يكون سعر الإيجار السنوي رقمًا إيجابيًا').optional(),
+  sale_price: z.number({ message: "سعر البيع" }).nonnegative('يجب أن يكون سعر البيع رقمًا إيجابيًا').optional(),
   image1: z.instanceof(File, { message: "الصورة الأولى للسيارة مطلوبة" }),
   image2: z.instanceof(File, { message: "الصورة الثانية للسيارة مطلوبة" }),
   image3: z.instanceof(File, { message: "الصورة الثالثة للسيارة مطلوبة" }),
@@ -107,6 +119,14 @@ export const addCarSchema = z.object({
 }, {
   message: "سعر الإيجار السنوي مطلوب عندما تكون السيارة متاحة للإيجار السنوي",
   path: ["yearly_rent_price"],
+}).refine((data) => {
+  if (data.is_for_sale && !data.sale_price) {
+    return false;
+  }
+  return true;
+}, {
+  message: "سعر الببع مطلوب عندما تكون السيارة متاحة للبيع",
+  path: ["sale_price"],
 });
 
 export type AddCarSchema = z.infer<typeof addCarSchema>;
