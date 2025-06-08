@@ -34,7 +34,8 @@ export const paths = {
         reservations: {
             index: "/employee/reservations",
             temporary: "/employee/reservations/temporary",
-            all: "/employee/reservations/all"
+            all: "/employee/reservations/all",
+            fake: "/employee/reservations/fake",
         }
     },
     cars: {
@@ -44,7 +45,10 @@ export const paths = {
     },
     customer: {
         temporaryReservations: "/customer/temporary-reservations",
-        cars: "/customer/cars"
+        cars: "/customer/cars",
+        office: {
+            evaluate: "customer/office/evaluate"
+        }
     }
 };
 

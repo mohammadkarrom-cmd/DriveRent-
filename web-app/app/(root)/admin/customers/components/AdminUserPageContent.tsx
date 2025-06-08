@@ -21,8 +21,6 @@ const AdminUserPageContent = () => {
         }
     }
 
-    console.log(users.data);
-
     return (
         <>
             <ManagementPageHeader

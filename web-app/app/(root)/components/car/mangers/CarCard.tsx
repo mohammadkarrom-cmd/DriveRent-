@@ -77,7 +77,7 @@ const CarCard = ({ car, mutate, categories }: Props) => {
                     <Chip
                         value={car.status_disaply}
                         variant='filled'
-                        color={car.status === 1 ? "green" : car.status === 2 ? "amber" : car.status === 3 ? "blue" : "red"}
+                        color={car.status === 1 ? "green" : (car.status === 2 || car.status === 4) ? "amber" : car.status === 3 ? "blue" : "red"}
                     />
                 </section>
                 <section

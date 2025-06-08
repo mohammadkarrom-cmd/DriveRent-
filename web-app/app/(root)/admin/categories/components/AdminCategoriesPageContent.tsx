@@ -8,9 +8,7 @@ import fetchApi from "@/lib/api/data/dataFetcher"
 import useSWR from "swr"
 import AdminCategoriesTable from "./AdminCategoriesTable"
 
-type Props = {}
-
-const AdminCategoriesPageContent = (props: Props) => {
+const AdminCategoriesPageContent = () => {
     const { data: categories, mutate, error, isLoading } = useSWR(endpoints.admin.categories.list, fetchApi);
 
     if (isLoading) {

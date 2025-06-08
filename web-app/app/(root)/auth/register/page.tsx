@@ -6,8 +6,8 @@ import { registerSchema, registerSchemaType } from '@/lib/api/data/zod/schemas';
 import { useSettingsContext } from '@/lib/context/settings/setting-context';
 import useBoolean from '@/lib/hooks/use-boolean';
 import { Backgrounds, TextPrimary } from '@/lib/ui/class/classNames';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Step, Stepper, Typography } from '@/lib/ui/MTFix';
+import { zodResolver } from '@hookform/resolvers/zod';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -17,11 +17,10 @@ import { IoIosMail } from 'react-icons/io';
 import { IoDocumentAttach, IoEye } from 'react-icons/io5';
 import { MdAccountCircle, MdOutlineShortText } from 'react-icons/md';
 
-import { PiEyeClosedDuotone } from 'react-icons/pi';
-import { useAuthContext } from '@/lib/context/auth/auth-context';
-import { uniqueId } from 'lodash';
-import Link from 'next/link';
 import { paths } from '@/app/components/layout/config-nav';
+import { useAuthContext } from '@/lib/context/auth/auth-context';
+import Link from 'next/link';
+import { PiEyeClosedDuotone } from 'react-icons/pi';
 
 
 
@@ -113,7 +112,7 @@ const RegisterPage = () => {
             >
                 <section
                     className={(activeStep === 0 ? "flex" : "hidden") + ' flex-col gap-5'}
-                    key={uniqueId()}
+                    key={"register-user-info"}
                 >
                     <RHFInput
                         label='الاسم الأول'
@@ -166,7 +165,7 @@ const RegisterPage = () => {
                 </section>
                 <section
                     className={(activeStep === 1 ? "flex" : "hidden") + ' flex-col w-full gap-5'}
-                    key={uniqueId()}
+                    key={"register-images"}
                 >
                     <RHFSingleImageDropzone
                         label='صورة الوجه الخلفي للهوية'
@@ -186,7 +185,7 @@ const RegisterPage = () => {
                 </section>
                 <section
                     className={(activeStep === 2 ? "flex" : "hidden") + ' flex-col gap-5'}
-                    key={uniqueId()}
+                    key={"register-password"}
                 >
                     <RHFInput
                         label='كلمة المرور'

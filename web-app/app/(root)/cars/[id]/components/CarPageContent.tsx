@@ -22,7 +22,7 @@ type Props = {
 }
 
 const CarPageContent = ({ id }: Props) => {
-    const { data: carData, mutate, error, isLoading } = useSWR(endpoints.cars.car(parseInt(id)), fetchApi);
+    const { data: carData, error, isLoading } = useSWR(endpoints.cars.car(parseInt(id)), fetchApi);
 
     if (isLoading) {
         return <NormalLoading />

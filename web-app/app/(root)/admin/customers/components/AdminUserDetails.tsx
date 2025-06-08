@@ -10,6 +10,7 @@ import { Backgrounds } from "@/lib/ui/class/classNames";
 import { Button, Typography } from "@material-tailwind/react";
 import { AxiosError } from "axios";
 import clsx from "clsx";
+import Image from "next/image";
 import { BsFillPatchCheckFill, BsFillPatchExclamationFill } from "react-icons/bs";
 import { FaIdCard } from "react-icons/fa";
 import { IoIosMailUnread } from "react-icons/io";
@@ -132,7 +133,7 @@ const AdminUserDetails = ({ userId, onClose }: Props) => {
                         <Typography variant="lead">
                             صورة شهادة القيادة
                         </Typography>
-                        <img src={user.driving_license_image} alt="" className="h-52" />
+                        <Image src={user.driving_license_image} alt="" className="h-52" />
                     </figure>
                     <figure
                         className={clsx(Backgrounds, "p-1 rounded-md")}
@@ -140,7 +141,7 @@ const AdminUserDetails = ({ userId, onClose }: Props) => {
                         <Typography variant="lead">
                             صورة الوجه الأمامي للهوية
                         </Typography>
-                        <img src={user.id_front_image} alt="" className="h-52" />
+                        <Image src={user.id_front_image} alt="" className="h-52" />
                     </figure>
                     <figure
                         className={clsx(Backgrounds, "p-1 rounded-md")}
@@ -148,7 +149,7 @@ const AdminUserDetails = ({ userId, onClose }: Props) => {
                         <Typography variant="lead">
                             صورة الوجه الخلفي للهوية
                         </Typography>
-                        <img src={user.id_back_image} alt="" className="h-52" />
+                        <Image src={user.id_back_image} alt="" className="h-52" />
                     </figure>
                 </section>
             </section>

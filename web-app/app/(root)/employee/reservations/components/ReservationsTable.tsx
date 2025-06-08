@@ -11,10 +11,11 @@ import Reservation from './Reservation';
 
 type Props = {
     reservations: reservationsType[],
-    refetch: KeyedMutator<AxiosResponse<unknown, unknown>>
+    refetch: KeyedMutator<AxiosResponse<unknown, unknown>>,
+    isFake?: boolean
 }
 
-const ReservationsTable = ({ reservations, refetch }: Props) => {
+const ReservationsTable = ({ reservations, refetch,isFake }: Props) => {
     const tableHead: TableHead[] = [
         {
             id: 1,
@@ -121,6 +122,7 @@ const ReservationsTable = ({ reservations, refetch }: Props) => {
                 <Reservation
                     Reservation={row}
                     refetch={refetch}
+                    isFake={isFake}
                 />
             )
         },

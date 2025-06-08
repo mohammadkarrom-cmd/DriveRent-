@@ -28,7 +28,6 @@ const CarsMangerHeader = ({ model, setModel, brand, setBrand, category, setCateg
                 value={category}
                 onChange={(value) => {
                     setCategory(value);
-                    console.log(typeof value);
                 }}
                 tabIndex={100}
                 menuProps={{
@@ -46,6 +45,7 @@ const CarsMangerHeader = ({ model, setModel, brand, setBrand, category, setCateg
                     categories.map(category => (
                         <Option
                             value={category.id_car_type.toString()}
+                            key={category.id_car_type}
                         >
                             {category.name}
                         </Option>

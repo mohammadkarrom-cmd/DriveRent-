@@ -184,6 +184,7 @@ const AddCar = ({ mutate, categories,isCustomer }: Props) => {
                                         categories.map(category => (
                                             <Option
                                                 value={category.id_car_type.toString()}
+                                                key={category.id_car_type}
                                             >
                                                 {category.name}
                                             </Option>

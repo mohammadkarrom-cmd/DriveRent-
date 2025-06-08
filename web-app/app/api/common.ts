@@ -79,6 +79,8 @@ export const endpoints = {
         switch: "/account/bulk-action/",
         confirmReservation: (id: number) => `/car/confirm-reservation/${id}/`,
         cancelReservation: (id: number) => `/car/reservations/cancel/${id}/`,
+        confirmFakeReservation: (id: number) => `/car/confirm-fake-reservations/${id}/`,
+        cancelFakeReservation: (id: number) => `/car/reservations/cancel/${id}/`,
         searchReservation: (first_name?: string, last_name?: string, phone?: string, id_number?: string, status_reservation?: string) => {
             if (!first_name && !last_name && !phone && !id_number && !status_reservation) {
                 return false;
@@ -98,6 +100,9 @@ export const endpoints = {
         },
         all: {
             list: "/car/list/reservations/"
+        },
+        fake: {
+            list: "/car/list/fake-reservations/"
         }
     },
     home: "/car/home/"

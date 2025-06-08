@@ -16,6 +16,11 @@ export const employeeLinks: MenuLinkType[] = [
                 label: "الحجوزات المؤقتة",
                 icon: <TbTransactionDollar />,
                 path: paths.employee.reservations.temporary,
+            },
+            {
+                label: "الحجوزات الوهمية",
+                icon: <TbTransactionDollar />,
+                path: paths.employee.reservations.fake,
             }
         ]
     }

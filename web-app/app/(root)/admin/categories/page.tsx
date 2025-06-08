@@ -1,8 +1,6 @@
 import AdminCategoriesPageContent from "./components/AdminCategoriesPageContent"
 
-type Props = {}
-
-const AdminCategoriesPage = (props: Props) => {
+const AdminCategoriesPage = () => {
   return (
     <section>
         <AdminCategoriesPageContent />

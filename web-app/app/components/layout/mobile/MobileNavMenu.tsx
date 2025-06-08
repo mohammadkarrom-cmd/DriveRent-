@@ -1,12 +1,12 @@
-import { CgMenuLeft } from 'react-icons/cg';
-import { IconButton, Menu, MenuHandler, MenuItem, MenuList } from '@/lib/ui/MTFix'
-import clsx from 'clsx';
 import { Backgrounds, CardBackgrounds, TextPrimary } from '@/lib/ui/class/classNames';
-import { appNavLinks } from '../config-nav';
+import { IconButton, Menu, MenuHandler, MenuItem, MenuList } from '@/lib/ui/MTFix';
+import clsx from 'clsx';
+import { uniqueId } from 'lodash';
 import Link from 'next/link';
 import { createElement } from 'react';
-import { uniqueId } from 'lodash';
-import SpecialLink from '../commonLayout/SpecialLink';
+import { CgMenuLeft } from 'react-icons/cg';
+import SpecialMenuLink from '../commonLayout/SpecialMenuLink';
+import { appNavLinks } from '../config-nav';
 
 
 const MobileNavMenu = () => {
@@ -46,7 +46,7 @@ const MobileNavMenu = () => {
                         </Link>
                     ))
                 }
-                <SpecialLink />
+                <SpecialMenuLink />
             </MenuList>
         </Menu>
     )

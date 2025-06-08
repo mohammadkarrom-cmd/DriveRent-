@@ -2,6 +2,7 @@
 import { ROLES } from "@/app/constants";
 import { useAuthContext } from "@/lib/context/auth/auth-context";
 import { Spinner } from "@material-tailwind/react";
+import { BsBuildingFill } from "react-icons/bs";
 import { IoCarSport } from "react-icons/io5";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { TbListDetails } from "react-icons/tb";
@@ -64,6 +65,13 @@ const SpecialLink = () => {
                                         >
                                             <IoCarSport />
                                             سيارتي
+                                        </NavLink>
+                                        <NavLink href={paths.customer.office.evaluate}
+                                            className="flex gap-1 items-center"
+                                            includes
+                                        >
+                                            <BsBuildingFill />
+                                            تقييم المكاتب
                                         </NavLink>
                                     </>
 

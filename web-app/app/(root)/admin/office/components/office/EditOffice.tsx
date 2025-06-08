@@ -13,6 +13,7 @@ import { Button, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } fr
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, AxiosResponse } from 'axios';
 import clsx from 'clsx';
+import { unset } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { BsBuildingFillAdd, BsBuildingFillGear } from 'react-icons/bs';
 import { FaBuilding } from 'react-icons/fa';
@@ -50,10 +51,9 @@ const EditOffice = ({ mutate, office }: Props) => {
         if (typeof data.image !== "object") {
             // const blob = await fetchImageAsBlob(data.image) as File;
             // data.image = new File([blob], "OfficeImage.jpg", { type: blob.type });
-            const {image,...leastData} = data;
-            console.log(image)
-            
-            formData = leastData;
+            // const {image,...leastData} = data;
+            unset(data,"image");
+            formData = data;
         } else {
             formData = data
         }

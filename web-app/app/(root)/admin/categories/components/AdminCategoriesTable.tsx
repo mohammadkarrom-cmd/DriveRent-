@@ -14,22 +14,22 @@ type Props = {
 }
 
 const AdminCategoriesTable = ({ categories, mutate }: Props) => {
-  const tableHead: TableHead[] = [
-    {
-      id: 1,
-      key: "name",
-      name: "التصنيف",
-      type: "string",
-      render: (row: CategoryType) => row.name
-    },
-    {
-      id: 1,
-      key: "id",
-      name: "المعرف",
-      type: "string",
-      render: (row: CategoryType) => row.id_car_type
-    }
-  ]
+  // const tableHead: TableHead[] = [
+  //   {
+  //     id: 1,
+  //     key: "name",
+  //     name: "التصنيف",
+  //     type: "string",
+  //     render: (row: CategoryType) => row.name
+  //   },
+  //   {
+  //     id: 1,
+  //     key: "id",
+  //     name: "المعرف",
+  //     type: "string",
+  //     render: (row: CategoryType) => row.id_car_type
+  //   }
+  // ]
   return (
     <Card
       className={clsx(CardBackgrounds, 'w-full p-5')}
