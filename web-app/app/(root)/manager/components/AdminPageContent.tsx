@@ -1,17 +1,17 @@
 "use client"
 
-import dynamic from "next/dynamic";
-import NormalLoading from "@/app/components/loaders/NormalLoading";
+import { endpoints } from "@/app/api/common";
 import { AreaAndBarChartProps, RadialAndDonutAndPieChartProps } from "@/app/components/chart/use-chart";
 import PageHeader from "@/app/components/layout/header/PageHeader";
-import { useAuthContext } from "@/lib/context/auth/auth-context";
-import useSWR from "swr";
-import { endpoints } from "@/app/api/common";
-import fetchApi from "@/lib/api/data/dataFetcher";
-import Loading from "../../loading";
-import Error from "../../error";
-import { AxiosError } from "axios";
+import NormalLoading from "@/app/components/loaders/NormalLoading";
 import Empty from "@/app/components/views/Empty";
+import fetchApi from "@/lib/api/data/dataFetcher";
+import { useAuthContext } from "@/lib/context/auth/auth-context";
+import { AxiosError } from "axios";
+import dynamic from "next/dynamic";
+import useSWR from "swr";
+import Error from "../../error";
+import Loading from "../../loading";
 
 const YearlyProfitChart = dynamic(() => import("./YearlyProfitChart"), { ssr: false, loading: () => <NormalLoading /> });
 const DailyProfitChart = dynamic(() => import("./DailyProfitChart"), { ssr: false, loading: () => <NormalLoading /> });
@@ -98,16 +98,16 @@ const AdminPageContent = () => {
 
     const getCategoryData = (cat: number, date: string, records: reservationsType[]) => {
         let data: number = 0;
-        const category = records.filter(record => record.car.category === cat && (record.status_reservation === 3 || record.status_reservation === 4) && new Date(record.start_date).toDateString() === date);
+        const category = records.filter(record => record.car.category === cat && (record.status_reservation === "حجز منتهي الصلاحية" || record.status_reservation === "حجز ملغي") && new Date(record.start_date).toDateString() === date);
 
         category.forEach(reservation => {
-            if (reservation.type_reservation === 1) {
+            if (reservation.type_reservation === "أجار يومي") {
                 data = reservation.car.daily_rent_price
             }
-            if (reservation.type_reservation === 2) {
+            if (reservation.type_reservation === "أجار شهري") {
                 data = reservation.car.monthly_rent_price
             }
-            if (reservation.type_reservation === 3) {
+            if (reservation.type_reservation === "أجار سنوي") {
                 data = reservation.car.monthly_rent_price
             }
         })
@@ -117,16 +117,16 @@ const AdminPageContent = () => {
 
     const getCategoryYearly = (cat: number, date: number, records: reservationsType[]) => {
         let data: number = 0;
-        const category = records.filter(record => record.car.category === cat && (record.status_reservation === 3 || record.status_reservation === 4) && new Date(record.start_date).getFullYear() === date);
+        const category = records.filter(record => record.car.category === cat && (record.status_reservation === "حجز منتهي الصلاحية" || record.status_reservation === "حجز ملغي") && new Date(record.start_date).getFullYear() === date);
 
         category.forEach(reservation => {
-            if (reservation.type_reservation === 1) {
+            if (reservation.type_reservation === "أجار يومي") {
                 data = reservation.car.daily_rent_price
             }
-            if (reservation.type_reservation === 2) {
+            if (reservation.type_reservation === "أجار شهري") {
                 data = reservation.car.monthly_rent_price
             }
-            if (reservation.type_reservation === 3) {
+            if (reservation.type_reservation === "أجار سنوي") {
                 data = reservation.car.monthly_rent_price
             }
         })
@@ -239,8 +239,8 @@ const AdminPageContent = () => {
     const todayReversions: RadialAndDonutAndPieChartProps = {
         labels: ["حجوزات معالجة", " حجوزات مؤقتة"],
         series: [
-            todayRecords.filter(record => record.status_reservation !== 2).length,
-            todayRecords.filter(record => record.status_reservation === 2).length,
+            todayRecords.filter(record => record.status_reservation !== "حجز مؤكد").length,
+            todayRecords.filter(record => record.status_reservation === "حجز مؤكد").length,
         ]
     }
 

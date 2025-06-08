@@ -107,7 +107,8 @@ type OfficeType = {
     phone_number_1: string,
     phone_number_2: string,
     image: string,
-    status_office: boolean
+    status_office: boolean,
+    ratings?: OfficeRatingType
 }
 
 type OfficeManger = {

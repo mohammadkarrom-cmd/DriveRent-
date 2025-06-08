@@ -25,14 +25,14 @@ import { KeyedMutator } from 'swr'
 type Props = {
     Reservation: reservationsType,
     refetch: KeyedMutator<AxiosResponse<unknown, unknown>>
-
+    isFake?: boolean
 }
 
-const Reservation = ({ Reservation, refetch }: Props) => {
+const Reservation = ({ Reservation, refetch, isFake }: Props) => {
     const open = useBoolean({ initialState: false });
 
     const handleConfirm = async () => {
-        const response = dataMutate(endpoints.employee.confirmReservation(Reservation.id_reservation), METHODS.PUT, {});
+        const response = dataMutate(isFake ? endpoints.employee.confirmFakeReservation(Reservation.id_reservation) : endpoints.employee.confirmReservation(Reservation.id_reservation), METHODS.PUT, {});
 
         await response.then(() => {
             toast.success("تم تأكيد الحجز بنجاح");
@@ -264,6 +264,18 @@ const Reservation = ({ Reservation, refetch }: Props) => {
                         >
                             إلغاء الحجز
                         </Button>
+                        <Button
+                            variant="gradient"
+                            color="green"
+                            onClick={handleConfirm}
+                        >
+                            تأكيد الحجز
+                        </Button>
+                    </DialogFooter>
+                }
+                {
+                    isFake &&
+                    <DialogFooter className='gap-5'>
                         <Button
                             variant="gradient"
                             color="green"

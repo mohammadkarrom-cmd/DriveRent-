@@ -641,9 +641,9 @@ class ConfirmFakeReservationView(generics.UpdateAPIView):
         car=models.Car.objects.get(id_car=reservation.car.id_car)
         # تحديث حالة السيارة حسب نوع الحجز
         if type_reservation in [1, 2, 3]:
-            car.status = 2  # حجز  للأجار
+            car.status = 3  # حجز  للأجار
         elif type_reservation == 4:
-            car.status = 4  # حجز  للبيع
+            car.status = 6  # حجز  للبيع
         car.save()
 
         return Response({"message": " تم تحويل الحجز إلى  حجز مؤقت بنجاح"}, status=status.HTTP_200_OK)

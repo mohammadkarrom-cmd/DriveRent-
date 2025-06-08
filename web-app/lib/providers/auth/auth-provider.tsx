@@ -8,9 +8,9 @@ import { METHODS, setHeaderToken } from '@/lib/api/setup/api'
 import AuthContext, { AuthContextType, loginCredentials, StatusType } from '@/lib/context/auth/auth-context'
 import { getFromStorage, removeFromStorage, useLocalStorage } from '@/lib/hooks/use-local-storage'
 import { AxiosError } from 'axios'
-import { unset } from 'lodash'
+import { isArray, unset } from 'lodash'
 import { useRouter } from 'next/navigation'
-import React, { ReactNode, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 
 type Props = {
@@ -60,17 +60,29 @@ const AuthProvider = ({ children }: Props) => {
                 const response = dataMutate(endpoints.auth.login, METHODS.POST, data);
                 await response.then((value: LoginType) => {
                     router.replace(paths.home)
+                    toast.success("تم تسجيل الدخول بنجاح")
+                    toast.info(`اهلا بعودتك ${value.first_name} ${value.last_name}`)
                     refreshToken.update("token", value.refresh);
                     setUser(value as AuthenticatedUser);
                     setHeaderToken(value.access);
                     setAuthenticated(true)
                 }).catch(error => {
                     if (error instanceof AxiosError) {
-                        if (error.status === 400) {
-                            toast.error("invalid username or password")
+                        if (error.response.data && error.response.data?.message) {
+                            if (isArray(error.response.data?.message )) {
+                                error.response.data?.message.map((m) => {
+                                    toast.error(m)
+                                })
+                            } else {
+                                toast.error(error.response.data?.message)
+                            }
+                        } else if (error.status === 400) {
+                            toast.error("بيانات الدخول غير صحيحة")
                         } else {
-                            toast.error("connection error")
+                            toast.error("خطأ بالأتصال")
                         }
+                    } else {
+                        toast.error("خطأ بالأتصال")
                     }
                 });
             },
@@ -83,20 +95,29 @@ const AuthProvider = ({ children }: Props) => {
                     }
                 });
                 await response.then((value: LoginType) => {
-                    toast.success("تم تسجيل الدخول بنجاح")
                     router.replace(paths.home)
+                    toast.info("تم إنشاء الحساب بنجاح. يرجى انتظار تفعيل الحساب من قبل الإدارة.")
                     refreshToken.update("token", value.refresh);
                     setUser(value as AuthenticatedUser);
                     setHeaderToken(value.access);
                     setAuthenticated(true)
-                    toast.success("")
                 }).catch(error => {
                     if (error instanceof AxiosError) {
-                        if (error.status === 400) {
-                            toast.error("الرقم الوطني أو اسم المستخدم موجود بالفعل ")
+                        if (error.response.data && error.response.data?.message) {
+                            if (isArray(error.response.data?.message )) {
+                                error.response.data?.message.map((m) => {
+                                    toast.error(m)
+                                })
+                            } else {
+                                toast.error(error.response.data?.message)
+                            }
+                        } else if (error.status === 400) {
+                            toast.error("الرقم الوطني أو اسم المستخدم موجود بالفعل")
                         } else {
                             toast.error("خطأ بالأتصال")
                         }
+                    } else {
+                        toast.error("خطأ بالأتصال")
                     }
                 });
             },

@@ -58,8 +58,6 @@ const EditOfficeAccount = ({ mutate, account }: Props) => {
         const formData = data;
         unset(formData, "confirm_password");
         if (data.password === null) {
-            console.log("unset");
-            
             unset(formData, "password")
         }
         const promise = dataMutate(endpoints.admin.office.accounts.edit(account.id_office_account), METHODS.PATCH, formData)

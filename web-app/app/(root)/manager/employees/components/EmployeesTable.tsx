@@ -1,23 +1,18 @@
 "use client"
 
 import Table from '@/app/components/table/Table'
-import React from 'react'
-import { FaIdCard } from 'react-icons/fa'
-import { Card, CardBody, Checkbox, Chip, IconButton, Menu, MenuHandler, MenuList, Typography } from '@/lib/ui/MTFix'
-import clsx from 'clsx'
 import { CardBackgrounds, TextPrimary } from '@/lib/ui/class/classNames'
-import { MdManageAccounts, MdOutlineShortText } from 'react-icons/md'
+import { Card, CardBody, Chip, IconButton, Menu, MenuHandler, MenuList, Typography } from '@/lib/ui/MTFix'
+import { AxiosResponse } from 'axios'
+import clsx from 'clsx'
 import { BsFillPatchCheckFill, BsFillPatchExclamationFill, BsFillPatchQuestionFill } from 'react-icons/bs'
-import { TbDotsVertical } from 'react-icons/tb'
+import { FaIdCard } from 'react-icons/fa'
 import { FaPhoneFlip } from 'react-icons/fa6'
+import { MdManageAccounts, MdOutlineShortText } from 'react-icons/md'
+import { TbDotsVertical } from 'react-icons/tb'
+import { KeyedMutator } from 'swr'
 import DeleteEmployee from './DeleteEmployee'
 import EditEmployee from './EditEmployee'
-import dataMutate from '@/lib/api/data/dataMutate'
-import { endpoints } from '@/app/api/common'
-import { METHODS } from '@/lib/api/setup/api'
-import { KeyedMutator } from 'swr'
-import { AxiosResponse } from 'axios'
-import { toast } from 'react-toastify'
 
 
 type Props = {
@@ -94,33 +89,10 @@ const EmployeesTable = ({ employees, mutate }: Props) => {
             className: "flex justify-center items-center",
             icon: <BsFillPatchQuestionFill size={17.5} />,
             render(row: EmployeeType) {
-                const ToggleActivation = async () => {
-                    const action = row.is_active ? "deactivate" : "activate"
-                    const data = {
-                        id: [row.id],
-                        action: action
-                    }
-
-                    const promise = dataMutate(endpoints.employee.switch, METHODS.POST, data);
-
-                    await promise.then(() => {
-                        toast.success(`تم ${row.is_active ? "الغاء" : ""} التنشيط بنجاح`)
-                        mutate()
-                    }).catch((error => {
-                        console.log(error);
-                    }))
-
-                }
                 return (
                     <div
                         className='w-full flex justify-center items-center'
                     >
-                        <Checkbox
-                            checked={row.is_active}
-                            crossOrigin={undefined}
-                            color='green'
-                            onChange={ToggleActivation}
-                        />
                         {row.is_active
                             ? <Chip
                                 value={

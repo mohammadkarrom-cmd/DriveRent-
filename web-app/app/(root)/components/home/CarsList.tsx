@@ -8,7 +8,7 @@ type Props = {
 const CarsList = ({ cars }: Props) => {
   return (
     <ul
-    className="flex gap-5 w-full overflow-scroll items-center py-5"
+      className="flex gap-5 w-full overflow-scroll items-center py-5"
     >
       {
         cars.map((car) => (

@@ -226,3 +226,10 @@ export const categorySchema = z.object({
 });
 
 export type CategorySchemaType = z.infer<typeof categorySchema>;
+
+export const RatingOfficeSchema = z.object({
+  rating: z.number().min(0, "تقييم المكتب يجب أن يكون 0 على الأقل").max(5, "تقييم المكتب يجب أن يكون 5 على الأكثر"),
+  comment: z.string({ message: 'التعليق مطلوب' }).min(2, "يجب أن يكون التعليق مكونًا من 2 حرف كحد أدنى").max(200, "يجب أن يكون التعليق مكونًا من 200 حرف كحد أقصى"),
+});
+
+export type RattingOfficeType = z.infer<typeof RatingOfficeSchema>; 
