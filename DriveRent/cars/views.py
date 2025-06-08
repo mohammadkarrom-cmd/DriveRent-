@@ -191,11 +191,13 @@ class HomeCustomerView(generics.GenericAPIView):
         cars_random = queryset.order_by('?')[:10]
         cars_new_serialized = self.get_serializer(cars_new, many=True).data
         cars_random_serialized = self.get_serializer(cars_random, many=True).data
-
+        office = models.Office.objects.all()
+        office=serializers.OfficeSerializer(office,many=True)
         return Response(
             {
                 "cars_new": cars_new_serialized,
-                "cars_random": cars_random_serialized
+                "cars_random": cars_random_serialized,
+                "offices":office.data
             },
             status=status.HTTP_200_OK
         )
