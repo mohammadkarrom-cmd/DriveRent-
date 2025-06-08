@@ -333,3 +333,5 @@ class OfficeRatingCreateSerializer(serializers.ModelSerializer):
             'rating': {'required': True, 'min_value': 1, 'max_value': 5},
             'comment': {'required': False}
         }
+        
+        

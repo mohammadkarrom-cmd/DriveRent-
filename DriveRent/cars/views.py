@@ -641,9 +641,9 @@ class ConfirmFakeReservationView(generics.UpdateAPIView):
         car=models.Car.objects.get(id_car=reservation.car.id_car)
         # تحديث حالة السيارة حسب نوع الحجز
         if type_reservation in [1, 2, 3]:
-            car.status = 2  # حجز  للأجار
+            car.status = 3  # حجز  للأجار
         elif type_reservation == 4:
-            car.status = 4  # حجز  للبيع
+            car.status = 6  # حجز  للبيع
         car.save()
 
         return Response({"message": " تم تحويل الحجز إلى  حجز مؤقت بنجاح"}, status=status.HTTP_200_OK)
@@ -917,3 +917,31 @@ class CustomerEvaluateOfficeView(generics.CreateAPIView):
         avg_rating = models.OfficeRating.objects.filter(office=office).aggregate(avg=Avg('rating'))['avg'] or 0
         office.ratings = avg_rating
         office.save()
+        
+        
+class CustomerCarCategoryListCreateView(generics.ListAPIView):
+    queryset = models.CarCategory.objects.all()
+    serializer_class = serializers.CarCategorySerializer
+    permission_classes = [AllowAny]
+
+
+
+class CustomerOfficesListView(generics.ListAPIView):
+    queryset = models.Office.objects.all()
+    serializer_class = serializers.OfficeSerializer
+    permission_classes = [AllowAny]
+
+class CustomerOfficeRetrieveView(generics.RetrieveAPIView):
+    serializer_class = serializers.OfficeSerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'id_office'
+    def retrieve(self, request, *args, **kwargs):
+        id_office = self.kwargs.get('id_office')
+        office = get_object_or_404(models.Office,id_office=id_office)
+        cars=models.Car.objects.filter(owner_office=id_office)
+        office=self.get_serializer(office)
+        cars=serializers.CarSerializer(cars,many=True)
+        return Response({
+            "office":office.data,
+            "cars":cars.data,
+            },status=status.HTTP_200_OK)

@@ -28,6 +28,13 @@ urlpatterns = [
     ##### Customer
     path('home/', views.HomeCustomerView.as_view(), name='home'),
     path('list/', views.CarlistViewView.as_view(), name='car-list-view'),
+    
+    path('customer/category-list/', views.CustomerCarCategoryListCreateView.as_view(), name='category-list'),
+    path('customer/offices-list/', views.CustomerOfficesListView.as_view(), name='customer-offices-list'),
+    path('customer/office/<int:id_office>/', views.CustomerOfficeRetrieveView.as_view(), name='office-detail'),
+
+    
+    
     path('serche-customer/', views.CarSearchCustomerView.as_view(), name='car-serche-customer'),
     path('customer/detail/<int:id_car>/', views.CarDetailView.as_view(), name='car-detail'),
     path('customer/list-create/', views.CustomerCarListCreateView.as_view(), name='car-list-create'),
