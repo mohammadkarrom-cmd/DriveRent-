@@ -26,6 +26,7 @@ from django.db.models import Avg
 from django.utils import timezone
 from collections import defaultdict
 from calendar import month_abbr
+from django.db.models import Count, Sum
 
 type_reservation_list = {
     1: timedelta(days=1),  
@@ -1091,4 +1092,95 @@ class StatisticCreateView(generics.RetrieveAPIView):
             "dailyProfit": daily_profit,
             "monthlyProfit": monthly_profit,
             "yearlyProfit": yearly_profit
+        })
+        
+        
+
+
+class AdminStatisticView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]
+
+    def get(self, request, *args, **kwargs):
+        # === carsStatus ===
+        cars = models.Car.objects.all()
+        Reservation= models.Reservation.objects.all()
+        cars_status = {
+            "متاحة": cars.filter(status=1).count(),
+            "مباعة": cars.filter(status=6).count(),
+            "أجار يومي": Reservation.filter(type_reservation=1, status_reservation=2).count(),
+            "أجار شهري": Reservation.filter(type_reservation=2, status_reservation=2).count(),
+            "أجار سنوي": Reservation.filter(type_reservation=3, status_reservation=2).count(),
+            "حجز مؤقت": cars.filter(status=2).count(),
+        }
+
+        # === carsCategories ===
+        car_categories = models.Car.objects.values('category__name').annotate(total=Count('id_car'))
+        category_names = []
+        category_totals = []
+
+        for item in car_categories:
+            category_names.append(item['category__name'] or "غير مصنفة")
+            category_totals.append(item['total'])
+
+        # === incomeBar ===
+        offices = models.Office.objects.all()
+        office_names = [office.name for office in offices]
+
+        income_types = {
+            "مبيع": [],
+            "أجار يومي": [],
+            "أجار شهري": [],
+            "أجار سنوي": []
+        }
+
+        total_income = 0
+
+        for office in offices:
+            sale = models.Car.objects.filter(owner_office=office, status=6).aggregate(sale_total=Sum('sale_price'))['sale_total'] or 0
+            daily = models.Reservation.objects.filter(car__owner_office=office, type_reservation=1).aggregate(total=Sum('car__daily_rent_price'))['total'] or 0
+            monthly = models.Reservation.objects.filter(car__owner_office=office, type_reservation=2).aggregate(total=Sum('car__monthly_rent_price'))['total'] or 0
+            yearly = models.Reservation.objects.filter(car__owner_office=office, type_reservation=3).aggregate(total=Sum('car__yearly_rent_price'))['total'] or 0
+
+            profit_sale = sale * 0.05
+            profit_daily = daily * 0.05
+            profit_monthly = monthly * 0.05
+            profit_yearly = yearly * 0.05
+
+            income_types["مبيع"].append(profit_sale)
+            income_types["أجار يومي"].append(profit_daily)
+            income_types["أجار شهري"].append(profit_monthly)
+            income_types["أجار سنوي"].append(profit_yearly)
+
+            total_income += profit_sale + profit_daily + profit_monthly + profit_yearly
+
+
+        income_bar = {
+            "chartData": {
+                "categories": office_names,
+                "series": [
+                    {"nmame": key, "data": value}
+                    for key, value in income_types.items()
+                ]
+            },
+            "total": total_income
+        }
+
+        # === summary counts ===
+        return Response({
+            "carsStatus": {
+                "labels": list(cars_status.keys()),
+                "series": list(cars_status.values())
+            },
+            "carsCategories": {
+                "categories": category_names,
+                "series": [{"name": "cars", "data": category_totals}]
+            },
+            "incomeBar": income_bar,
+            "customerCount": models.Customer.objects.count(),
+            "officesCount": models.Office.objects.count(),
+            "categoriesCount": models.CarCategory.objects.count(),
+            "carsCount": models.Car.objects.count()
         })
