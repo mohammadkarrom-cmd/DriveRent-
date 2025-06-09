@@ -17,6 +17,9 @@ urlpatterns = [
 
     ##### manager
     ##################cars
+    path('manager/statistic/', views.StatisticCreateView.as_view(), name='statistic'),
+
+    
     path('list-create/', views.CarListCreateView.as_view(), name='car-list-create'),
     path('detail/<int:id_car>/', views.CarUpdateDestroyView.as_view(), name='car-detail'),
     path('serche/', views.CarSearchView.as_view(), name='car-serche'),
