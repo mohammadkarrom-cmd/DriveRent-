@@ -23,6 +23,10 @@ from rest_framework.permissions import IsAuthenticated
 from cars.tasks import expire_reservation
 from cars import models, serializers
 from django.db.models import Avg
+from django.utils import timezone
+from collections import defaultdict
+from calendar import month_abbr
+from django.db.models import Count, Sum
 
 type_reservation_list = {
     1: timedelta(days=1),  
@@ -947,3 +951,236 @@ class CustomerOfficeRetrieveView(generics.RetrieveAPIView):
             "office":office.data,
             "cars":cars.data,
             },status=status.HTTP_200_OK)
+
+
+
+
+class StatisticCreateView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['manager'])]
+
+    def retrieve(self, request, *args, **kwargs):
+        user = request.user
+        today = timezone.now().date()
+
+        if user.account_type != "manager":
+            return Response({"message": "غير مصرح لك بالوصول إلى الإحصائيات"}, status=403)
+
+        office_account = models.OfficeAccount.objects.filter(user=user).first()
+        if not office_account:
+            return Response({"message": "لم يتم العثور على مكتب مرتبط بهذا الحساب"}, status=404)
+
+        office = office_account.office
+
+        # === إحصائيات الحجوزات اليومية ===
+        today_reservations = models.Reservation.objects.filter(
+            car__owner_office=office,
+            time_reservation__date=today
+        )
+
+        total_reservations = today_reservations.count()
+        temporary_reservations = today_reservations.filter(status_reservation=1).count()
+        confirmed_reservations = today_reservations.filter(status_reservation=2).count()
+
+        # === إحصائيات الربح السنوي حسب نوع السيارة ===
+        current_year = today.year
+        previous_year = current_year - 1
+
+        # تجهيز جميع التصنيفات بصفر
+        all_categories = models.CarCategory.objects.all()
+        profit_data = {
+            category.name: {
+                previous_year: 0,
+                current_year: 0
+            }
+            for category in all_categories
+        }
+
+        # جلب الحجوزات الفعلية
+        yearly_reservations = models.Reservation.objects.filter(
+            car__owner_office=office,
+            type_reservation=3,  # أجار سنوي
+            status_reservation=2,  # مؤكد
+            start_date__year__in=[previous_year, current_year]
+        )
+
+        for res in yearly_reservations:
+            category = res.car.category.name if res.car.category else "غير مصنفة"
+            year = res.start_date.year
+            profit = res.car.yearly_rent_price or 0
+            if category not in profit_data:
+                profit_data[category] = {previous_year: 0, current_year: 0}
+            profit_data[category][year] += profit
+
+        # تنسيق الإخراج النهائي
+        yearly_profit = {
+            "series": [],
+            "categories": [str(previous_year), str(current_year)]
+        }
+
+        for category_name, year_data in profit_data.items():
+            yearly_profit["series"].append({
+                "name": category_name,
+                "data": [
+                    year_data.get(previous_year, 0),
+                    year_data.get(current_year, 0)
+                ]
+            })
+                    
+        daily_dates = [today - timedelta(days=i) for i in range(6, -1, -1)]
+        daily_categories = [d.strftime("%Y-%m-%d") for d in daily_dates]
+
+        daily_reservations = models.Reservation.objects.filter(
+            car__owner_office=office,
+            type_reservation=1,
+            status_reservation=2,
+            start_date__date__in=daily_dates
+        )
+
+        daily_profit_data = {
+            category.name: [0] * 7 for category in all_categories
+        }
+
+        for res in daily_reservations:
+            category = res.car.category.name if res.car.category else "غير مصنفة"
+            date_index = daily_categories.index(res.start_date.date().strftime("%Y-%m-%d"))
+            profit = res.car.daily_rent_price or 0
+            if category in daily_profit_data:
+                daily_profit_data[category][date_index] += profit
+
+        daily_profit = {
+            "series": [
+                {"name": cat_name, "data": daily_profit_data[cat_name]}
+                for cat_name in daily_profit_data
+            ],
+            "categories": daily_categories
+        }
+
+        # === الربح الشهري (مجمّع) لكل شهر من السنة الحالية ===
+        monthly_reservations = models.Reservation.objects.filter(
+            car__owner_office=office,
+            type_reservation=2,
+            status_reservation=2,
+            start_date__year=today.year
+        )
+
+        monthly_profit_series = [0] * 12
+
+        for res in monthly_reservations:
+            month_index = res.start_date.month - 1  # من 0 إلى 11
+            monthly_profit_series[month_index] += res.car.monthly_rent_price or 0
+
+        monthly_profit = {
+            "series": monthly_profit_series,
+            "labels": [month_abbr[i] for i in range(1, 13)]
+        }
+        return Response({
+            "todayReversions": {
+                "labels": [
+                    "حجوزات كلية",
+                    "حجوزات مؤقتة",
+                    "حجوزات مؤكدة"
+                ],
+                "series": [
+                    total_reservations,
+                    temporary_reservations,
+                    confirmed_reservations
+                ]
+            },
+            "dailyProfit": daily_profit,
+            "monthlyProfit": monthly_profit,
+            "yearlyProfit": yearly_profit
+        })
+        
+        
+
+
+class AdminStatisticView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        return [IsRole(allowed_roles=['admin'])]
+
+    def get(self, request, *args, **kwargs):
+        # === carsStatus ===
+        cars = models.Car.objects.all()
+        Reservation= models.Reservation.objects.all()
+        cars_status = {
+            "متاحة": cars.filter(status=1).count(),
+            "مباعة": cars.filter(status=6).count(),
+            "أجار يومي": Reservation.filter(type_reservation=1, status_reservation=2).count(),
+            "أجار شهري": Reservation.filter(type_reservation=2, status_reservation=2).count(),
+            "أجار سنوي": Reservation.filter(type_reservation=3, status_reservation=2).count(),
+            "حجز مؤقت": cars.filter(status=2).count(),
+        }
+
+        # === carsCategories ===
+        car_categories = models.Car.objects.values('category__name').annotate(total=Count('id_car'))
+        category_names = []
+        category_totals = []
+
+        for item in car_categories:
+            category_names.append(item['category__name'] or "غير مصنفة")
+            category_totals.append(item['total'])
+
+        # === incomeBar ===
+        offices = models.Office.objects.all()
+        office_names = [office.name for office in offices]
+
+        income_types = {
+            "مبيع": [],
+            "أجار يومي": [],
+            "أجار شهري": [],
+            "أجار سنوي": []
+        }
+
+        total_income = 0
+
+        for office in offices:
+            sale = models.Car.objects.filter(owner_office=office, status=6).aggregate(sale_total=Sum('sale_price'))['sale_total'] or 0
+            daily = models.Reservation.objects.filter(car__owner_office=office, type_reservation=1).aggregate(total=Sum('car__daily_rent_price'))['total'] or 0
+            monthly = models.Reservation.objects.filter(car__owner_office=office, type_reservation=2).aggregate(total=Sum('car__monthly_rent_price'))['total'] or 0
+            yearly = models.Reservation.objects.filter(car__owner_office=office, type_reservation=3).aggregate(total=Sum('car__yearly_rent_price'))['total'] or 0
+
+            profit_sale = sale * 0.05
+            profit_daily = daily * 0.05
+            profit_monthly = monthly * 0.05
+            profit_yearly = yearly * 0.05
+
+            income_types["مبيع"].append(profit_sale)
+            income_types["أجار يومي"].append(profit_daily)
+            income_types["أجار شهري"].append(profit_monthly)
+            income_types["أجار سنوي"].append(profit_yearly)
+
+            total_income += profit_sale + profit_daily + profit_monthly + profit_yearly
+
+
+        income_bar = {
+            "chartData": {
+                "categories": office_names,
+                "series": [
+                    {"nmame": key, "data": value}
+                    for key, value in income_types.items()
+                ]
+            },
+            "total": total_income
+        }
+
+        # === summary counts ===
+        return Response({
+            "carsStatus": {
+                "labels": list(cars_status.keys()),
+                "series": list(cars_status.values())
+            },
+            "carsCategories": {
+                "categories": category_names,
+                "series": [{"name": "cars", "data": category_totals}]
+            },
+            "incomeBar": income_bar,
+            "customerCount": models.Customer.objects.count(),
+            "officesCount": models.Office.objects.count(),
+            "categoriesCount": models.CarCategory.objects.count(),
+            "carsCount": models.Car.objects.count()
+        })

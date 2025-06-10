@@ -3,6 +3,8 @@ from cars import views
 
 urlpatterns = [
     ##### admin
+    path("admin/statistics/", views.AdminStatisticView.as_view(), name="admin-statistics"),
+
     path('office/list-create/', views.OfficeListCreateView.as_view(), name='office-list-create'),
     path('office/<int:id_office>/', views.OfficeRetrieveUpdateView.as_view(), name='office-detail'),
 
@@ -17,6 +19,9 @@ urlpatterns = [
 
     ##### manager
     ##################cars
+    path('manager/statistic/', views.StatisticCreateView.as_view(), name='statistic'),
+
+    
     path('list-create/', views.CarListCreateView.as_view(), name='car-list-create'),
     path('detail/<int:id_car>/', views.CarUpdateDestroyView.as_view(), name='car-detail'),
     path('serche/', views.CarSearchView.as_view(), name='car-serche'),
