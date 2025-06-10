@@ -1161,7 +1161,7 @@ class AdminStatisticView(generics.RetrieveAPIView):
             "chartData": {
                 "categories": office_names,
                 "series": [
-                    {"nmame": key, "data": value}
+                    {"name": key, "data": value}
                     for key, value in income_types.items()
                 ]
             },

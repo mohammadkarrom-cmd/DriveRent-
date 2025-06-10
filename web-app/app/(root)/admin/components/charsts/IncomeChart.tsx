@@ -1,5 +1,5 @@
 import useChart, { AreaAndBarChartProps } from '@/app/components/chart/use-chart';
-import { CardBackgrounds, TextSecondary } from '@/lib/ui/class/classNames';
+import { CardBackgrounds, TextPrimary, TextSecondary } from '@/lib/ui/class/classNames';
 import { Card, CardBody, CardHeader, Typography } from '@material-tailwind/react';
 import { ApexOptions } from 'apexcharts';
 import clsx from 'clsx';
@@ -26,12 +26,12 @@ const IncomeChart = ({chartData,total}:Props) => {
         xaxis: {
             categories: chartData.categories,
             title: {
-                text: "office"
+                text: "الكتب"
             }
         },
         yaxis: {
             title: {
-                text: 'Income ($)',
+                text: 'الربح ($)',
             },
         },
         tooltip: {
@@ -60,13 +60,19 @@ const IncomeChart = ({chartData,total}:Props) => {
                     as="h2"
                     color="green"
                 >
-                    توزع السيارات
+                    الأرباح
                 </Typography>
                 <Typography
                     variant="paragraph"
                     className={TextSecondary}
                 >
-                    توزع السيارات تبعا للتصنيف
+                    نسبة الأرباح من تأجير و بيع السيارات في كافة المكانب
+                </Typography>
+                <Typography
+                    variant="lead"
+                    className={TextPrimary}
+                >
+                    {`الربح الكلي ${total}($)`}
                 </Typography>
 
             </CardHeader>

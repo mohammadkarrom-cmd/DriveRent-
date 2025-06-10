@@ -1,40 +1,34 @@
 "use client"
 
 import { endpoints } from "@/app/api/common";
+import { AreaAndBarChartProps, RadialAndDonutAndPieChartProps } from "@/app/components/chart/use-chart";
 import NormalLoading from "@/app/components/loaders/NormalLoading";
 import fetchApi from "@/lib/api/data/dataFetcher";
-import { AxiosError } from "axios";
 import useSWR from "swr";
 import Error from "../../error";
 import ManagerStatics from "./ManagerStatics";
 
-// const YearlyProfitChart = dynamic(() => import("./YearlyProfitChart"), { ssr: false, loading: () => <NormalLoading /> });
-// const DailyProfitChart = dynamic(() => import("./DailyProfitChart"), { ssr: false, loading: () => <NormalLoading /> });
-// const ReversionsChart = dynamic(() => import("./ReversionsChart"), { ssr: false, loading: () => <NormalLoading /> });
+
+export type managerStaticsType = {
+    dailyProfit: AreaAndBarChartProps
+    monthlyProfit: RadialAndDonutAndPieChartProps
+    yearlyProfit: AreaAndBarChartProps
+    todayReversions: RadialAndDonutAndPieChartProps
+}
 
 
 const AdminPageContent = () => {
-    const { data: reservations, error, isLoading } = useSWR(endpoints.reservations.all.list, fetchApi);
+    const { data: data, error, isLoading } = useSWR(endpoints.managerStatics, fetchApi);
 
     if (isLoading) {
         return <NormalLoading />
     }
     if (error) {
-        if (error instanceof AxiosError) {
-            if (error.status === 404) {
-                return <ManagerStatics
-                />
-            }
-        } else {
-            return <Error error={error} />;
-        }
+        return <Error error={error} />;
     }
 
 
-    const revData = (reservations.data || []) as reservationsType[];
-    console.log(revData);
-
-
+    const statics = data.data as managerStaticsType
 
 
     return (
@@ -42,6 +36,7 @@ const AdminPageContent = () => {
             className="p-5"
         >
             <ManagerStatics
+                statics={statics}
             />
         </section>
     )

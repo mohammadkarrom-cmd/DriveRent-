@@ -31,7 +31,8 @@ export const endpoints = {
             return `car/serche/?brand=${brand}&model=${model}&category=${category}`
         },
         rating: "/car/ratings/",
-        categories: "/car/customer/category-list/"
+        categories: "/car/customer/category-list/",
+
     },
     admin: {
         office: {
@@ -52,7 +53,8 @@ export const endpoints = {
             list: 'car/category/list-create/',
             add: 'car/category/list-create/',
             edit: (id: number) => `car/category/${id}/`,
-        }
+        },
+        statics: "/car/admin/statistics/"
     },
     customer: {
         reserveCar: "/car/reserve/",
@@ -60,13 +62,13 @@ export const endpoints = {
         cancel: (id: number) => `/car/reserve/cancel/${id}/`,
         evaluations: {
             evaluableOffices: "/car/customer/evaluable-offices/",
-            rate: (id:number) => `/car/customer/evaluate-office/${id}/`
+            rate: (id: number) => `/car/customer/evaluate-office/${id}/`
         },
         customerCars: {
             list: "/car/customer/list-create/",
             add: "/car/customer/list-create/",
-            edit: (id:number) => `/car/customer/detail-car/${id}/`,
-            delete: (id:number) => `/car/customer/detail-car/${id}/`,
+            edit: (id: number) => `/car/customer/detail-car/${id}/`,
+            delete: (id: number) => `/car/customer/detail-car/${id}/`,
             search: (brand?: string, model?: string, category?: string) => {
                 if (!brand && !model && !category) {
                     return false;
@@ -111,8 +113,9 @@ export const endpoints = {
     },
     offices: {
         list: "/car/customer/offices-list/",
-        get:(id: number) => `/car/customer/office/${id}/`
+        get: (id: number) => `/car/customer/office/${id}/`
     },
-    home: "/car/home/"
+    home: "/car/home/",
+    managerStatics: "/car/manager/statistic/"
 
 }

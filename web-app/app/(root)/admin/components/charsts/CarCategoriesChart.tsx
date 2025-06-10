@@ -27,10 +27,14 @@ const CarCategoriesChart = ({ categories, series }: RadarChartProps) => {
             opacity: 0.4,
         },
         dataLabels: {
-            enabled: false
+            enabled: true,
+            offsetY: 4.5,
         },
         markers: {
-            size: 3,
+            size: 8,
+            shape: "square",
+            fillOpacity: 0,
+            strokeWidth: 0
         },
     });
 

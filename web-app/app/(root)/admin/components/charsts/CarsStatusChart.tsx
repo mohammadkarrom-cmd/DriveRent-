@@ -19,7 +19,14 @@ const CarsStatusChart = ({ labels, series }: RadialAndDonutAndPieChartProps) => 
         grid: {
             borderColor: "#00000000"
         },
-        colors: ["#4ade80", "#38bdf8", "#f87171", "#a78baa", "#a78bff", "#fbbf24"]
+        colors: ["#4ade80", "#38bdf8", "#f87171", "#a78baa", "#a78bff", "#fbbf24"],
+        chart: {
+            type:"donut",
+            
+        },
+       dataLabels: {
+        enabled: true
+       }
     });
     return (
         <Card
