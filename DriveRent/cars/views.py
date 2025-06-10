@@ -192,7 +192,7 @@ class HomeCustomerView(generics.GenericAPIView):
         cars_new_serialized = self.get_serializer(cars_new, many=True).data
         cars_random_serialized = self.get_serializer(cars_random, many=True).data
         office = models.Office.objects.all()
-        office=serializers.OfficeSerializer(office,many=True)
+        office=serializers.OfficeSerializer(office,many=True,context={'request': request})
         return Response(
             {
                 "cars_new": cars_new_serialized,
@@ -469,7 +469,7 @@ class OfficeEmployeeReservationsView(generics.ListAPIView):
     serializer_class = serializers.ReservationSrecheSerializer
     permission_classes = [IsAuthenticated]
     def get_permissions(self):
-        return [IsRole(allowed_roles=['employee'])]
+        return [IsRole(allowed_roles=['employee',"manager"])]
     
     def get_queryset(self):
         queryset = models.Reservation.objects.all()
@@ -941,8 +941,8 @@ class CustomerOfficeRetrieveView(generics.RetrieveAPIView):
         id_office = self.kwargs.get('id_office')
         office = get_object_or_404(models.Office,id_office=id_office)
         cars=models.Car.objects.filter(owner_office=id_office)
-        office=self.get_serializer(office)
-        cars=serializers.CarSerializer(cars,many=True)
+        office=self.get_serializer(office, context={'request': request})
+        cars=serializers.CarSerializer(cars,many=True, context={'request': request})
         return Response({
             "office":office.data,
             "cars":cars.data,

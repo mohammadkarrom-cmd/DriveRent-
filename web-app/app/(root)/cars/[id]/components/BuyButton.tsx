@@ -15,7 +15,7 @@ import { useState } from 'react'
 import { toast } from 'react-toastify'
 
 type Props = {
-    car: CarType,
+    car: CarDetailsType,
     available: boolean
 }
 
@@ -75,7 +75,9 @@ const BuyButton = ({ car, available }: Props) => {
                 <Button
                     color='green'
                     size='lg'
-                    className='text-center w-full lg:w-fit'
+                    className='text-center'
+                    variant='outlined'
+                    fullWidth
                     onClick={open.onTrue}
                     disabled={!available}
                 >
@@ -127,6 +129,19 @@ const BuyButton = ({ car, available }: Props) => {
                     </DialogFooter>
                 </Dialog>
             </>
+        )
+    } else {
+        return (
+            <Button
+                color='green'
+                size='lg'
+                className='text-center'
+                variant='outlined'
+                disabled
+                fullWidth
+            >
+                شراء
+            </Button>
         )
     }
 }

@@ -49,11 +49,12 @@ const AdminUserDetails = ({ userId, onClose }: Props) => {
         await promise.then(() => {
             toast.success(`تم ${user.is_active ? "الغاء" : ""} التنشيط بنجاح`)
             mutate()
-            // onClose()
         }).catch((error => {
             toast.error("حدث خطاء بالاتصال")
             console.log(error);
-        }))
+        })).finally(() => {
+            onClose();
+        })
 
     }
 
@@ -133,7 +134,7 @@ const AdminUserDetails = ({ userId, onClose }: Props) => {
                         <Typography variant="lead">
                             صورة شهادة القيادة
                         </Typography>
-                        <Image src={user.driving_license_image} alt="" className="h-52" />
+                        <Image src={user.driving_license_image} alt="driving_license_image" className="h-52" width={500} height={500} />
                     </figure>
                     <figure
                         className={clsx(Backgrounds, "p-1 rounded-md")}
@@ -141,7 +142,7 @@ const AdminUserDetails = ({ userId, onClose }: Props) => {
                         <Typography variant="lead">
                             صورة الوجه الأمامي للهوية
                         </Typography>
-                        <Image src={user.id_front_image} alt="" className="h-52" />
+                        <Image src={user.id_front_image} alt="id_front_image" className="h-52" width={500} height={500} />
                     </figure>
                     <figure
                         className={clsx(Backgrounds, "p-1 rounded-md")}
@@ -149,7 +150,7 @@ const AdminUserDetails = ({ userId, onClose }: Props) => {
                         <Typography variant="lead">
                             صورة الوجه الخلفي للهوية
                         </Typography>
-                        <Image src={user.id_back_image} alt="" className="h-52" />
+                        <Image src={user.id_back_image} alt="id_back_image" className="h-52" width={500} height={500} />
                     </figure>
                 </section>
             </section>

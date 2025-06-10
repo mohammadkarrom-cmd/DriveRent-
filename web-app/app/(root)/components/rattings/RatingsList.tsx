@@ -42,7 +42,8 @@ const RatingsList = ({ ratings }: Props) => {
                         {rating.customer}
                       </Typography>
                       <Rating
-                        value={rating.rating}
+                        value={rating.rating ? parseInt(rating.rating.toString()) : 0}
+                        count={5}
                         readonly
                       />
                     </div>

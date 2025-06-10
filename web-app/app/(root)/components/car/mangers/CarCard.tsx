@@ -20,9 +20,10 @@ type Props = {
     car: CarType
     categories: CategoryType[],
     mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
+    isCustomer?: boolean
 }
 
-const CarCard = ({ car, mutate, categories }: Props) => {
+const CarCard = ({ car, mutate, categories, isCustomer }: Props) => {
     return (
         <Card
             className={clsx(CardBackgrounds, TextPrimary, 'xl:flex-row justify-between')}
@@ -154,12 +155,14 @@ const CarCard = ({ car, mutate, categories }: Props) => {
                         car={car}
                         mutate={mutate}
                         categories={categories}
+                        isCustomer={isCustomer}
                     />
                     <DeleteCar
                         brand={car.brand}
                         carId={car.id_car}
                         model={car.model}
                         mutate={mutate}
+                        isCustomer={isCustomer}
                     />
                 </section>
             </CardBody>

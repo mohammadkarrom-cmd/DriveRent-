@@ -29,10 +29,11 @@ type Props = {
     car: CarType
     categories: CategoryType[],
     mutate: KeyedMutator<AxiosResponse<unknown, unknown>>
+    isCustomer?: boolean
 }
 
 
-function EditCarModalHandler({ car, mutate, categories }: Props) {
+function EditCarModalHandler({ car, mutate, categories, isCustomer }: Props) {
     const { theme } = useSettingsContext();
     const open = useBoolean({ initialState: false });
     const loading = useBoolean({ initialState: false });
@@ -55,7 +56,6 @@ function EditCarModalHandler({ car, mutate, categories }: Props) {
         image1: car.image1,
         image2: car.image2,
         image3: car.image3,
-
     };
 
     const methods = useForm<UpdateCarSchema>({
@@ -92,7 +92,7 @@ function EditCarModalHandler({ car, mutate, categories }: Props) {
             formData.image3 = new File([blob], "image2.jpg", { type: blob.type });
         }
 
-        const promise = dataMutate(endpoints.cars.update(car.id_car), METHODS.PUT, formData, {
+        const promise = dataMutate(isCustomer ? endpoints.customer.customerCars.edit(car.id_car) : endpoints.cars.update(car.id_car), METHODS.PUT, formData, {
             headers: {
                 "Content-Type": "multipart/form-data"
             }
@@ -276,7 +276,7 @@ function EditCarModalHandler({ car, mutate, categories }: Props) {
                                             className: clsx(TextPrimary, "text-sm")
                                         }}
                                     />
-                                     <RHFCheckbox
+                                    <RHFCheckbox
                                         color='green'
                                         label='متاح البيع'
                                         name='is_for_sale'

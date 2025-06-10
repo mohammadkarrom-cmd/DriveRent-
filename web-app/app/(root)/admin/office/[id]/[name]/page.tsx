@@ -12,10 +12,15 @@ type Props = {
 const AdminOfficeManagersPage = async ({ params }: Props) => {
     const { name, id } = await params;
 
+    
+    const realName = decodeURIComponent(name)
+    
+    console.log(realName);
+
     return (
         <section>
             <AdminOfficeMangersContent
-                name={name}
+                name={realName}
                 id={id}
             />
         </section>

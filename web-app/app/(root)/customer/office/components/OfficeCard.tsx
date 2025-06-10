@@ -1,8 +1,10 @@
+import { paths } from "@/app/components/layout/config-nav"
 import { CardBackgrounds, TextPrimary } from "@/lib/ui/class/classNames"
-import { Card, CardBody, CardFooter, CardHeader, Chip, Rating, Typography } from "@/lib/ui/MTFix"
+import { Button, Card, CardBody, CardFooter, CardHeader, Chip, Rating, Typography } from "@/lib/ui/MTFix"
 import { AxiosResponse } from "axios"
 import clsx from "clsx"
 import Image from "next/image"
+import Link from "next/link"
 import { BsBuildingFill, BsFillPatchCheckFill, BsFillPatchExclamationFill } from "react-icons/bs"
 import { FaMapLocationDot, FaPhoneFlip } from "react-icons/fa6"
 import { KeyedMutator } from "swr"
@@ -11,11 +13,11 @@ import EvaluateOffice from "./EvaluateOffice"
 type Props = {
     office: OfficeType,
     evaluate?: boolean,
-    mutate: KeyedMutator<AxiosResponse<unknown, unknown>>,
-
+    mutate?: KeyedMutator<AxiosResponse<unknown, unknown>>,
+    view: boolean
 }
 
-const OfficeCard = ({ office, evaluate,mutate }: Props) => {
+const OfficeCard = ({ office, evaluate, mutate, view }: Props) => {
     return (
         <Card
             className={clsx(CardBackgrounds, "p-0 rounded-md")}
@@ -28,7 +30,7 @@ const OfficeCard = ({ office, evaluate,mutate }: Props) => {
             >
                 <Image
                     src={office.image}
-                    className="h-full w-full object-cover"
+                    className="object-cover w-[375px] h-[350px]"
                     alt={office.name}
                     width={500}
                     height={500}
@@ -62,7 +64,7 @@ const OfficeCard = ({ office, evaluate,mutate }: Props) => {
                         {office.location}
                     </Typography>
                     <div
-                        className="flex w-full justify-between items-center flex-wrap mt-2"
+                        className="flex w-full justify-between items-center flex-wrap mt-2 gap-x-3"
                     >
                         <Typography
                             variant="paragraph"
@@ -86,14 +88,29 @@ const OfficeCard = ({ office, evaluate,mutate }: Props) => {
             >
                 <Rating
                     readonly
-                    value={office?.ratings?.total_rating || 0}
+                    value={office.ratings ? parseInt(office?.ratings.toString()) : 0}
+                    count={5}
                 />
                 {
-                    evaluate &&
+                    evaluate && mutate &&
                     <EvaluateOffice
                         officeId={office.id_office}
                         mutate={mutate}
                     />
+                }
+                {
+                    view &&
+                    <Link
+                        href={paths.offices.office(office.id_office)}
+                    >
+                        <Button
+                            color="green"
+                            size="sm"
+                            className="flex justify-center items-center gap-0.5"
+                        >
+                            عرض المكتب
+                        </Button>
+                    </Link>
                 }
             </CardFooter>
         </Card>

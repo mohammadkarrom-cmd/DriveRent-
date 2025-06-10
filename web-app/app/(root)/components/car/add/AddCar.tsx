@@ -46,6 +46,8 @@ const AddCar = ({ mutate, categories,isCustomer }: Props) => {
         is_available_daily: true,
         is_available_monthly: true,
         is_available_yearly: true,
+        is_for_sale: true,
+        sale_price: 0,
         daily_rent_price: 0,
         monthly_rent_price: 0,
         yearly_rent_price: 0,

@@ -6,11 +6,12 @@ import OfficeCard from "./OfficeCard"
 type Props = {
     offices: OfficeType[]
     evaluate?: boolean,
-    mutate: KeyedMutator<AxiosResponse<unknown, unknown>>,
+    mutate?: KeyedMutator<AxiosResponse<unknown, unknown>>,
+    view?: boolean
 }
 
-const OfficesList = ({ offices,evaluate,mutate }: Props) => {
-    if (offices.length < 1) {
+const OfficesList = ({ offices, evaluate, mutate,view }: Props) => {
+    if (offices?.length === 0) {
         return <Empty
             title="لا يوجد مكاتب بعد قم بمراجعة الصفحة في وقت أخر"
         />
@@ -29,11 +30,12 @@ const OfficesList = ({ offices,evaluate,mutate }: Props) => {
                                 office={office}
                                 evaluate={evaluate}
                                 mutate={mutate}
+                                view={view}
                             />
                         </li>
                     ))
                 }
-                
+
             </ul>
         )
     }

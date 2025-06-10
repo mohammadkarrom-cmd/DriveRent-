@@ -4,7 +4,7 @@ import { ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 
 import { CardBackgrounds, TextSecondary } from "@/lib/ui/class/classNames";
-import { Card, CardBody, CardHeader, Typography } from '@/lib/ui/MTFix'
+import { Card, CardBody, CardHeader, Typography } from '@/lib/ui/MTFix';
 import clsx from 'clsx';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });

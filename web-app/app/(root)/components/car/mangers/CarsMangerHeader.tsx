@@ -31,7 +31,7 @@ const CarsMangerHeader = ({ model, setModel, brand, setBrand, category, setCateg
                 }}
                 tabIndex={100}
                 menuProps={{
-                    className: clsx(Backgrounds, shadowPrimary, TextPrimary, "shadow border-none z-50"),
+                    className: clsx(Backgrounds, shadowPrimary, TextPrimary, "shadow border-none z-50 max-h-[100px] overflow-scroll"),
                     tabIndex: 100
                 }}
             >

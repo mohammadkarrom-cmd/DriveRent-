@@ -30,7 +30,8 @@ export const endpoints = {
             }
             return `car/serche/?brand=${brand}&model=${model}&category=${category}`
         },
-        rating: "/car/ratings/"
+        rating: "/car/ratings/",
+        categories: "/car/customer/category-list/"
     },
     admin: {
         office: {
@@ -58,11 +59,14 @@ export const endpoints = {
         temporaryReservations: "/car/my-temporary-reservations/",
         cancel: (id: number) => `/car/reserve/cancel/${id}/`,
         evaluations: {
-            evaluableOffices: "/car/customer/evaluable-offices/"
+            evaluableOffices: "/car/customer/evaluable-offices/",
+            rate: (id:number) => `/car/customer/evaluate-office/${id}/`
         },
         customerCars: {
             list: "/car/customer/list-create/",
             add: "/car/customer/list-create/",
+            edit: (id:number) => `/car/customer/detail-car/${id}/`,
+            delete: (id:number) => `/car/customer/detail-car/${id}/`,
             search: (brand?: string, model?: string, category?: string) => {
                 if (!brand && !model && !category) {
                     return false;
@@ -104,6 +108,10 @@ export const endpoints = {
         fake: {
             list: "/car/list/fake-reservations/"
         }
+    },
+    offices: {
+        list: "/car/customer/offices-list/",
+        get:(id: number) => `/car/customer/office/${id}/`
     },
     home: "/car/home/"
 

@@ -1,6 +1,7 @@
 "use client"
 
 import TopCarCard from '@/app/(root)/components/car/TopCarCard'
+import Error from '@/app/(root)/error'
 import { endpoints } from '@/app/api/common'
 import NormalLoading from '@/app/components/loaders/NormalLoading'
 import SimplePagination from '@/app/components/Pagination/SimplePagination'
@@ -8,7 +9,7 @@ import Empty from '@/app/components/views/Empty'
 import fetchApi from '@/lib/api/data/dataFetcher'
 import useBoolean from '@/lib/hooks/use-boolean'
 import { Backgrounds, shadowPrimary, TextPrimary } from '@/lib/ui/class/classNames'
-import { Select, Option, Button } from '@/lib/ui/MTFix'
+import { Button, Option, Select } from '@/lib/ui/MTFix'
 import { splitArrayIntoChunks } from '@/lib/utils/arrays'
 import { AxiosError } from 'axios'
 import clsx from 'clsx'
@@ -16,6 +17,7 @@ import { uniqueId } from 'lodash'
 import { useState } from 'react'
 import { TbBrandGoogleBigQuery } from 'react-icons/tb'
 import { toast } from 'react-toastify'
+import useSWR from 'swr'
 
 
 const SearchSection = () => {
@@ -59,6 +61,18 @@ const SearchSection = () => {
         loading.onFalse();
     }
 
+    const { data: data, error, isLoading } = useSWR(endpoints.cars.categories, fetchApi);
+
+    
+    if (isLoading) {
+        return <NormalLoading />
+    }
+    if (error) {
+        return Error(error)
+    }
+    
+    const categories = data.data as CategoryType[];
+    
     return (
         <section>
             <section
@@ -87,36 +101,17 @@ const SearchSection = () => {
                         >
                             غير محدد
                         </Option>
-                        <Option
-                            value='1'
-                            className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                        >
-                            فاخرة
-                        </Option>
-                        <Option
-                            value='2'
-                            className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                        >
-                            اقتصادية
-                        </Option>
-                        <Option
-                            value='3'
-                            className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                        >
-                            رياضية
-                        </Option>
-                        <Option
-                            value='4'
-                            className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                        >
-                            شاحنة خفيفة (بيك أب)
-                        </Option>
-                        <Option
-                            value='5'
-                            className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
-                        >
-                            كهربائية
-                        </Option>
+                        {
+                            categories.map((category) => (
+                                <Option
+                                    value={category.id_car_type.toString()}
+                                    key={category.id_car_type}
+                                    className={clsx(Backgrounds, TextPrimary, "hover:bg-background-card-light dark:hover:bg-background-card-dark")}
+                                >
+                                    {category.name}
+                                </Option>
+                            ))
+                        }
                     </Select>
                 </div>
                 <div

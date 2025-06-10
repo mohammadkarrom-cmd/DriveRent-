@@ -44,6 +44,46 @@ type CarType = {
     owner_customer: null | string
 }
 
+type CarReversionsType = {
+    start_date: string
+    end_date: string
+    type_reservation: number
+    time_reservation: string
+}
+type CarDetailsType = {
+    id_car: number
+    brand: string
+    model: string
+    description: string
+    category: number
+    category_disaply: string
+    is_available_daily: boolean
+    is_available_monthly: boolean
+    is_available_yearly: boolean
+    is_for_sale: boolean
+    daily_rent_price: number
+    monthly_rent_price: number
+    yearly_rent_price: number
+    sale_price: number
+    image1: string
+    image2: string
+    image3: string
+    status: number | string
+    status_disaply: string
+    owner_office: null | OfficeType
+    owner_customer: null | {
+        id: number
+        first_name: string
+        last_name: string
+        phone: string,
+        email: string
+    }
+}
+
+type CarDetailsPageType = {
+    car: CarDetailsType,
+    reservations: CarReversionsType[]
+}
 
 type EmployeeType = {
     id: number,
@@ -64,7 +104,8 @@ type rolesType = 'manager' | 'employee' | "customer";
 
 type customerHomeType = {
     cars_new: CarType[]
-    cars_random: CarType[]
+    cars_random: CarType[],
+    offices: OfficeType[]
 }
 
 type reservationsType = {
@@ -108,7 +149,7 @@ type OfficeType = {
     phone_number_2: string,
     image: string,
     status_office: boolean,
-    ratings?: OfficeRatingType
+    ratings?: number
 }
 
 type OfficeManger = {
@@ -178,4 +219,9 @@ type OfficeRatingType = {
 type AllCarsType = {
     cars: CarType[]
     cars_category: CategoryType[]
+}
+
+type OfficePageType = {
+    office: OfficeType
+    cars: CarType[]
 }

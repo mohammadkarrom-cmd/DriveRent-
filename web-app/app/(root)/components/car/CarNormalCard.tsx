@@ -1,6 +1,5 @@
 import { paths } from '@/app/components/layout/config-nav'
 import MyCarousel from '@/app/components/views/MyCarousel'
-import { carCategoryParser } from '@/lib/api/data/carCategory'
 import { CardBackgrounds, TextPrimary, TextSecondary } from '@/lib/ui/class/classNames'
 import { Button, Card, CardBody, CardFooter, CardHeader, Chip, Typography } from '@/lib/ui/MTFix'
 import clsx from 'clsx'
@@ -53,7 +52,7 @@ const CarNormalCard = ({ car }: Props) => {
                                 className='w-fit flex items-center gap-1'
                             >
                                 <GiSteeringWheel />
-                                {carCategoryParser(car.category)}
+                                {car.category_disaply}
                             </Typography>
                             <Typography
                                 variant='paragraph'

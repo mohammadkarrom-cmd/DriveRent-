@@ -1,6 +1,6 @@
-import LODASH from "lodash";
-import { ApexOptions } from "apexcharts";
 import { useSettingsContext } from "@/lib/context/settings/setting-context";
+import { ApexOptions } from "apexcharts";
+import LODASH from "lodash";
 
 interface Options extends ApexOptions {
   [key: string]: unknown;
@@ -14,6 +14,15 @@ export interface AreaAndBarChartProps {
 export interface RadialAndDonutAndPieChartProps {
   labels: string[];
   series: number[];
+}
+
+export interface RadarSeriesProps {
+  name: string
+  data: number[]
+};
+export interface RadarChartProps {
+  categories: string[] | number[] | Date[];
+  series: RadarSeriesProps[]
 }
 
 // Define your Tailwind colors here

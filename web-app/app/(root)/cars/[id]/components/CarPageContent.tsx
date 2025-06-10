@@ -3,7 +3,6 @@
 import Error from '@/app/(root)/error';
 import { endpoints } from '@/app/api/common';
 import NormalLoading from '@/app/components/loaders/NormalLoading';
-import { carCategoryParser } from '@/lib/api/data/carCategory';
 import fetchApi from '@/lib/api/data/dataFetcher';
 import { CardBackgrounds, TextSecondary } from '@/lib/ui/class/classNames';
 import { Chip, Typography } from '@/lib/ui/MTFix';
@@ -70,7 +69,7 @@ const CarPageContent = ({ id }: Props) => {
                         className='w-fit flex items-center gap-1 text-xl'
                     >
                         <GiSteeringWheel />
-                        {carCategoryParser(car.category)}
+                        {car.category_disaply}
                     </Typography>
                     {/* <Chip
                     value={car.status === 1 ? "متاحة" : car.status === 2 ? "حجز مؤقت" : car.status === 3 ? "محجوزة" : "منتهية الصلاحية"}

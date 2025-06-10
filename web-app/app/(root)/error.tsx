@@ -3,7 +3,6 @@ import { CardBackgrounds, TextPrimary } from '@/lib/ui/class/classNames'
 import { Button, Card, CardBody, CardFooter, CardHeader, Typography } from '@/lib/ui/MTFix'
 import clsx from 'clsx'
 import Link from 'next/link'
-import { useEffect } from 'react'
 import { MdHeartBroken } from 'react-icons/md'
 import { paths } from '../components/layout/config-nav'
 
@@ -17,10 +16,7 @@ function Error({
 }) {
 
 
-  useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error)
-  }, [error]);
+console.log(error);
 
   return (
     <section

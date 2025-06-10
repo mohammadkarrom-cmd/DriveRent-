@@ -78,7 +78,7 @@ const CarsManger = ({ response, mutate,isCustomer }: Props) => {
             shadow={false}
         >
             <CardHeader
-                // floated={false}
+                floated={false}
                 shadow={false}
                 color='transparent'
                 className={clsx('text-inherit p-5 m-0 mb-5 border-b rounded-b-none', BorderPrimary)}

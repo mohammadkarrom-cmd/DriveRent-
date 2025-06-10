@@ -45,12 +45,13 @@ const CarsPageContent = () => {
     ))
 
     cars.cars.forEach(car => {
-        if (car.status === 1) {
+        if (car.status === "متاحة") {
             recommendedCars.cars.push(car)
         };
 
         categories.forEach(category => {
             if (car.category === category.value) {
+                car.category_disaply = category.title
                 category.cars.push(car)
             }
         });

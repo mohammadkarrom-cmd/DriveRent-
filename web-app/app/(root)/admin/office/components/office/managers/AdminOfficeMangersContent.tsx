@@ -26,7 +26,7 @@ const AdminOfficeMangersContent = ({ id, name }: Props) => {
         }
     }
 
-    console.log(accounts.data);
+    console.log(name);
 
     return (
         <div>

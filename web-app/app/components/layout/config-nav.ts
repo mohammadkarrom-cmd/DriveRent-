@@ -1,3 +1,4 @@
+import { BsBuildingFill } from "react-icons/bs";
 import { FaFacebook } from "react-icons/fa";
 import { FaTelegram } from "react-icons/fa6";
 import { IoIosHome } from "react-icons/io";
@@ -23,7 +24,12 @@ export const paths = {
         home: "/admin",
         office: {
             list: "/admin/office",
-            managers: (id: number, name: string) => `/admin/office/${id}/${name}`
+            managers: (id: number, name: string) => {
+                const safeName = encodeURIComponent(name);
+                const url = `/admin/office/${id}/${safeName}`;
+
+                return url;
+            }
         },
         customers: {
             list: "/admin/customers"
@@ -47,8 +53,12 @@ export const paths = {
         temporaryReservations: "/customer/temporary-reservations",
         cars: "/customer/cars",
         office: {
-            evaluate: "customer/office/evaluate"
+            evaluate: "/customer/office/evaluate"
         }
+    },
+    offices: {
+        index: "/offices",
+        office: (id: number) => `/offices/${id}`
     }
 };
 
@@ -88,6 +98,11 @@ export const appNavLinks: AppNavLinkType[] = [
         label: "البحث",
         href: paths.cars.search,
         icon: TbBrandGoogleBigQuery
+    },
+    {
+        label: "المكاتب",
+        href: paths.offices.index,
+        icon: BsBuildingFill
     },
 ]
 

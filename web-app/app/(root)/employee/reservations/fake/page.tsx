@@ -1,9 +1,8 @@
 import PageHeader from '@/app/components/layout/header/PageHeader'
 import NormalLoading from '@/app/components/loaders/NormalLoading'
 import dynamic from 'next/dynamic'
-import FakeReservation from '../components/FakeReservation'
 
-const TemporaryReservations = dynamic(() => import("../components/TemporaryReservations"), { loading: () => <NormalLoading /> })
+const FakeReservation = dynamic(() => import("../components/FakeReservation"), { loading: () => <NormalLoading /> })
 
 const page = () => {
 

@@ -36,7 +36,7 @@ const CarsMangerContent = () => {
     return (
         <>
             <ManagementPageHeader
-                title='مخزون السيارات'
+                title='قائمة السيارات'
                 body='هنا يمكنك عرض جميع السيارات وإدارتها'
                 actions={<AddCar mutate={mutate} categories={data.category_list} />}
             />

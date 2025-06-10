@@ -16,7 +16,7 @@ import { PiCurrencyDollarBold } from 'react-icons/pi'
 import { toast } from 'react-toastify'
 
 type Props = {
-    car: CarType,
+    car: CarDetailsType,
     available: boolean
 }
 
@@ -26,7 +26,7 @@ type reservationRequest = {
     type_reservation: number,
 }
 
-const ReserveButton = ({ car,available }: Props) => {
+const ReserveButton = ({ car, available }: Props) => {
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
@@ -80,7 +80,8 @@ const ReserveButton = ({ car,available }: Props) => {
                 <Button
                     color='green'
                     size='lg'
-                    className='text-center w-full lg:w-fit'
+                    className='text-center'
+                    fullWidth
                     onClick={open.onTrue}
                     disabled={!available}
                 >
@@ -181,6 +182,18 @@ const ReserveButton = ({ car,available }: Props) => {
                     </DialogFooter>
                 </Dialog>
             </>
+        )
+    } else {
+        return (
+            <Button
+                color='green'
+                size='lg'
+                className='text-center'
+                fullWidth
+                disabled
+                >
+                حجز
+            </Button>
         )
     }
 }

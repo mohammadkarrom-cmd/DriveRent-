@@ -1,17 +1,22 @@
 "use client";
 
+import { endpoints } from "@/app/api/common";
 import MyFormProvider from "@/app/components/form/MyFormProvider";
 import RHFRatting from "@/app/components/form/RHFRatting";
 import RHFTextArea from "@/app/components/form/RHFTextArea";
+import dataMutate from "@/lib/api/data/dataMutate";
 import { RatingOfficeSchema, RattingOfficeType } from "@/lib/api/data/zod/schemas";
+import { METHODS } from "@/lib/api/setup/api";
 import useBoolean from "@/lib/hooks/use-boolean";
 import { CardBackgrounds } from "@/lib/ui/class/classNames";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Dialog, DialogBody, DialogFooter, DialogHeader, Typography } from "@material-tailwind/react";
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import clsx from "clsx";
+import { isArray } from "lodash";
 import { useForm } from "react-hook-form";
 import { GiFallingStar } from "react-icons/gi";
+import { toast } from "react-toastify";
 import { KeyedMutator } from "swr";
 
 type Props = {
@@ -35,28 +40,39 @@ const EvaluateOffice = ({ officeId, mutate }: Props) => {
     });
 
     const onSubmit = async (data: RattingOfficeType) => {
-        // loading.onTrue();
-        // const promise = dataMutate(endpoints.cars.add, METHODS.POST, data, {
-        //     headers: {
-        //         "Content-Type": "multipart/form-data"
-        //     }
-        // });
-        // await promise.then(() => {
-        //     mutate();
-        //     loading.onFalse();
-        //     methods.reset();
-        //     open.onFalse();
-        //     toast.success("تم اضافة السيارة بنجاح")
-        // }).catch(error => {
-        //     if (error instanceof AxiosError && error.status === 400) {
-        //         toast.error("حدث خطأ أثناء اضافة السيارة")
-        //     } else {
-        //         console.log(error);
-        //     }
-        //     loading.onFalse();
-        // })
-        console.log(data);
-
+        loading.onTrue();
+        const promise = dataMutate(endpoints.customer.evaluations.rate(officeId), METHODS.POST, data, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
+        await promise.then(() => {
+            mutate();
+            loading.onFalse();
+            methods.reset();
+            open.onFalse();
+            toast.success("تم تقييم المكتب بنجاح")
+        }).catch(error => {
+            open.onFalse();
+            loading.onFalse();
+            if (error instanceof AxiosError) {
+                if (error.response.data && error.response.data?.message) {
+                    if (isArray(error.response.data?.message)) {
+                        error.response.data?.message.map((m) => {
+                            toast.error(m)
+                        })
+                    } else {
+                        toast.error(error.response.data?.message)
+                    }
+                } else if (error.status === 400) {
+                    toast.error("حدث خطأ أثناء تقييم المكتب")
+                } else {
+                    toast.error("خطأ بالأتصال")
+                }
+            } else {
+                toast.error("خطأ بالأتصال")
+            }
+        })
     };
 
     return (
@@ -67,7 +83,7 @@ const EvaluateOffice = ({ officeId, mutate }: Props) => {
                 className="flex justify-center items-center gap-0.5"
                 onClick={open.onTrue}
             >
-                <GiFallingStar/>
+                <GiFallingStar />
                 تقييم
             </Button>
 

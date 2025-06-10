@@ -1,7 +1,12 @@
+import AdminStatics from "./components/AdminStatics"
+import AdminStaticsHeader from "./components/AdminStaticsHeader"
 
 const AdminHomePage = () => {
   return (
-    <div>AdminHomePage</div>
+    <div className="p-5">
+      <AdminStaticsHeader />
+      <AdminStatics />
+    </div>
   )
 }
 

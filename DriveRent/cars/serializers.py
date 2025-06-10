@@ -271,6 +271,7 @@ class CarCustomerListSerializer(serializers.ModelSerializer):
     owner_office = serializers.SerializerMethodField()
     owner_customer = serializers.SerializerMethodField()
     status=serializers.SerializerMethodField()
+    category_disaply=serializers.CharField(source='category.name' ,read_only=True)
     class Meta:
         model = models.Car
         fields = '__all__'

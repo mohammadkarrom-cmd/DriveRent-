@@ -33,11 +33,12 @@ const OfficeRatings = ({ officeRating }: Props) => {
                     </Typography>
                     <div>
 
-                    <Rating
-                        value={parseInt(officeRating.total_rating.toFixed(0))}
-                        
+                        <Rating
+                            value={officeRating.total_rating ? parseInt(officeRating.total_rating.toString()) : 0}
+                            count={5}
+                            readonly
                         />
-                        </div>
+                    </div>
                 </div>
             </CardHeader>
             <CardBody

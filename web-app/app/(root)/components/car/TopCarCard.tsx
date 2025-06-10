@@ -1,5 +1,4 @@
 import { paths } from '@/app/components/layout/config-nav'
-import { carCategoryParser } from '@/lib/api/data/carCategory'
 import { CardBackgrounds, TextSecondary } from '@/lib/ui/class/classNames'
 import { Button, Card, CardBody, CardHeader, Chip, Typography } from '@/lib/ui/MTFix'
 import { TextSlice } from '@/lib/utils/textFormaters'
@@ -65,7 +64,7 @@ const TopCarCard = ({ car }: Props) => {
                         className='w-fit flex items-center gap-1'
                     >
                         <GiSteeringWheel />
-                        {carCategoryParser(car.category)}
+                        {car.category_disaply}
                     </Typography>
                     <Typography
                         variant='paragraph'

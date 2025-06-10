@@ -1,4 +1,5 @@
-import CarPageContent from "./components/CarPageContent";
+import dynamic from 'next/dynamic';
+const CarPageContentTest  = dynamic(() => import("./components/CarPageContentTest"));
 
 
 type Props = {
@@ -29,7 +30,7 @@ const CarPage = async ({ params }: Props) => {
 
     return (
         <>
-            <CarPageContent
+            <CarPageContentTest
                 id={id}
             />
         </>

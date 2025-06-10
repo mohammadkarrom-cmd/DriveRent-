@@ -1,3 +1,5 @@
+"use client"
+
 import useBoolean from '@/lib/hooks/use-boolean';
 import { Button } from '@material-tailwind/react';
 import { BiSolidUserDetail } from 'react-icons/bi';

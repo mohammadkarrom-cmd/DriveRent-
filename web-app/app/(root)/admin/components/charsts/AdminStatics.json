@@ -1,0 +1,44 @@
+{
+    "carsStatus": {
+      "labels": ["متاحة", "مباعة", "أجار يوي", "أجار شهري", "أجار سنوي", "حجز مؤقت"],
+      "series": [15, 3, 30, 17, 8, 40]
+    },
+    "carsCategories": {
+      "categories": ["رياضية", "كهرابائية", "فاخرة", "أقتصادية"],
+      "series": [
+        {
+          "name": "cars",
+          "data": [5, 3, 4, 7]
+        }
+      ]
+    },
+    "incomeBar": {
+      "chartData": {
+        "categories": ["Office A", "Office B", "Office C", "Office d", "Office e", "office f"],
+        "series": [
+          {
+            "name": "مبيع",
+            "data": [100000, 85000, 92000, 70000, 55000, 81000]
+          },
+          {
+            "name": "أجار يومي",
+            "data": [4000, 3000, 4500, 1000, 3000, 25000]
+          },
+          {
+            "name": "أجار شهري",
+            "data": [2000, 1500, 2250, 500, 1200, 12500]
+          },
+          {
+            "name": "أجار سنوي",
+            "data": [40000, 30000, 45000, 10000, 30000, 25000]
+          }
+        ]
+      },
+      "total": 1000000
+    },
+    "customerCount": 50,
+    "officesCount": 10,
+    "categoriesCount": 7,
+    "carsCount": 40
+  }
+  

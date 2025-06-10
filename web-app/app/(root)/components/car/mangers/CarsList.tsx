@@ -34,6 +34,7 @@ const CarsList = ({ cars, mutate, categories,isCustomer }: Props) => {
                                         car={car}
                                         categories={categories}
                                         mutate={mutate}
+                                        isCustomer={isCustomer}
                                     />
                                 </motion.div>
                             ))
