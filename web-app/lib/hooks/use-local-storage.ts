@@ -12,7 +12,11 @@ type UseLocalStorageReturn = {
 
 export const useLocalStorage = (key: string, defaultValue: StorageValueType): UseLocalStorageReturn => {
     //# default value for storage item
-    const [value, setValue] = useState<StorageValueType>(defaultValue);
+    const [value, setValue] = useState<StorageValueType>(() => {
+        const storedValue = getFromStorage(key);
+        return storedValue ? { ...defaultValue, ...storedValue } : defaultValue;
+      });
+      
 
     //! handle effect of changing the item key
     useEffect(() => {

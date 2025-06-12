@@ -1,6 +1,6 @@
 "use client"
 
-import Error from '@/app/(root)/error';
+import Error from '@/app/(admin)/error';
 import { endpoints } from '@/app/api/common';
 import ManagementPageHeader from '@/app/components/layout/header/ManagementPageHeader';
 import NormalLoading from '@/app/components/loaders/NormalLoading';

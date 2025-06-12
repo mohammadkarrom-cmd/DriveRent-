@@ -1,10 +1,11 @@
 "use client"
 
-import { ReactNode, useEffect } from "react";
-import { StatusType, useAuthContext } from "../context/auth/auth-context";
 import { paths } from "@/app/components/layout/config-nav";
-import { redirect } from "next/navigation";
 import NormalLoading from "@/app/components/loaders/NormalLoading";
+import { redirect } from "next/navigation";
+import { ReactNode, useEffect } from "react";
+import { toast } from "react-toastify";
+import { StatusType, useAuthContext } from "../context/auth/auth-context";
 
 type Props = {
   children: ReactNode
@@ -34,6 +35,8 @@ const AuthGuardContainer = ({ children, status }: GuardProps) => {
   useEffect(() => {
     if (status === 'unauthenticated') {
       // toast.error("login first please",{toastId: "auth-guard"})
+      toast.warning("غير مصرح لك بدخول هذه الصفحة", { toastId: "roleGuard" })
+
       redirect(paths.home)
     }
   }, [status])

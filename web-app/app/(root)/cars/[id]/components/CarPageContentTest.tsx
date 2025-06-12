@@ -303,9 +303,10 @@ const CarPageContentTest = ({ id }: Props) => {
                     </Typography>
                     <ul className='flex flex-col p-5 max-h-96 overflow-scroll gap-5'>
                         {
-                            carData.reservations.map((reservation) => (
+                            carData.reservations.map((reservation, index) => (
                                 <li
                                     className={clsx(CardBackgrounds, "p-5 rounded-md shadow-sm shadow-current")}
+                                    key={index}
                                 >
                                     <div
                                         className='flex justify-start items-center gap-10 flex-wrap'

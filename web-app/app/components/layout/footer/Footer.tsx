@@ -1,11 +1,10 @@
-import React from 'react'
-import { footerLinks, socialLinks } from '../config-nav'
-import { Typography } from "@/lib/ui/MTFix"
-import SocialSection from './SocialSection'
-import PagesSection from './PagesSection'
-import clsx from 'clsx'
 import { CardBackgrounds } from '@/lib/ui/class/classNames'
+import { Typography } from "@/lib/ui/MTFix"
+import clsx from 'clsx'
 import NextLogo from '../../NextLogo'
+import { footerLinks, socialLinks } from '../config-nav'
+import PagesSection from './PagesSection'
+import SocialSection from './SocialSection'
 
 
 function Footer() {

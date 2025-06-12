@@ -7,10 +7,10 @@ const AdminStaticsWarper = dynamic(() => import("./components/AdminStaticsWarper
 
 const AdminHomePage = () => {
   return (
-    <div className="p-5">
+    <>
       <AdminStaticsHeader />
       <AdminStaticsWarper />
-    </div>
+    </>
   )
 }
 

@@ -25,7 +25,7 @@ const MobileNavMenu = () => {
                 </IconButton>
             </MenuHandler>
             <MenuList
-                className={clsx(CardBackgrounds, 'w-full md:hidden mx-1 shadow-blue-gray-900 border-none gap-2')}
+                className={clsx(CardBackgrounds, 'w-full lg:hidden mx-1 shadow-blue-gray-900 border-none gap-2')}
             >
                 {
                     appNavLinks.map(link => (

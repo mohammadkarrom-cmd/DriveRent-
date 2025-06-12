@@ -1,11 +1,15 @@
+import AuthGuard from "@/lib/guards/auth-guard";
+import RoleGuard from "@/lib/guards/role-guard";
 import AppProvider from "@/lib/providers";
 import { Backgrounds, TextPrimary } from "@/lib/ui/class/classNames";
 import clsx from "clsx";
 import type { Metadata } from "next";
-import CommonLayout from "../components/layout/commonLayout";
+import AdminLayout from "../components/layout/admin/AdminLayout";
 import NavLinks from "../components/layout/commonLayout/NavLinks";
 import MobileNavMenu from "../components/layout/mobile/MobileNavMenu";
+import { ROLES } from "../constants";
 import "../globals.css";
+import { adminLinks } from "./admin/config";
 
 
 export const metadata: Metadata = {
@@ -42,24 +46,31 @@ export default function RootLayout({
           <span id="shadowSecondary" className="shadow-background-card-dark dark:shadow-background-card-light"></span>
         </>
         <AppProvider>
-          <CommonLayout
-            navLinks={
-              <section>
-                <div
-                  className="hidden lg:block"
-                >
-                  <NavLinks />
-                </div>
-                <div
-                  className="lg:hidden"
-                >
-                  <MobileNavMenu />
-                </div>
-              </section>
-            }
-          >
-            {children}
-          </CommonLayout>
+          <AuthGuard>
+            <RoleGuard
+              roles={[ROLES.ADMIN]}
+            >
+              <AdminLayout
+                MenuLink={adminLinks}
+                navLinks={
+                  <section>
+                    <div
+                      className="hidden lg:block"
+                    >
+                      <NavLinks />
+                    </div>
+                    <div
+                      className="lg:hidden"
+                    >
+                      <MobileNavMenu />
+                    </div>
+                  </section>
+                }
+              >
+                {children}
+              </AdminLayout>
+            </RoleGuard>
+          </AuthGuard>
         </AppProvider>
       </body>
     </html>

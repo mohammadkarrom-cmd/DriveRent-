@@ -3,9 +3,7 @@
 import PageHeader from "@/app/components/layout/header/PageHeader";
 import { useAuthContext } from "@/lib/context/auth/auth-context";
 
-type Props = {}
-
-const ManStatHeader = (props: Props) => {
+const ManStatHeader = () => {
   const { user } = useAuthContext();
 
   return (

@@ -5,8 +5,8 @@ import { AreaAndBarChartProps, RadarChartProps, RadialAndDonutAndPieChartProps }
 import NormalLoading from "@/app/components/loaders/NormalLoading";
 import fetchApi from "@/lib/api/data/dataFetcher";
 import useSWR from "swr";
-import Error from "../../error";
 
+import Error from "@/app/(root)/error";
 import dynamic from "next/dynamic";
 const AdminStatics = dynamic(() => import("./AdminStatics"), { loading: () => <NormalLoading /> })
 

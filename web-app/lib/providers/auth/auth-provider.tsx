@@ -140,7 +140,7 @@ const AuthProvider = ({ children }: Props) => {
                 });
             }
         }),
-        [user, status, refreshToken, router]
+        [user, status, refreshToken.value.token]
     );
 
     return <AuthContext.Provider value={memoizedValues}>

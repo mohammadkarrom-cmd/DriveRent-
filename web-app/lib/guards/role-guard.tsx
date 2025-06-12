@@ -15,10 +15,12 @@ type Props = {
 const RoleGuard = ({ roles, children }: Props) => {
   const { user, status } = useAuthContext();
 
+
+
   useEffect(() => {
     if (status === "authenticated" && user && !roles.includes(user.role)) {
-      toast.warning("غير مصرح لك بدخول هذه الصفحة",{toastId: "roleGuard"})
-      
+      toast.warning("غير مصرح لك بدخول هذه الصفحة", { toastId: "roleGuard" })
+
       redirect(paths.home);
     }
   }, [status, user, roles]);

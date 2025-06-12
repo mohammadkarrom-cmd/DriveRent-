@@ -1,7 +1,7 @@
+import RatingsList from "@/app/(root)/components/rattings/RatingsList"
 import { CardBackgrounds, shadowSecondary, TextPrimary } from "@/lib/ui/class/classNames"
 import { Card, CardBody, CardHeader, Rating, Typography } from "@/lib/ui/MTFix"
 import clsx from "clsx"
-import RatingsList from "../../components/rattings/RatingsList"
 
 type Props = {
     officeRating: OfficeRatingType

@@ -13,16 +13,53 @@ export const endpoints = {
         update: (id: number) => `/car/detail/${id}/`,
         car: (id: number) => `/car/customer/detail/${id}/`,
         cars: "/car/list/",
-        customerSearch: (categoryId?: string, rentTypeId?: string) => {
-            if (categoryId && !rentTypeId) {
-                return `car/serche-customer/?category=${categoryId}`
-            } else if (!categoryId && rentTypeId) {
-                return `car/serche-customer/?type_rent=${rentTypeId}`
-            } else if (categoryId && rentTypeId) {
-                return `car/serche-customer/?category=${categoryId}&type_rent=${rentTypeId}`
-            } else {
+        customerSearch: (categoryId?: string, rentTypeId?: string, minPrice?: number, maxPrice?: number) => {
+            let firstParamSet: boolean = false;
+            let query: string = 'car/serche-customer/';
+            // ?category=${categoryId}&type_rent=${rentTypeId}
+
+            if (categoryId) {
+                if (firstParamSet) {
+                    query = query + `&category=${categoryId}`
+                } else {
+                    query = query + `?category=${categoryId}`
+                    firstParamSet = true;
+                }
+            }
+
+            if (rentTypeId) {
+                if (firstParamSet) {
+                    query = query + `&type_rent=${rentTypeId}`
+                } else {
+                    query = query + `?type_rent=${rentTypeId}`
+                    firstParamSet = true;
+                }
+            }
+
+            if (minPrice) {
+                if (firstParamSet) {
+                    query = query + `&min_price=${minPrice}`
+                } else {
+                    query = query + `?min_price=${minPrice}`
+                    firstParamSet = true;
+                }
+            }
+
+            if (maxPrice) {
+                if (firstParamSet) {
+                    query = query + `&max_price=${maxPrice}`
+                } else {
+                    query = query + `?max_price=${maxPrice}`
+                    firstParamSet = true;
+                }
+            }
+
+            if (!firstParamSet) {
                 return false;
             }
+
+            return query;
+
         },
         adminSearch: (brand?: string, model?: string, category?: string) => {
             if (!brand && !model && !category) {

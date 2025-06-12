@@ -1,7 +1,7 @@
-import React, { ReactNode } from 'react'
-import Header from '../nav/Header'
-import Main from '../main/Main'
+import { ReactNode } from 'react'
 import Footer from '../footer/Footer'
+import Main from '../main/Main'
+import Header from '../nav/Header'
 
 type Props = {
     children: ReactNode
@@ -16,10 +16,14 @@ const CommonLayout = ({ children, navLinks, drawer }: Props) => {
                 navigation={navLinks}
                 drawer={drawer}
             />
-            <Main>
-                {children}
-            </Main>
-            <Footer/>
+            <div
+                className='h-[calc(100vh-4rem)] overflow-y-scroll'
+            >
+                <Main>
+                    {children}
+                </Main>
+                <Footer />
+            </div>
         </>
     )
 }

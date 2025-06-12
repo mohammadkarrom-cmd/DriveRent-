@@ -45,11 +45,24 @@ const TopCarCard = ({ car }: Props) => {
                         <BiSolidCategory />
                         {car.brand}
                     </Typography>
-                    <Chip
-                        value={car.status}
-                        variant='filled'
-                        color={car.status === "متاحة" ? "green" : (car.status === "حجز مؤقت للأجار" || car.status === "حجز مؤقت للبيع" )? "amber" : (car.status === "محجوزة للأجار" || car.status === "مباعة") ? "blue" : "red"}
-                    />
+                    {
+                        typeof car.status === "string" &&
+                        <Chip
+                            value={car.status}
+                            variant='filled'
+                            color={car.status === "متاحة" ? "green" : (car.status === "حجز مؤقت للأجار" || car.status === "حجز مؤقت للبيع") ? "amber" : (car.status === "محجوزة للأجار" || car.status === "مباعة") ? "blue" : "red"}
+                            className='h-fit'
+                        />
+                    }
+                    {
+                        typeof car.status === "number" &&
+                        <Chip
+                            value={car.status_disaply}
+                            variant='filled'
+                            color={car.status === 1 ? "green" : (car.status === 2 || car.status === 4) ? "amber" : (car.status === 3 || car.status === 6) ? "blue" : "red"}
+                            className='h-fit'
+                        />
+                    }
                 </section>
                 <section className='flex gap-x-20 flex-wrap'>
                     <Typography
