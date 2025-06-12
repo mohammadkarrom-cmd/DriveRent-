@@ -26,8 +26,6 @@ const AdminOfficeMangersContent = ({ id, name }: Props) => {
         }
     }
 
-    console.log(name);
-
     return (
         <div>
             <ManagementPageHeader

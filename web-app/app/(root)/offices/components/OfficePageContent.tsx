@@ -26,7 +26,6 @@ const OfficePageContent = ({ id }: Props) => {
     if (error) {
         return Error(error)
     }
-    console.log(data);
 
     const office = data.data as OfficePageType
 

@@ -15,8 +15,6 @@ const AdminOfficeManagersPage = async ({ params }: Props) => {
     
     const realName = decodeURIComponent(name)
     
-    console.log(realName);
-
     return (
         <section>
             <AdminOfficeMangersContent

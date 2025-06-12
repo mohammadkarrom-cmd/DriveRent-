@@ -39,9 +39,6 @@ const AdminStaticsWarper = () => {
 
   const statics = data.data as AdminStaticsType
 
-  console.log(statics.incomeBar);
-  
-
 
   return (
     <AdminStatics

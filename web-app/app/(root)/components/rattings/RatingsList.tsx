@@ -7,7 +7,6 @@ type Props = {
 }
 
 const RatingsList = ({ ratings }: Props) => {
-  console.log(ratings);
 
   return (
     <>

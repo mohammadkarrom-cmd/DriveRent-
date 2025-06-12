@@ -28,8 +28,6 @@ const AdminPageContent2 = () => {
 
     const data = response.data as OfficeRatingType;
 
-    console.log(data);
-    
     return (
         <div>
             <OfficeRatings
